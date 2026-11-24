@@ -4,6 +4,8 @@ import {
   CheckCircle2,
   CircleDot,
   Clock,
+  Eye,
+  EyeOff,
   Inbox,
   Link2,
   PenLine,
@@ -15,7 +17,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import type { ApiError } from '@/lib/api';
 import { STATUS_LABEL } from '@/lib/rules';
 import type { IssueStatus } from '@/lib/types';
@@ -166,12 +168,25 @@ type FieldProps = {
 
 export function Field({ label, name, error, hint, textarea, ...rest }: FieldProps) {
   const id = `f-${name}`;
+  const [show, setShow] = useState(false);
   const describedBy = [hint && `${id}-h`, error && `${id}-e`].filter(Boolean).join(' ') || undefined;
   const common = { id, name, 'aria-invalid': !!error || undefined, 'aria-describedby': describedBy };
+  const isPassword = !textarea && rest.type === 'password';
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      {textarea ? <textarea className="textarea" {...common} {...rest} /> : <input className="input" {...common} {...rest} />}
+      {textarea ? (
+        <textarea className="textarea" {...common} {...rest} />
+      ) : isPassword ? (
+        <div className="pw">
+          <input className="input" {...common} {...rest} type={show ? 'text' : 'password'} />
+          <button type="button" className="pw-toggle" onClick={() => setShow(!show)} aria-label={show ? 'Parolni yashirish' : 'Parolni ko‘rsatish'} aria-pressed={show} aria-controls={id}>
+            {show ? <EyeOff size={20} aria-hidden /> : <Eye size={20} aria-hidden />}
+          </button>
+        </div>
+      ) : (
+        <input className="input" {...common} {...rest} />
+      )}
       {hint && (
         <span className="hint" id={`${id}-h`}>
           {hint}

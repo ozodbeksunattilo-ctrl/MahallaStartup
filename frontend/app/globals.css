@@ -120,6 +120,10 @@ p { margin: 0; }
 .input, .select, .textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); color: var(--ink); font: inherit; }
 .textarea { min-height: 96px; resize: vertical; }
 .input[aria-invalid='true'], .textarea[aria-invalid='true'] { border-color: var(--danger); }
+.pw { position: relative; }
+.pw .input { padding-right: 52px; }
+.pw-toggle { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 44px; height: 40px; display: grid; place-items: center; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--muted); cursor: pointer; }
+.pw-toggle:hover { color: var(--ink); background: var(--surface-2); }
 .check { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; }
 .check input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--primary); }
 
