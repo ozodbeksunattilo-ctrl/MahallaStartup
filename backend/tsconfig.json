@@ -16,5 +16,5 @@
     "noEmit": true,
     "rootDir": "."
   },
-  "include": ["src", "test", "scripts", "vitest.config.mts"]
+  "include": ["src", "api", "test", "scripts", "vitest.config.mts"]
 }

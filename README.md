@@ -6,7 +6,7 @@ Uchta **alohida, mustaqil** loyiha — har biri o'z papkasida, o'z `package.json
 
 ```
 backend/    Express 5 + PostgreSQL — API (to'liq), CLI, migratsiyalar, testlar, openapi.yaml
-frontend/   Next.js 16 admin veb-panel — skelet (barcha sahifalar bor, API'ga ulanish keyingi bosqich)
+frontend/   Next.js 16 admin veb-panel — backend API'ga to'liq ulangan
 mobile/     Expo SDK 58 (Android/iOS) — skelet
 docs/       DECISIONS.md, FOR_CLIENTS.md, ENDPOINTS.md
 legacy/     Eski Vite shabloni (kerak emas, o'chirish mumkin)
@@ -51,7 +51,7 @@ Ildizdagi qisqa buyruqlar: `pnpm install:all`, `pnpm dev:backend`, `pnpm dev:fro
 | Backend: holat mashinasi, ish natijasi, muallif fikri | tayyor |
 | Backend: bildirishnoma + push, chat (REST + Socket.IO), shikoyat, tadbir, e'lon, `/home`, dashboard, audit | tayyor |
 | Backend: seed, bench, OpenAPI (avtomatik), testlar | tayyor (`pnpm test`: 13 fayl, 80 test) |
-| Frontend (admin) | skelet: 21 marshrut, login/parol almashtirish API'ga ulangan |
+| Frontend (admin) | backendga ulangan: dashboard, moderatsiya, muammolar va holat o'tishlari, ovoz natijalari, aholi, tadbirlar, e'lonlar, shikoyatlar, audit (`pnpm test`: 4 test) |
 | Mobil | skelet (shu bosqichda o'zgartirilmadi) |
 
 75 ta endpoint: [docs/ENDPOINTS.md](docs/ENDPOINTS.md) · shartnoma: [backend/openapi.yaml](backend/openapi.yaml) ·
@@ -63,7 +63,7 @@ mijozlar uchun: [docs/FOR_CLIENTS.md](docs/FOR_CLIENTS.md) · qarorlar: [docs/DE
 - **Redis** (`ioredis` keshi, rate limit, Socket.IO Redis adapter) va **S3/MinIO** (presigned URL) yo'llari — o'rnatilmagani uchun sinalmadi; lokal rejimdagi muqobillari testlangan.
 - **Push**: Expo API testlarda soxtalashtirilgan (yuborish, `DeviceNotRegistered` tokenni o'chirish tekshirilgan); real qurilmada va `EXPO_ACCESS_TOKEN` bilan sinalmadi. Receipt tekshiruvi xotirada (qayta ishga tushganda yo'qoladi).
 - **Video**: o'zgartirilmay saqlanadi — metadata (GPS) tozalash va transkodlash keyingi bosqich.
-- **TZ** (`MAHALLADOSH_TZ_CLAUDE.md`) faqat sherik branch'ida (`origin/frontend/admin-panel`) bor ekan; backend yorliqlari va qoidalari unga moslandi. Mobil skeletining pastki navigatsiyasi TZ dan farq qiladi (TZ: Bosh sahifa, Muammolar, Tadbirlar, Chat, Profil) — mobil dasturchi moslashtiradi. Sherikning `apps/admin` paneli va `docs/api-contract.md` qoralamasi alohida branch'da: nomlar farqi `docs/FOR_CLIENTS.md` da.
+- **TZ**: `MAHALLADOSH_TZ_CLAUDE.md` (ildizda). Mobil skeletining pastki navigatsiyasi TZ dan farq qiladi (TZ: Bosh sahifa, Muammolar, Tadbirlar, Chat, Profil) — mobil dasturchi moslashtiradi. Mobil dizayn topshirig'i va tokenlar: [docs/design/README.md](docs/design/README.md).
 - Frontend/mobil API'ga to'liq ulanmagan; mobilda `EXPO_PUBLIC_SKIP_AUTH=true` (ekranlarni ko'rish uchun).
 
 ## Xato kodlari

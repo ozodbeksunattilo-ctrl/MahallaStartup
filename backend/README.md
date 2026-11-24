@@ -87,3 +87,18 @@ haqiqiy javoblarni `src/contract/responses.ts` sxemalari bilan solishtiradi.
 
 Maqsad p95 < 150 ms bajarildi. PGlite bitta ulanishli, haqiqiy Postgres'da raqamlar boshqacha bo'ladi — `pnpm bench` bilan qayta o'lchang.
 `EXPLAIN ANALYZE` bilan indeks tekshiruvi haqiqiy Postgres'da bajarilmagan (qarang: asosiy README, «Tekshirilmaganlar»).
+
+## Vercel'ga deploy (serverless)
+
+`api/index.ts` + `vercel.json` — backend Vercel funksiyasi sifatida ishlaydi (Railway/Render shart emas).
+
+1. Vercel → **Add New Project** → shu repo → **Root Directory: `backend`**, Framework: Other (build/output `vercel.json` dan olinadi).
+2. Environment Variables: `NODE_ENV=production`, `DATABASE_URL` (Supabase **Session pooler**, `?uselibpqcompat=true&sslmode=require`),
+   `DATABASE_POOL_MAX=5`, `STORAGE_SIGNING_SECRET` (tasodifiy), `TRUST_PROXY=1`, `STORAGE_DIR=/tmp/media`,
+   `WEB_ORIGINS=https://<admin-panel>.vercel.app`, `PUBLIC_API_URL=https://<backend>.vercel.app`.
+3. Migratsiya funksiyada bajarilmaydi: yangi migratsiya bo'lsa lokal `DATABASE_URL=... pnpm db:migrate`.
+4. Region `icn1` (Seul) — Supabase `ap-northeast-2` ga yaqin.
+
+Cheklovlar: Socket.IO yo'q (chat REST bilan, `?after=`); fon vazifalari (oy yakuni, e'lon tarqatish, eslatmalar)
+so'rovlar ortidan bajariladi — trafik bo'lmasa kechikadi; `/tmp` dagi media nusxalar orasida yo'qolishi mumkin —
+doimiy saqlash uchun Supabase Storage'ni `S3_*` orqali ulang. Swagger UI (`/api/docs`) Vercel'da tekshirilmagan.

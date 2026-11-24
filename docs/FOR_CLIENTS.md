@@ -92,11 +92,11 @@ Server `EXPO_ACCESS_TOKEN` bo'lsa yuboradi; bo'lmasa faqat ichki ro'yxat (`GET /
 
 ## Sahifalar va ekranlar xaritasi
 
-Har sahifa/ekran faylining tepasida `// API:` sharhi — qaysi endpointlarga ulanishi kerakligi. Tugmalardagi `data-endpoint` (frontend) ham shu maqsadda.
+Mobil ekran fayllarining tepasida `// API:` sharhi — qaysi endpointlarga ulanishi kerakligi.
 
-**Frontend** (`frontend/app`): `/login`, `/change-password`, `/` (dashboard), `/moderation`, `/moderation/[id]`, `/issues`, `/issues/[id]`,
-`/rounds`, `/rounds/[id]`, `/residents`, `/residents/new`, `/residents/[id]`, `/reports`, `/events`, `/events/new`, `/events/[id]`,
-`/announcements`, `/announcements/new`, `/announcements/[id]`, `/audit`.
+**Frontend** (`frontend/app`, API'ga ulangan): `/login`, `/change-password`, `/` (dashboard), `/moderation`, `/issues`, `/issues/[id]`,
+`/rounds`, `/residents`, `/reports`, `/events`, `/announcements`, `/audit`. Yaratish, tahrirlash, rad etish va holat o'tishlari shu
+sahifalardagi dialoglarda bajariladi.
 
 **Mobil** (`mobile/app`): `login`, `change-password`, tablar `(tabs)/{index,feed,vote,chat,profile}`, `issues/{new,mine,[id],[id]/edit}`,
 `rounds/{index,[id]}`, `events/{index,[id]}`, `announcements/{index,[id]}`, `notifications`.

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo skip",
+  "buildCommand": "mkdir -p .vercel-empty",
+  "outputDirectory": ".vercel-empty",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "https://frontend-production-8907b1e6.up.railway.app/$1" }
+  ]
+}
