@@ -82,7 +82,7 @@ const roundListItem = z.object({
   totalVoters: z.number().int().nullable(),
   totalVotes: z.number().int().nullable(),
 });
-const chatMessage = z.object({ id: uuid, text: z.string(), senderId: uuid, senderName: z.string(), mine: z.boolean(), createdAt: dt });
+const chatMessage = z.object({ id: uuid, text: z.string(), senderId: uuid, senderName: z.string(), senderRole: z.enum(['RESIDENT', 'MAHALLA_ADMIN']), mine: z.boolean(), createdAt: dt });
 const event = z.object({
   id: uuid,
   title: z.string(),

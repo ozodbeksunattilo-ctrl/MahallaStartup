@@ -14,6 +14,15 @@ Avtomatik generatsiya: `pnpm contract:build` (qo'lda tahrirlamang). Prefiks: `/a
 | `GET` | `/me` | har qanday kirgan | Joriy foydalanuvchi |
 | `PUT` | `/devices` | har qanday kirgan | Push token'ni ro'yxatdan o'tkazish (idempotent) |
 | `DELETE` | `/devices/:token` | har qanday kirgan | Push token'ni o'chirish |
+| `POST` | `/auth/access-requests` | ochiq | Kirish so'rovi (mobil «Ro'yxatdan o'tish»; akkauntni mahalla admini beradi) |
+
+## Admin: kirish so'rovlari
+
+| Metod | Yo'l | Kim | Tavsif |
+| --- | --- | --- | --- |
+| `GET` | `/admin/access-requests` | admin | Kirish so'rovlari ro'yxati |
+| `POST` | `/admin/access-requests/:id/approve` | admin | So'rovni tasdiqlash: akkaunt yaratiladi, vaqtinchalik parol bir marta qaytadi |
+| `POST` | `/admin/access-requests/:id/reject` | admin | So'rovni rad etish |
 
 ## Bosh sahifa
 
@@ -69,6 +78,21 @@ Avtomatik generatsiya: `pnpm contract:build` (qo'lda tahrirlamang). Prefiks: `/a
 | --- | --- | --- | --- |
 | `GET` | `/chat/messages` | har qanday kirgan | Chat tarixi (mahallada bitta kanal) |
 | `POST` | `/chat/messages` | har qanday kirgan | Xabar yuborish (idempotent: clientMessageId) |
+
+## Support
+
+| Metod | Yo'l | Kim | Tavsif |
+| --- | --- | --- | --- |
+| `GET` | `/support/messages` | aholi | Adminga yozilgan shaxsiy chat tarixi (aholining o'z suhbati) |
+| `POST` | `/support/messages` | aholi | Adminga xabar yuborish (idempotent: clientMessageId) |
+
+## Admin: support chat
+
+| Metod | Yo'l | Kim | Tavsif |
+| --- | --- | --- | --- |
+| `GET` | `/admin/support/threads` | admin | Aholi suhbatlari ro'yxati (oxirgi xabar bo'yicha) |
+| `GET` | `/admin/support/threads/:residentId/messages` | admin | Bitta aholi bilan suhbat tarixi |
+| `POST` | `/admin/support/threads/:residentId/messages` | admin | Aholiga javob yozish |
 
 ## Shikoyatlar
 

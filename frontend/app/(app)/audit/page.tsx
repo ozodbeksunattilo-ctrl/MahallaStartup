@@ -1,42 +1,60 @@
-import type { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
 import { DataTable } from '@/components/DataTable';
-import { Field } from '@/components/Field';
 import { PageHeader } from '@/components/PageHeader';
+import { fmtDateTime } from '@/lib/format';
+import { useFetch } from '@/lib/hooks';
 
-export const metadata: Metadata = { title: 'Audit jurnali' };
+interface AuditItem {
+  id: string;
+  action: string;
+  actorName: string;
+  targetType: string | null;
+  targetId: string | null;
+  reason: string | null;
+  ip: string | null;
+  createdAt: string;
+}
 
-// API: GET /admin/audit?action&actorId&cursor
+// API: GET /admin/audit?action&cursor (parol/token hech qachon yozilmaydi)
 export default function AuditPage() {
+  const [action, setAction] = useState('');
+  const { data, error, loading } = useFetch<{ items: AuditItem[] }>(
+    `/admin/audit?limit=50${action ? `&action=${encodeURIComponent(action)}` : ''}`,
+  );
+
   return (
     <>
-      <PageHeader
-        title="Audit jurnali"
-        description="Adminlar va tizim amallari tarixi (parol va tokenlar yozilmaydi)"
-      />
-
-      <form className="filters" method="get">
-        <Field label="Harakat">
-          <input className="input" name="action" placeholder="masalan, issue.approve" />
-        </Field>
-        <Field label="Bajaruvchi ID">
-          <input className="input" name="actorId" />
-        </Field>
-        <button type="submit" className="btn">
-          {"Qo'llash"}
-        </button>
-      </form>
-
+      <PageHeader title="Audit jurnali" description="Admin amallari tarixi" />
+      <div className="filters">
+        <input
+          className="input"
+          placeholder="Amal bo'yicha filtr (masalan, issue.approve)"
+          value={action}
+          onChange={(e) => setAction(e.target.value.trim())}
+        />
+      </div>
+      {error ? <p className="error-text">{error}</p> : null}
       <DataTable
         columns={[
           { key: 'createdAt', label: 'Vaqt' },
-          { key: 'action', label: 'Harakat' },
-          { key: 'actor', label: 'Bajaruvchi' },
-          { key: 'target', label: 'Obyekt' },
+          { key: 'actor', label: 'Kim' },
+          { key: 'action', label: 'Amal' },
+          { key: 'target', label: "Ob'ekt" },
           { key: 'reason', label: 'Sabab' },
           { key: 'ip', label: 'IP' },
         ]}
-        rows={[]}
-        emptyTitle="Yozuvlar yo'q"
+        rows={(data?.items ?? []).map((a) => ({
+          createdAt: fmtDateTime(a.createdAt),
+          actor: a.actorName,
+          action: <code>{a.action}</code>,
+          target: a.targetType ? `${a.targetType} ${a.targetId?.slice(0, 8) ?? ''}` : '—',
+          reason: a.reason ?? '—',
+          ip: a.ip ?? '—',
+        }))}
+        emptyTitle={loading ? 'Yuklanmoqda…' : 'Yozuv yo‘q'}
+        emptyHint=""
       />
     </>
   );

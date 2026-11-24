@@ -19,3 +19,22 @@ export const CATEGORIES: Array<{ value: string; label: string }> = [
   { value: 'LANDSCAPING', label: 'Obodonlashtirish' },
   { value: 'OTHER', label: 'Boshqa' },
 ];
+
+export const EVENT_STATUS: Record<string, string> = {
+  PUBLISHED: 'Nashr qilingan',
+  CANCELLED: 'Bekor qilingan',
+  COMPLETED: 'Yakunlangan',
+  DRAFT: 'Qoralama',
+};
+
+export const NOTIFICATION_ICONS: Record<string, string> = {
+  ISSUE_STATUS_CHANGED: 'swap-horizontal-outline',
+  ISSUE_REJECTED: 'create-outline',
+  ROUND_WINNER: 'trophy-outline',
+  FOLLOWED_ISSUE_UPDATE: 'eye-outline',
+  AUTHOR_FEEDBACK: 'chatbox-ellipses-outline',
+  EVENT_UPDATED: 'calendar-outline',
+  EVENT_CANCELLED: 'close-circle-outline',
+  EVENT_REMINDER: 'alarm-outline',
+  IMPORTANT_ANNOUNCEMENT: 'megaphone-outline',
+};

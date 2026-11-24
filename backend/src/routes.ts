@@ -1,5 +1,6 @@
 import type { AnyRoute } from './core/http';
 import { adminRoutes } from './modules/admin/routes';
+import { accessRequestRoutes } from './modules/access-requests/routes';
 import { announcementRoutes } from './modules/announcements/routes';
 import { authRoutes } from './modules/auth/routes';
 import { chatRoutes } from './modules/chat/routes';
@@ -12,6 +13,7 @@ import { moderationRoutes } from './modules/moderation/routes';
 import { notificationRoutes } from './modules/notifications/routes';
 import { residentRoutes } from './modules/residents/routes';
 import { roundRoutes } from './modules/rounds/routes';
+import { supportRoutes } from './modules/support/routes';
 
 /**
  * Marshrutlar tartibi muhim (Express ketma-ket moslaydi): aniq yo'llar (`/issues/mine`) parametrli
@@ -20,11 +22,13 @@ import { roundRoutes } from './modules/rounds/routes';
  */
 export const allRoutes: AnyRoute[] = [
   ...authRoutes,
+  ...accessRequestRoutes,
   ...homeRoutes,
   ...issueRoutes,
   ...roundRoutes,
   ...mediaRoutes,
   ...chatRoutes,
+  ...supportRoutes,
   ...moderationRoutes,
   ...eventRoutes,
   ...announcementRoutes,

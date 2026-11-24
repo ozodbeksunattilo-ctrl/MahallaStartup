@@ -24,7 +24,7 @@ export function ChangePasswordForm() {
     setError(null);
     try {
       await api('/auth/change-password', { method: 'POST', json: { currentPassword, newPassword } });
-      router.replace('/');
+      router.replace('/dashboard');
       router.refresh();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Serverga ulanib bo'lmadi");

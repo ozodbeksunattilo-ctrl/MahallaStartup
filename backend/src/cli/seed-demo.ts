@@ -133,6 +133,7 @@ async function wipeMahalla(deps: Deps, q: Queryable, mahallaId: string): Promise
     (r) => r.user_id,
   );
   const steps = [
+    'DELETE FROM access_requests WHERE mahalla_id = $1',
     'DELETE FROM notifications WHERE mahalla_id = $1',
     'DELETE FROM reports WHERE mahalla_id = $1',
     'DELETE FROM audit_events WHERE mahalla_id = $1',

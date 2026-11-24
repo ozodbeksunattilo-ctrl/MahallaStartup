@@ -8,7 +8,9 @@ import {
   type ReactNode,
 } from 'react';
 import { api, setSessionHandlers } from './api';
-import { SKIP_AUTH } from './config';
+import { DEMO, SKIP_AUTH } from './config';
+import { clearFetchCache } from './hooks';
+import { registerForPush, unregisterPush } from './push';
 import { clearToken, loadToken, saveToken } from './token';
 
 type Status = 'loading' | 'signedOut' | 'signedIn';
@@ -31,7 +33,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (SKIP_AUTH) return;
+    // SecureStore osilib qolsa ham 3s dan keyin login ekraniga o'tamiz
+    const timer = setTimeout(() => setStatus((s) => (s === 'loading' ? 'signedOut' : s)), 3000);
     void loadToken().then((token) => setStatus(token ? 'signedIn' : 'signedOut'));
+    return () => clearTimeout(timer);
   }, []);
 
   const signIn = useCallback(async (token: string, mustChange: boolean) => {
@@ -41,12 +46,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    await unregisterPush();
     // Serverda sessiyani bekor qilishga urinamiz; xato bo'lsa ham lokal tozalaymiz
     await api('/auth/logout', { method: 'POST' }).catch(() => undefined);
     await clearToken();
+    clearFetchCache();
     setMustChangePassword(false);
     setStatus('signedOut');
   }, []);
+
+  // Parol almashtirilgach (boshqa bo'limlar ochilgach) push tokenini yozamiz
+  useEffect(() => {
+    if (status === 'signedIn' && !mustChangePassword && !SKIP_AUTH && !DEMO) void registerForPush();
+  }, [status, mustChangePassword]);
 
   const passwordChanged = useCallback(() => setMustChangePassword(false), []);
 
@@ -54,6 +66,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setSessionHandlers({
       onUnauthorized: () => {
         void clearToken();
+        clearFetchCache();
         setMustChangePassword(false);
         setStatus('signedOut');
       },

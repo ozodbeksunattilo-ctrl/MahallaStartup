@@ -9,3 +9,5 @@ export const API_URL =
     : raw;
 
 export const SKIP_AUTH = process.env.EXPO_PUBLIC_SKIP_AUTH === 'true';
+/** Backend'siz demo: barcha so'rovlar src/lib/mock.ts dan javob oladi (login ixtiyoriy login/parol bilan ishlaydi). */
+export const DEMO = process.env.EXPO_PUBLIC_DEMO === 'true';

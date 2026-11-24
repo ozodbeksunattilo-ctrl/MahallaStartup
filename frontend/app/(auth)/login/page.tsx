@@ -5,10 +5,13 @@ export const metadata: Metadata = { title: 'Kirish' };
 
 export default function LoginPage() {
   return (
-    <div className="auth-card">
-      <h1>Mahalladosh</h1>
-      <p className="muted">Mahalla admini sifatida tizimga kiring</p>
+    <div className="lg-card">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/logo-full.png" alt="Mahalladosh" className="lg-logo" />
+      <h1 className="lg-title">Xush kelibsiz</h1>
+      <p className="lg-sub">Mahalla admini sifatida tizimga kiring</p>
       <LoginForm />
+      <p className="lg-foot">Mahallamiz — bizning kuchimiz</p>
     </div>
   );
 }

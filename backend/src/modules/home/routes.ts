@@ -14,7 +14,7 @@ interface Shared {
 const home = route({
   method: 'get',
   path: '/home',
-  auth: 'resident',
+  auth: 'user',
   tag: 'Bosh sahifa',
   summary: "Mobil bosh sahifa: bitta so'rovda hammasi",
   description: "Mahalla bo'yicha umumiy qism 10 s keshlanadi; ovozlar va o'qilmaganlar foydalanuvchiga xos.",

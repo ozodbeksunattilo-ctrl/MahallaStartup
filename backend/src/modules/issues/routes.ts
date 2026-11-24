@@ -38,7 +38,7 @@ const categories = route({
 const mine = route({
   method: 'get',
   path: '/issues/mine',
-  auth: 'resident',
+  auth: 'user',
   tag: 'Muammolar',
   summary: "Mening muammolarim (hamma holatda, rad sababi va dublikat bilan)",
   query: pageQuery,

@@ -100,6 +100,15 @@ async function generateExamples(): Promise<Record<string, unknown>> {
     const notVoted = feed.items.find((i: any) => !i.myVote);
     if (notVoted) await call('PUT /issues/:id/vote', 'PUT', `/issues/${notVoted.id}/vote`, ali);
     await call('POST /chat/messages', 'POST', '/chat/messages', ali, { text: "Assalomu alaykum, qo'shnilar!", clientMessageId: `contract-${Date.now()}-0001` });
+    // ---- aholi <-> admin shaxsiy chat
+    await call('POST /support/messages', 'POST', '/support/messages', ali, { text: 'Assalomu alaykum, hovlidagi chiroq yonmayapti', clientMessageId: `contract-support-${Date.now()}-0001` });
+    await call('GET /support/messages', 'GET', '/support/messages?limit=10', ali);
+    const threads = await call('GET /admin/support/threads', 'GET', '/admin/support/threads', admin);
+    const thread = threads?.items?.[0];
+    if (thread) {
+      await call('POST /admin/support/threads/:residentId/messages', 'POST', `/admin/support/threads/${thread.residentId}/messages`, admin, { text: "Salom! Ertaga ko'rib chiqamiz", clientMessageId: `contract-support-${Date.now()}-0002` });
+      await call('GET /admin/support/threads/:residentId/messages', 'GET', `/admin/support/threads/${thread.residentId}/messages?limit=10`, admin);
+    }
     const comment = await call('POST /issues/:id/comments', 'POST', `/issues/${lamp.id}/comments`, ali, { text: "Men ham har kuni shu yerdan o'taman" });
     const foreign = chat?.items?.find((m: any) => !m.mine);
     if (foreign) await call('POST /reports', 'POST', '/reports', ali, { targetType: 'CHAT_MESSAGE', targetId: foreign.id, reason: 'Reklama xarakteridagi xabar' });

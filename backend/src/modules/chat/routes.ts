@@ -9,6 +9,7 @@ interface MessageRow {
   text: string;
   sender_id: string;
   sender_name: string;
+  sender_role: 'RESIDENT' | 'MAHALLA_ADMIN';
   created_at: Date;
 }
 
@@ -17,6 +18,7 @@ export const toMessage = (m: MessageRow, meId: string) => ({
   text: m.text,
   senderId: m.sender_id,
   senderName: m.sender_name,
+  senderRole: m.sender_role,
   mine: m.sender_id === meId,
   createdAt: m.created_at,
 });
@@ -43,8 +45,9 @@ const history = route({
     else if (query.before) where.push(`m.id < ${p.add(query.before)}`);
 
     const r = await deps.db.query<MessageRow>(
-      `SELECT m.id, m.text, m.sender_id, u.display_name AS sender_name, m.created_at
+      `SELECT m.id, m.text, m.sender_id, u.display_name AS sender_name, ms.role AS sender_role, m.created_at
          FROM chat_messages m JOIN users u ON u.id = m.sender_id
+         JOIN memberships ms ON ms.user_id = m.sender_id
         WHERE ${where.join(' AND ')}
         ORDER BY m.id ${ascending ? 'ASC' : 'DESC'} LIMIT ${query.limit + 1}`,
       p.values,
@@ -83,8 +86,9 @@ const send = route({
     );
     const created = ins.rows.length > 0;
     const row = await deps.db.query<MessageRow>(
-      `SELECT m.id, m.text, m.sender_id, u.display_name AS sender_name, m.created_at
+      `SELECT m.id, m.text, m.sender_id, u.display_name AS sender_name, ms.role AS sender_role, m.created_at
          FROM chat_messages m JOIN users u ON u.id = m.sender_id
+         JOIN memberships ms ON ms.user_id = m.sender_id
         WHERE m.sender_id = $1 AND m.client_message_id = $2`,
       [user.userId, body.clientMessageId],
     );
