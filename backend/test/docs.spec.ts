@@ -97,4 +97,18 @@ describe('Swagger (TZ bo‘yicha API hujjati)', () => {
     expect(JSON.stringify(examples)).not.toMatch(/"token":"(?!Zk3QXw0hY1mJb7pS4nVd8eAcF2uLgT9rKiOyWq5Ni_M)/);
     expect(JSON.stringify(examples)).not.toContain('http://127.0.0.1');
   });
+
+  it("production'da ham ochiq (mobil/admin uchun); API_DOCS=false bilan yopiladi", async () => {
+    const prod = await createTestApp({ NODE_ENV: 'production', STORAGE_SIGNING_SECRET: 'prod-secret' });
+    const off = await createTestApp({ API_DOCS: 'false' });
+    try {
+      expect((await prod.req('GET', '/api/openapi.json')).status).toBe(200);
+      expect((await fetch(`${prod.base}/api/docs`)).status).toBe(200);
+      expect((await off.req('GET', '/api/openapi.json')).status).toBe(404);
+      expect((await fetch(`${off.base}/api/docs`)).status).toBe(404);
+    } finally {
+      await prod.close();
+      await off.close();
+    }
+  });
 });

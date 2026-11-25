@@ -1,10 +1,10 @@
 import type { Request, RequestHandler, Response, Router } from 'express';
 import { z } from 'zod';
 import { AppError } from '../common/app-error';
-import { authenticate, authMeta, csrfGuard, CSRF_COOKIE, SESSION_COOKIE } from '../middleware/auth';
+import { authenticate, authMeta, csrfGuard, CSRF_COOKIE, parseCookies, SESSION_COOKIE } from '../middleware/auth';
 import { rateLimit } from '../middleware/rate-limit';
 import { zodFields } from '../middleware/errors';
-import { SESSION_TTL_MS } from '../modules/auth/session';
+import { newToken, SESSION_TTL_MS } from '../modules/auth/session';
 import type { Deps } from './deps';
 import type { AuthUser } from './types';
 import './zod-uz';
@@ -127,16 +127,12 @@ function handlerFor(spec: AnyRoute, deps: Deps): RequestHandler {
       if (user.mustChangePassword && !spec.allowWhileMustChange) {
         throw new AppError('PASSWORD_CHANGE_REQUIRED');
       }
-      // Veb: sliding sessiya bilan cookie muddati ham uzaytiriladi
+      // Veb: sliding sessiya bilan ikkala cookie muddati ham uzaytiriladi
+      // (aks holda 12 soatdan keyin CSRF cookie o'chib, sessiya tirik bo'lsa ham barcha o'zgartirishlar 403 bo'ladi)
       const meta = authMeta(req);
       if (meta?.refreshed && meta.via === 'cookie') {
-        res.cookie(SESSION_COOKIE, meta.token, {
-          httpOnly: true,
-          sameSite: 'lax',
-          secure: deps.env.NODE_ENV === 'production',
-          path: '/',
-          maxAge: SESSION_TTL_MS.WEB,
-        });
+        const csrf = parseCookies(req.headers.cookie)[CSRF_COOKIE];
+        setSessionCookies(res, deps, meta.token, csrf || newToken());
       }
     }
 

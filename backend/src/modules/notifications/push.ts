@@ -108,6 +108,9 @@ export async function runPushWorker(deps: Deps): Promise<number> {
 /** 15 daqiqadan oshgan ticketlar uchun receipt tekshiradi va `DeviceNotRegistered` tokenlarni o'chiradi. */
 export async function checkPushReceipts(deps: Deps): Promise<void> {
   if (!deps.env.EXPO_ACCESS_TOKEN || pendingReceipts.size === 0) return;
+  // Expo receipt'larni ~24 soat saqlaydi: undan eskisi hech qachon kelmaydi, xotirada to'planib qolmasin
+  const stale = Date.now() - 24 * 3600_000;
+  for (const [id, v] of pendingReceipts) if (v.at < stale) pendingReceipts.delete(id);
   const cutoff = Date.now() - 15 * 60_000;
   const due = [...pendingReceipts.entries()].filter(([, v]) => v.at <= cutoff).slice(0, 300);
   if (due.length === 0) return;

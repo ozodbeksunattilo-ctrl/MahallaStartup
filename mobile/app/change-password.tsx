@@ -6,7 +6,8 @@ import { Field } from '@/components/Field';
 import { Logo } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { ApiError, api } from '@/lib/api';
+import { api } from '@/lib/api';
+import { errorMessage } from '@/lib/hooks';
 import { useSession } from '@/lib/session';
 import { useTheme } from '@/theme';
 
@@ -51,7 +52,7 @@ export default function ChangePasswordScreen() {
       passwordChanged();
       if (router.canGoBack()) router.back();
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Kutilmagan xato yuz berdi');
+      setError(errorMessage(e));
     } finally {
       setPending(false);
     }

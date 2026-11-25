@@ -25,7 +25,8 @@ export function Topbar() {
   async function logout() {
     setLeaving(true);
     try {
-      await api('/auth/logout', { method: 'POST' });
+      // Sessiya allaqachon tugagan bo'lsa ham login sahifasiga chiqamiz
+      await api('/auth/logout', { method: 'POST' }).catch(() => undefined);
     } finally {
       // Qisqa «Ko'rishguncha» lahzasi, keyin login sahifasi
       setTimeout(() => {

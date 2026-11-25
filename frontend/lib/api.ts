@@ -50,6 +50,10 @@ export async function api<T = void>(path: string, init: ApiInit = {}): Promise<T
   const data: unknown = await res.json().catch(() => null);
   if (!res.ok) {
     const err = (data as ErrorResponse | null)?.error;
+    // Sessiya tugagan/bekor qilingan: istalgan sahifadan login'ga (login formasining o'z xatosi bundan mustasno)
+    if (res.status === 401 && err?.code === 'UNAUTHENTICATED' && typeof window !== 'undefined' && window.location.pathname !== '/login') {
+      window.location.replace('/login');
+    }
     throw new ApiError(
       res.status,
       err?.code ?? 'INTERNAL_ERROR',

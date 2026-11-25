@@ -57,11 +57,24 @@ const create = route({
   handler: async ({ deps, body, req, now }) => {
     await rateLimit(deps, { name: 'access-request-ip', limit: 5, windowSec: 3600, key: req.ip ?? 'unknown' });
 
-    const m = await deps.db.query<{ id: string }>(
-      `SELECT id FROM mahalla WHERE name ILIKE $1 OR slug = lower($2) ORDER BY name LIMIT 1`,
-      [`%${escapeLike(body.mahallaName)}%`, body.mahallaName],
+    // Avval aniq moslik (nom yoki slug); bo'lmasa qisman moslik faqat bitta mahallaga tushsa —
+    // aks holda so'rov noto'g'ri mahallaga (alifbo bo'yicha birinchisiga) ketib qolardi
+    const exact = await deps.db.query<{ id: string }>(
+      `SELECT id FROM mahalla WHERE lower(name) = lower($1) OR slug = lower($1) LIMIT 1`,
+      [body.mahallaName],
     );
-    const mahalla = m.rows[0];
+    let mahalla = exact.rows[0];
+    if (!mahalla) {
+      const partial = await deps.db.query<{ id: string }>(`SELECT id FROM mahalla WHERE name ILIKE $1 LIMIT 2`, [
+        `%${escapeLike(body.mahallaName)}%`,
+      ]);
+      if (partial.rows.length > 1) {
+        throw new AppError('VALIDATION_ERROR', undefined, {
+          fields: { mahallaName: "Bir nechta mahalla mos keldi: to'liq nomini yozing" },
+        });
+      }
+      mahalla = partial.rows[0];
+    }
     if (!mahalla) {
       throw new AppError('VALIDATION_ERROR', undefined, { fields: { mahallaName: 'Bunday mahalla topilmadi' } });
     }

@@ -51,7 +51,7 @@ export function LoginForm() {
             name="login"
             autoComplete="username"
             placeholder="admin.yunusobod"
-            maxLength={50}
+            maxLength={64}
             autoFocus
             required
           />
@@ -69,7 +69,7 @@ export function LoginForm() {
             type={show ? 'text' : 'password'}
             autoComplete="current-password"
             placeholder="••••••••"
-            maxLength={50}
+            maxLength={200}
             onKeyUp={(e) => setCaps(e.getModifierState('CapsLock'))}
             required
           />

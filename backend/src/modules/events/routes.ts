@@ -394,7 +394,7 @@ export async function sendEventReminders(deps: Deps, now: Date): Promise<number>
       mahallaId: e.mahalla_id,
       type: 'EVENT_REMINDER',
       title: 'Tadbir eslatmasi',
-      body: `«${e.title}» ertaga boshlanadi`,
+      body: `«${e.title}» 24 soat ichida boshlanadi`,
       entityType: 'EVENT',
       entityId: e.id,
       // Vaqt o'zgarsa yangi eslatma, qayta ishlasa dublikat yo'q

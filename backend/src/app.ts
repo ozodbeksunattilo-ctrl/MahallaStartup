@@ -70,7 +70,7 @@ export function createApp(deps: Deps): Express {
     res.status(ok ? 200 : 503).json({ status: ok ? 'ok' : 'fail', checks: { db, cache, storage } });
   });
 
-  // Swagger UI (`/api/docs`) va OpenAPI (`/api/openapi.json`) — faqat dev
+  // Swagger UI (`/api/docs`) va OpenAPI (`/api/openapi.json`); `API_DOCS=false` bilan o'chiriladi
   mountDocs(app, deps);
 
   const api = express.Router();

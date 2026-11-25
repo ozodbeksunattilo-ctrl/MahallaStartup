@@ -40,6 +40,11 @@ export const envSchema = z
       ),
     TRUST_PROXY: z.string().default('loopback'),
     ALLOW_TIME_TRAVEL: bool,
+    /** Swagger UI (`/api/docs`) va `/api/openapi.json`: standart yoqiq (production'da ham); o'chirish uchun `false` */
+    API_DOCS: z
+      .enum(['true', 'false', '1', '0', ''])
+      .optional()
+      .transform((v) => v === undefined || v === '' || v === 'true' || v === '1'),
     LOGIN_IP_LIMIT: z.coerce.number().int().positive().default(20),
     /** Umumiy so'rovlar chegarasi: foydalanuvchi boshiga daqiqasiga */
     API_RATE_LIMIT: z.coerce.number().int().positive().default(300),

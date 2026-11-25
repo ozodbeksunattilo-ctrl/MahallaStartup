@@ -14,6 +14,8 @@ const upload = route({
   description:
     "Rasm: JPEG/PNG/WebP, 5 MB gacha (413 FILE_TOO_LARGE); video: MP4/QuickTime, 25 MB gacha. Tur magic bytes bilan aniqlanadi (415). " +
     "Rasmdagi EXIF/GPS o'chiriladi. Bir xil `clientUploadId` dublikat yaratmaydi (o'sha media qaytadi, 200).",
+  // Har fayl 25 MB gacha diskka yoziladi: cheksiz yuklash bilan xotira/diskni to'ldirib bo'lmasin
+  limit: { name: 'media-upload', limit: 60, windowSec: 3600 },
   status: 201,
   handler: async (ctx) => {
     const { result, created } = await uploadMedia(ctx.deps, ctx.user, ctx.req);

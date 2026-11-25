@@ -3,7 +3,11 @@ import { ApiError, api } from './api';
 import type { Page } from './types';
 
 export function errorMessage(e: unknown): string {
-  return e instanceof ApiError ? e.message : 'Kutilmagan xato yuz berdi';
+  if (!(e instanceof ApiError)) return 'Kutilmagan xato yuz berdi';
+  // VALIDATION_ERROR: umumiy matn o'rniga aniq maydon xatosi (masalan, «Joriy parol noto'g'ri»)
+  const fields = (e.details as { fields?: Record<string, string> }).fields;
+  const first = fields ? Object.values(fields)[0] : undefined;
+  return first ?? e.message;
 }
 
 // Ekranlar orasida qaytganda darhol ko'rsatish uchun oddiy xotira keshi (stale-while-revalidate)

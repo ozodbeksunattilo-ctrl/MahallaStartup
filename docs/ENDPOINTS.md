@@ -28,14 +28,14 @@ Avtomatik generatsiya: `pnpm contract:build` (qo'lda tahrirlamang). Prefiks: `/a
 
 | Metod | Yo'l | Kim | Tavsif |
 | --- | --- | --- | --- |
-| `GET` | `/home` | aholi | Mobil bosh sahifa: bitta so'rovda hammasi |
+| `GET` | `/home` | har qanday kirgan | Mobil bosh sahifa: bitta so'rovda hammasi |
 
 ## Muammolar
 
 | Metod | Yo'l | Kim | Tavsif |
 | --- | --- | --- | --- |
 | `GET` | `/categories` | har qanday kirgan | Toifalar (o'zbekcha nomlari bilan) |
-| `GET` | `/issues/mine` | aholi | Mening muammolarim (hamma holatda, rad sababi va dublikat bilan) |
+| `GET` | `/issues/mine` | har qanday kirgan | Mening muammolarim (hamma holatda, rad sababi va dublikat bilan) |
 | `GET` | `/issues` | har qanday kirgan | Muammolar lentasi |
 | `POST` | `/issues` | aholi | Muammo yuborish (moderatsiyaga tushadi) |
 | `GET` | `/issues/:id` | har qanday kirgan | Muammo sahifasi (media URL'lar 5 daqiqalik) |

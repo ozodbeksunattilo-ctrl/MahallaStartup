@@ -65,9 +65,12 @@ export async function createRealtime(httpServer: HttpServer, deps: Deps): Promis
 
     // Bloklangan/chiqqan foydalanuvchining ulanishi uzilsin
     const timer = setInterval(() => {
-      void resolveSession(deps, socket.data['token'] as string, deps.clock.now()).then((r) => {
-        if (!r) socket.disconnect(true);
-      });
+      // DB/Redis vaqtincha ishlamasa: rad etilgan promise jarayonni yiqitmasin, keyingi tikda qayta tekshiriladi
+      resolveSession(deps, socket.data['token'] as string, deps.clock.now())
+        .then((r) => {
+          if (!r) socket.disconnect(true);
+        })
+        .catch(() => undefined);
     }, RECHECK_MS);
     timer.unref();
     socket.on('disconnect', () => clearInterval(timer));

@@ -44,9 +44,10 @@ export async function api<T = void>(path: string, init: ApiInit = {}): Promise<T
   try {
     return await request<T>(path, init);
   } catch (e) {
-    // Server javob bermasa/xato bersa, o'qish so'rovlarida bo'sh ekran o'rniga namunaviy (mock) ma'lumot ko'rsatiladi
+    // Faqat dev rejimida: server javob bermasa o'qish so'rovlarida namunaviy (mock) ma'lumot ko'rsatiladi.
+    // Haqiqiy build'da soxta ma'lumot ko'rsatilmaydi — aks holda ulanish yo'qligi «ishlayapti» bo'lib ko'rinadi.
     const method = init.method ?? 'GET';
-    if (method === 'GET' && e instanceof ApiError && (e.status === 0 || e.status >= 500)) {
+    if (__DEV__ && method === 'GET' && e instanceof ApiError && (e.status === 0 || e.status >= 500)) {
       const demo = mockResponse(path, 'GET');
       if (demo !== undefined) {
         log.warn('api', `GET ${path} -> ${e.status}: namunaviy ma'lumot ko'rsatilmoqda`);

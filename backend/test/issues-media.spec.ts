@@ -228,6 +228,13 @@ describe('post va media', () => {
     await t.req('POST', `/api/v1/admin/content/comment/${c1.body.id}/hide`, { token: w.admin.token, json: { reason: 'Haqorat' } });
     expect((await t.req('GET', `/api/v1/issues/${issue}/comments`, { token: author().token })).body.items).toHaveLength(1);
     expect((await t.req('GET', `/api/v1/issues/${issue}/comments`, { token: w.admin.token })).body.items).toHaveLength(2);
+    // commentCount faqat ko'rinadigan izohlarni sanaydi; takroriy yashirish ikki marta kamaytirmaydi
+    const count = async () => (await t.req('GET', `/api/v1/issues/${issue}`, { token: author().token })).body.commentCount;
+    expect(await count()).toBe(1);
+    await t.req('POST', `/api/v1/admin/content/comment/${c1.body.id}/hide`, { token: w.admin.token, json: { reason: 'Haqorat' } });
+    expect(await count()).toBe(1);
+    await t.req('POST', `/api/v1/admin/content/comment/${c1.body.id}/unhide`, { token: w.admin.token });
+    expect(await count()).toBe(2);
   });
 
   it('validatsiya xatolari yagona formatda (o‘zbekcha xabar + details.fields)', async () => {

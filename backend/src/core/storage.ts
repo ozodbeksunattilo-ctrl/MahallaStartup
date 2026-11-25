@@ -40,6 +40,8 @@ export class LocalStorage implements Storage {
     private readonly dir: string,
     private readonly secret: string,
     private readonly baseUrl: string,
+    /** `PUBLIC_API_URL` aniq berilgan bo'lsa so'rov host'idan ustun (proksi ortida ichki host chiqib qolmasin) */
+    private readonly fixedBaseUrl?: string,
   ) {
     fs.mkdirSync(this.dir, { recursive: true });
   }
@@ -59,7 +61,7 @@ export class LocalStorage implements Storage {
 
   async signedUrl(key: string, ttlSec: number, now: Date): Promise<string> {
     const exp = Math.floor(now.getTime() / 1000) + ttlSec;
-    const base = requestContext.getStore()?.baseUrl ?? this.baseUrl;
+    const base = this.fixedBaseUrl ?? requestContext.getStore()?.baseUrl ?? this.baseUrl;
     return `${base}/api/v1/files/${key}?exp=${exp}&sig=${this.sign(key, exp)}`;
   }
 
@@ -135,5 +137,10 @@ export function createStorage(env: Env): Storage {
       forcePathStyle: env.S3_FORCE_PATH_STYLE,
     });
   }
-  return new LocalStorage(path.resolve(env.STORAGE_DIR), env.STORAGE_SIGNING_SECRET, publicApiUrl(env));
+  return new LocalStorage(
+    path.resolve(env.STORAGE_DIR),
+    env.STORAGE_SIGNING_SECRET,
+    publicApiUrl(env),
+    env.PUBLIC_API_URL?.replace(/\/+$/, ''),
+  );
 }

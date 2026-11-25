@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, api } from './api';
 
 export function errorText(e: unknown): string {
@@ -28,16 +28,24 @@ export function useFetch<T>(path: string | null, pollMs?: number): FetchState<T>
   const [error, setError] = useState<string | null>(null);
   // Qaysi yo'l uchun javob kelgani; `loading` shundan hisoblanadi (effekt ichida setState kerak emas)
   const [loadedPath, setLoadedPath] = useState<string | null>(null);
+  // Filtr/sahifa tez almashganda eski so'rovning kech kelgan javobi yangisini bosib ketmasin
+  const latest = useRef<string | null>(path);
+  useEffect(() => {
+    latest.current = path;
+  }, [path]);
 
   const reload = useCallback(async () => {
     if (path === null) return;
     try {
-      setData(await api<T>(path));
+      const res = await api<T>(path);
+      if (latest.current !== path) return;
+      setData(res);
       setError(null);
     } catch (e) {
+      if (latest.current !== path) return;
       setError(errorText(e));
     } finally {
-      setLoadedPath(path);
+      if (latest.current === path) setLoadedPath(path);
     }
   }, [path]);
 

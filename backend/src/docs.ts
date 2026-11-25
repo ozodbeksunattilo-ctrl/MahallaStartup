@@ -38,10 +38,11 @@ const INIT = `window.ui = SwaggerUIBundle({
 
 /**
  * Swagger UI: `GET /api/docs` (internetsiz ishlaydi: fayllar `swagger-ui-dist` dan lokal beriladi),
- * hujjat — `GET /api/openapi.json`. Production'da o'chiq.
+ * hujjat — `GET /api/openapi.json`. Production'da ham ochiq (mobil/admin ishlab chiquvchilar uchun);
+ * `API_DOCS=false` bilan o'chiriladi.
  */
 export function mountDocs(app: Express, deps: Pick<Deps, 'env'>): void {
-  if (deps.env.NODE_ENV === 'production') return;
+  if (!deps.env.API_DOCS) return;
   const dist = path.dirname(require.resolve('swagger-ui-dist/package.json'));
   let doc: unknown;
 

@@ -3,7 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { Field } from '@/components/Field';
-import { ApiError, api } from '@/lib/api';
+import { api } from '@/lib/api';
+import { errorText } from '@/lib/hooks';
 
 // API: POST /auth/change-password { currentPassword, newPassword }
 export function ChangePasswordForm() {
@@ -27,7 +28,7 @@ export function ChangePasswordForm() {
       router.replace('/dashboard');
       router.refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Serverga ulanib bo'lmadi");
+      setError(errorText(err));
     } finally {
       setPending(false);
     }

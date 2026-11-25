@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Badge } from '@/components/Badge';
 import { DataTable } from '@/components/DataTable';
 import { PageHeader } from '@/components/PageHeader';
-import { ApiError, api } from '@/lib/api';
-import { useFetch } from '@/lib/hooks';
+import { api } from '@/lib/api';
+import { errorText, useFetch } from '@/lib/hooks';
 
 type Status = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -57,7 +57,7 @@ export default function AccessRequestsPage() {
       }
       await load();
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Amal bajarilmadi');
+      setError(errorText(e));
     } finally {
       setBusy(null);
     }

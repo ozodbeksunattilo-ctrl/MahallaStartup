@@ -513,7 +513,7 @@ const hide = route({
   body: z.object({ reason: text(3, 500) }),
   status: 204,
   handler: async ({ deps, user, params, body, now, req }) => {
-    await hideContent(deps, deps.db, user, params.type, params.id, body.reason, now, req.ip);
+    await deps.db.tx((q) => hideContent(deps, q, user, params.type, params.id, body.reason, now, req.ip));
   },
 });
 
@@ -526,7 +526,7 @@ const unhide = route({
   params: z.object({ type: contentType, id: uuid }),
   status: 204,
   handler: async ({ deps, user, params, req }) => {
-    await unhideContent(deps.db, user, params.type, params.id, req.ip);
+    await deps.db.tx((q) => unhideContent(q, user, params.type, params.id, req.ip));
   },
 });
 

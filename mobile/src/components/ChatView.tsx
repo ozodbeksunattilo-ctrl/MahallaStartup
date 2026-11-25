@@ -70,8 +70,19 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
 
   const poll = useCallback(async () => {
     const after = lastServerId();
-    if (!after) return;
     try {
+      if (!after) {
+        // Suhbat hali bo'sh: `after` yo'q, shuning uchun oxirgi xabarlarni so'raymiz (aks holda yangi xabar hech kelmaydi)
+        const res = await api<Page<ChatMessage>>(`${base}?limit=30`);
+        if (res.items.length === 0) return;
+        setRows((prev) => {
+          const known = new Set(prev.map((r) => r.id));
+          const fresh = res.items.filter((m) => !known.has(m.id));
+          return fresh.length ? [...prev.filter((r) => r.local), ...fresh, ...prev.filter((r) => !r.local)] : prev;
+        });
+        setCursor((c) => c ?? res.nextCursor);
+        return;
+      }
       const res = await api<Page<ChatMessage>>(`${base}?after=${after}&limit=100`);
       if (res.items.length === 0) return;
       setRows((prev) => {

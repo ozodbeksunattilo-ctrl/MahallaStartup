@@ -171,6 +171,23 @@ describe('parol va sessiya', () => {
     expect((await post({ Origin: 'http://localhost:3001', 'X-CSRF-Token': csrfValue })).status).toBe(204);
   });
 
+  it('veb: sliding sessiyada CSRF cookie ham sessiya bilan birga uzaytiriladi', async () => {
+    await createUser(t, mahallaId, 'uzoq');
+    const login = await t.req('POST', '/api/v1/auth/login', { json: { login: 'uzoq', password: PASSWORD, client: 'web' } });
+    const cookies = login.headers.getSetCookie();
+    const session = cookies.find((c) => c.startsWith('mhd_session='))!.split(';')[0]!;
+    const csrf = cookies.find((c) => c.startsWith('mhd_csrf='))!.split(';')[0]!;
+
+    t.clock.advance(10 * 60_000);
+    t.kv.clear(); // sessiya keshi: DB'dan o'qilib, muddat uzaytirilsin
+    const me = await t.req('GET', '/api/v1/me', { headers: { Cookie: `${session}; ${csrf}` } });
+    expect(me.status).toBe(200);
+    const refreshed = me.headers.getSetCookie();
+    expect(refreshed.find((c) => c.startsWith('mhd_session='))).toBeDefined();
+    // CSRF qiymati o'zgarmaydi (ochiq tablar ishlashda davom etadi), faqat muddati yangilanadi
+    expect(refreshed.find((c) => c.startsWith('mhd_csrf='))?.split(';')[0]).toBe(csrf);
+  });
+
   it("rol tekshiruvi: aholi admin endpointiga kira olmaydi", async () => {
     const resident = await actor(t, mahallaId, 'oddiy');
     const res = await t.req('GET', '/api/v1/admin/residents', { token: resident.token });
