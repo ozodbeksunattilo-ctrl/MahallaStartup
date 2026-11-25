@@ -10,14 +10,14 @@ export interface StatusStyle {
   icon: string;
 }
 
-const AMBER = '#d97706';
-const BLUE = '#2563eb';
-const VIOLET = '#7c3aed';
-const TEAL = '#0891b2';
-const ORANGE = '#ea580c';
-const GREEN = '#16a34a';
-const RED = '#dc2626';
-const SLATE = '#64748b';
+const AMBER = '#9a6512';
+const BLUE = '#3a5f8f';
+const VIOLET = '#6d4f8c';
+const TEAL = '#2b6e66';
+const ORANGE = '#9d4229';
+const GREEN = '#3d6b36';
+const RED = '#a3302a';
+const SLATE = '#6b7065';
 
 export const STATUS_STYLE: Record<string, StatusStyle> = {
   // Muammolar
