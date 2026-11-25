@@ -34,7 +34,9 @@ export function IssueRow({ item, onPress }: { item: IssueListItem; onPress: () =
         <Pill label={item.categoryLabel} />
         <Pill label={item.statusLabel} tone={STATUS_TONE[item.status] ?? 'neutral'} />
       </View>
-      <Text variant="heading">{item.title}</Text>
+      <Text variant="heading" raw>
+        {item.title}
+      </Text>
       <Text variant="muted">{item.locationText}</Text>
       {item.rejectedReason ? (
         <Text variant="muted" style={{ color: colors.danger }}>

@@ -23,10 +23,12 @@ export default function AnnouncementScreen() {
                 MUHIM E&apos;LON
               </Text>
             ) : null}
-            <Text variant="title">{a.title}</Text>
+            <Text variant="title" raw>
+              {a.title}
+            </Text>
             <Text variant="muted">{formatDateTime(a.publishedAt ?? a.createdAt)}</Text>
             {/* Oddiy matn sifatida ko'rsatiladi (TZ 8-bo'lim): HTML sharhlanmaydi */}
-            <Text>{a.body}</Text>
+            <Text raw>{a.body}</Text>
           </>
         )}
       </AsyncView>

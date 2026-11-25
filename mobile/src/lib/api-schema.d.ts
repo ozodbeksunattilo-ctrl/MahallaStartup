@@ -49,7 +49,9 @@ export interface paths {
         put?: never;
         /**
          * Kirish (mobil: Bearer token, veb: HttpOnly cookie)
-         * @description Mobil: `{ token, user, mustChangePassword }`. Veb: `Set-Cookie: mhd_session` + `mhd_csrf` va `{ user, mustChangePassword }`. Bitta login uchun 5 ketma-ket xato -> 15 daqiqa blok (429 TOO_MANY_ATTEMPTS).
+         * @description **Rol:** ochiq (kirish shart emas)
+         *
+         *     Mobil: `{ token, user, mustChangePassword }`. Veb: `Set-Cookie: mhd_session` + `mhd_csrf` va `{ user, mustChangePassword }`. Bitta login uchun 5 ketma-ket xato -> 15 daqiqa blok (429 TOO_MANY_ATTEMPTS).
          */
         post: operations["postAuthLogin"];
         delete?: never;
@@ -67,7 +69,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Chiqish (joriy sessiyani bekor qiladi) */
+        /**
+         * Chiqish (joriy sessiyani bekor qiladi)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         post: operations["postAuthLogout"];
         delete?: never;
         options?: never;
@@ -84,7 +89,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Parolni almashtirish (joriy sessiyadan boshqalari bekor qilinadi) */
+        /**
+         * Parolni almashtirish (joriy sessiyadan boshqalari bekor qilinadi)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         post: operations["postAuthChangePassword"];
         delete?: never;
         options?: never;
@@ -99,7 +107,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Joriy foydalanuvchi */
+        /**
+         * Joriy foydalanuvchi
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getMe"];
         put?: never;
         post?: never;
@@ -117,7 +128,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Push token'ni ro'yxatdan o'tkazish (idempotent) */
+        /**
+         * Push token'ni ro'yxatdan o'tkazish (idempotent)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         put: operations["putDevices"];
         post?: never;
         delete?: never;
@@ -136,8 +150,133 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Push token'ni o'chirish */
+        /**
+         * Push token'ni o'chirish
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         delete: operations["deleteDevicesByToken"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/mahallas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Mahallalar ro'yxati (ro'yxatdan o'tish formasidagi tanlash uchun)
+         * @description **Rol:** ochiq (kirish shart emas)
+         */
+        get: operations["getAuthMahallas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/access-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Kirish so'rovi (mobil «Ro'yxatdan o'tish»; akkauntni mahalla admini beradi)
+         * @description **Rol:** ochiq (kirish shart emas)
+         *
+         *     `mahallaId` (GET /auth/mahallas dan) yoki `mahallaName` dan biri kerak. Javobdagi `id` bilan holatni GET /auth/access-requests/{id} orqali tekshirish mumkin.
+         */
+        post: operations["postAuthAccessRequests"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/access-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kirish so'rovi holati (PENDING / APPROVED / REJECTED); shaxsiy ma'lumot qaytarilmaydi
+         * @description **Rol:** ochiq (kirish shart emas)
+         */
+        get: operations["getAuthAccessRequestsById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/access-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kirish so'rovlari ro'yxati
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
+        get: operations["getAdminAccessRequests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/access-requests/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * So'rovni tasdiqlash: akkaunt yaratiladi, vaqtinchalik parol bir marta qaytadi
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
+        post: operations["postAdminAccessRequestsByIdApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/access-requests/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * So'rovni rad etish
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
+        post: operations["postAdminAccessRequestsByIdReject"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -152,7 +291,9 @@ export interface paths {
         };
         /**
          * Mobil bosh sahifa: bitta so'rovda hammasi
-         * @description Mahalla bo'yicha umumiy qism 10 s keshlanadi; ovozlar va o'qilmaganlar foydalanuvchiga xos.
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         *
+         *     Mahalla bo'yicha umumiy qism 10 s keshlanadi; ovozlar va o'qilmaganlar foydalanuvchiga xos.
          */
         get: operations["getHome"];
         put?: never;
@@ -170,7 +311,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Toifalar (o'zbekcha nomlari bilan) */
+        /**
+         * Toifalar (o'zbekcha nomlari bilan)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getCategories"];
         put?: never;
         post?: never;
@@ -187,7 +331,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Mening muammolarim (hamma holatda, rad sababi va dublikat bilan) */
+        /**
+         * Mening muammolarim (hamma holatda, rad sababi va dublikat bilan)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getIssuesMine"];
         put?: never;
         post?: never;
@@ -206,13 +353,19 @@ export interface paths {
         };
         /**
          * Muammolar lentasi
-         * @description `period=current` — faqat joriy davrda ovoz berilayotganlar; `sort=top` — ovoz bo'yicha.
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         *
+         *     `period=current` — faqat joriy davrda ovoz berilayotganlar; `roundKind` — oylik yoki haftalik muammolar; `sort=top` — ovoz bo'yicha.
          */
         get: operations["getIssues"];
         put?: never;
         /**
          * Muammo yuborish (moderatsiyaga tushadi)
-         * @description `Idempotency-Key` header majburiy: qayta yuborish o'sha postni qaytaradi (200).
+         * @description **Rol:** aholi (`RESIDENT`)
+         *
+         *     `Idempotency-Key` header majburiy: qayta yuborish o'sha postni qaytaradi (200). `roundKind`: MONTHLY (standart, oylik ovoz) yoki WEEKLY (haftalik ovoz, g'olib 1 hafta ichida hal qilinadi).
+         *
+         *     **Tezlik chegarasi:** 10 so'rov / 1 soat
          */
         post: operations["postIssues"];
         delete?: never;
@@ -228,15 +381,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Muammo sahifasi (media URL'lar 5 daqiqalik) */
+        /**
+         * Muammo sahifasi (media URL'lar 5 daqiqalik)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getIssuesById"];
         put?: never;
         post?: never;
-        /** O'chirish (soft delete; faqat PENDING_REVIEW / REJECTED) */
+        /**
+         * O'chirish (soft delete; faqat PENDING_REVIEW / REJECTED)
+         * @description **Rol:** aholi (`RESIDENT`)
+         */
         delete: operations["deleteIssuesById"];
         options?: never;
         head?: never;
-        /** Tahrirlash (faqat muallif; PENDING_REVIEW / REJECTED holatda) */
+        /**
+         * Tahrirlash (faqat muallif; PENDING_REVIEW / REJECTED holatda)
+         * @description **Rol:** aholi (`RESIDENT`)
+         */
         patch: operations["patchIssuesById"];
         trace?: never;
     };
@@ -249,7 +411,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Rad etilgan muammoni tahrirlab qayta yuborish (REJECTED -> PENDING_REVIEW) */
+        /**
+         * Rad etilgan muammoni tahrirlab qayta yuborish (REJECTED -> PENDING_REVIEW)
+         * @description **Rol:** aholi (`RESIDENT`)
+         */
         post: operations["postIssuesByIdResubmit"];
         delete?: never;
         options?: never;
@@ -265,10 +430,16 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Kuzatish (idempotent) */
+        /**
+         * Kuzatish (idempotent)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         put: operations["putIssuesByIdFollow"];
         post?: never;
-        /** Kuzatishni bekor qilish (idempotent) */
+        /**
+         * Kuzatishni bekor qilish (idempotent)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         delete: operations["deleteIssuesByIdFollow"];
         options?: never;
         head?: never;
@@ -284,7 +455,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Muallif fikri: yakundan keyin CONFIRMED yoki STILL_ONGOING (holat o'zgarmaydi) */
+        /**
+         * Muallif fikri: yakundan keyin CONFIRMED yoki STILL_ONGOING (holat o'zgarmaydi)
+         * @description **Rol:** aholi (`RESIDENT`)
+         */
         post: operations["postIssuesByIdFeedback"];
         delete?: never;
         options?: never;
@@ -299,10 +473,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Izohlar (eskisidan yangisiga) */
+        /**
+         * Izohlar (eskisidan yangisiga)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getIssuesByIdComments"];
         put?: never;
-        /** Izoh qoldirish (OPEN va keyingi holatdagi ko'rinadigan postlarga) */
+        /**
+         * Izoh qoldirish (OPEN va keyingi holatdagi ko'rinadigan postlarga)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         *
+         *     **Tezlik chegarasi:** 30 so'rov / 1 daqiqa
+         */
         post: operations["postIssuesByIdComments"];
         delete?: never;
         options?: never;
@@ -317,7 +499,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Joriy davr, ishlatilgan/qolgan ovozlar va mening ovozlarim */
+        /**
+         * Joriy davr, ishlatilgan/qolgan ovozlar va mening ovozlarim
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         *
+         *     Yuqori darajadagi maydonlar — oylik davr (orqaga moslik). `weekly` — parallel ishlaydigan haftalik davr (dushanba–dushanba, Toshkent vaqti); har bir davrda alohida 3 tadan ovoz.
+         */
         get: operations["getRoundsCurrent"];
         put?: never;
         post?: never;
@@ -334,7 +521,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Davrlar ro'yxati (yangisidan eskisiga) */
+        /**
+         * Davrlar ro'yxati (yangisidan eskisiga)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         *
+         *     `kind` — faqat oylik yoki haftalik davrlar; berilmasa ikkalasi aralash.
+         */
         get: operations["getRounds"];
         put?: never;
         post?: never;
@@ -351,7 +543,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Davr natijasi: g'olib, reyting, ovoz berganlar soni */
+        /**
+         * Davr natijasi: g'olib, reyting, ovoz berganlar soni
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getRoundsByIdResult"];
         put?: never;
         post?: never;
@@ -371,11 +566,16 @@ export interface paths {
         get?: never;
         /**
          * Ovoz berish (idempotent; 4-ovoz -> 409 VOTE_LIMIT_REACHED)
-         * @description Serverda tekshiriladi: davr ochiq va tugamagan, post shu davrda va OPEN, yashirilmagan. Xatolar: ROUND_CLOSED, ISSUE_NOT_VOTABLE, VOTE_LIMIT_REACHED. Allaqachon ovoz bergan bo'lsa 200 va o'sha holat.
+         * @description **Rol:** aholi (`RESIDENT`)
+         *
+         *     Serverda tekshiriladi: davr ochiq va tugamagan, post shu davrda va OPEN, yashirilmagan. Xatolar: ROUND_CLOSED, ISSUE_NOT_VOTABLE, VOTE_LIMIT_REACHED. Allaqachon ovoz bergan bo'lsa 200 va o'sha holat.
          */
         put: operations["putIssuesByIdVote"];
         post?: never;
-        /** Ovozni qaytarib olish (ovoz yo'q bo'lsa ham 204) */
+        /**
+         * Ovozni qaytarib olish (ovoz yo'q bo'lsa ham 204)
+         * @description **Rol:** aholi (`RESIDENT`)
+         */
         delete: operations["deleteIssuesByIdVote"];
         options?: never;
         head?: never;
@@ -389,7 +589,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Davrlar ro'yxati */
+        /**
+         * Davrlar ro'yxati
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminRounds"];
         put?: never;
         post?: never;
@@ -406,7 +609,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Davr natijasi (g'olibni almashtirish endpointi ataylab YO'Q) */
+        /**
+         * Davr natijasi (g'olibni almashtirish endpointi ataylab YO'Q)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminRoundsByIdResult"];
         put?: never;
         post?: never;
@@ -427,7 +633,11 @@ export interface paths {
         put?: never;
         /**
          * Media yuklash (multipart: file + clientUploadId)
-         * @description Rasm: JPEG/PNG/WebP, 5 MB gacha (413 FILE_TOO_LARGE); video: MP4/QuickTime, 25 MB gacha. Tur magic bytes bilan aniqlanadi (415). Rasmdagi EXIF/GPS o'chiriladi. Bir xil `clientUploadId` dublikat yaratmaydi (o'sha media qaytadi, 200).
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         *
+         *     Rasm: JPEG/PNG/WebP, 5 MB gacha (413 FILE_TOO_LARGE); video: MP4/QuickTime, 25 MB gacha. Tur magic bytes bilan aniqlanadi (415). Rasmdagi EXIF/GPS o'chiriladi. Bir xil `clientUploadId` dublikat yaratmaydi (o'sha media qaytadi, 200).
+         *
+         *     **Tezlik chegarasi:** 60 so'rov / 1 soat
          */
         post: operations["postMedia"];
         delete?: never;
@@ -443,7 +653,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Media uchun 5 daqiqalik o'qish URL'i (ruxsat tekshiruvidan keyin) */
+        /**
+         * Media uchun 5 daqiqalik o'qish URL'i (ruxsat tekshiruvidan keyin)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getMediaByIdUrl"];
         put?: never;
         post?: never;
@@ -462,15 +675,95 @@ export interface paths {
         };
         /**
          * Chat tarixi (mahallada bitta kanal)
-         * @description `before=<messageId>` — eskiroq xabarlar (yangisidan eskisiga); `after=<messageId>` — uzilishdan keyin davom (eskisidan yangisiga). `nextCursor` — keyingi so'rov uchun xabar ID'si (yo'q bo'lsa tugagan). Yashirilganlar chiqmaydi.
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         *
+         *     `before=<messageId>` — eskiroq xabarlar (yangisidan eskisiga); `after=<messageId>` — uzilishdan keyin davom (eskisidan yangisiga). `nextCursor` — keyingi so'rov uchun xabar ID'si (yo'q bo'lsa tugagan). Yashirilganlar chiqmaydi.
          */
         get: operations["getChatMessages"];
         put?: never;
         /**
          * Xabar yuborish (idempotent: clientMessageId)
-         * @description Javobdagi `id`/`createdAt` klientga «yuborildi» holatini beradi. Realtime: Socket.IO `/chat` -> `message:new`.
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         *
+         *     Javobdagi `id`/`createdAt` klientga «yuborildi» holatini beradi. Realtime: Socket.IO `/chat` -> `message:new`.
+         *
+         *     **Tezlik chegarasi:** 30 so'rov / 1 daqiqa
          */
         post: operations["postChatMessages"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/support/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Adminga yozilgan shaxsiy chat tarixi (aholining o'z suhbati)
+         * @description **Rol:** aholi (`RESIDENT`)
+         *
+         *     `before` — eskiroq (yangidan eskiga); `after` — yangilari (eskidan yangiga).
+         */
+        get: operations["getSupportMessages"];
+        put?: never;
+        /**
+         * Adminga xabar yuborish (idempotent: clientMessageId)
+         * @description **Rol:** aholi (`RESIDENT`)
+         *
+         *     **Tezlik chegarasi:** 30 so'rov / 1 daqiqa
+         */
+        post: operations["postSupportMessages"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/support/threads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Aholi suhbatlari ro'yxati (oxirgi xabar bo'yicha)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
+        get: operations["getAdminSupportThreads"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/support/threads/{residentId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bitta aholi bilan suhbat tarixi
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
+        get: operations["getAdminSupportThreadsByResidentIdMessages"];
+        put?: never;
+        /**
+         * Aholiga javob yozish
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         *
+         *     **Tezlik chegarasi:** 60 so'rov / 1 daqiqa
+         */
+        post: operations["postAdminSupportThreadsByResidentIdMessages"];
         delete?: never;
         options?: never;
         head?: never;
@@ -486,7 +779,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Shikoyat qilish (POST | COMMENT | CHAT_MESSAGE); bir kontentga bitta shikoyat — takroriy so'rov 200 */
+        /**
+         * Shikoyat qilish (POST | COMMENT | CHAT_MESSAGE); bir kontentga bitta shikoyat — takroriy so'rov 200
+         * @description **Rol:** aholi (`RESIDENT`)
+         *
+         *     **Tezlik chegarasi:** 20 so'rov / 1 soat
+         */
         post: operations["postReports"];
         delete?: never;
         options?: never;
@@ -501,7 +799,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Shikoyatlar ro'yxati (kontent matni bilan) */
+        /**
+         * Shikoyatlar ro'yxati (kontent matni bilan)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminReports"];
         put?: never;
         post?: never;
@@ -520,7 +821,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Shikoyat bo'yicha kontentni yashirish (sabab majburiy) */
+        /**
+         * Shikoyat bo'yicha kontentni yashirish (sabab majburiy)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminReportsByIdHide"];
         delete?: never;
         options?: never;
@@ -537,7 +841,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Shikoyatni rad etish */
+        /**
+         * Shikoyatni rad etish
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminReportsByIdDismiss"];
         delete?: never;
         options?: never;
@@ -552,7 +859,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Tadbirlar: kelgusi (yaqini birinchi) yoki o'tgan */
+        /**
+         * Tadbirlar: kelgusi (yaqini birinchi) yoki o'tgan
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getEvents"];
         put?: never;
         post?: never;
@@ -569,7 +879,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Tadbir (natija matni va fotolar bilan) */
+        /**
+         * Tadbir (natija matni va fotolar bilan)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getEventsById"];
         put?: never;
         post?: never;
@@ -587,10 +900,16 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Tadbirga yozilish (idempotent; faqat PUBLISHED va kelajakdagi tadbir) */
+        /**
+         * Tadbirga yozilish (idempotent; faqat PUBLISHED va kelajakdagi tadbir)
+         * @description **Rol:** aholi (`RESIDENT`)
+         */
         put: operations["putEventsByIdRsvp"];
         post?: never;
-        /** Yozilishni bekor qilish (idempotent) */
+        /**
+         * Yozilishni bekor qilish (idempotent)
+         * @description **Rol:** aholi (`RESIDENT`)
+         */
         delete: operations["deleteEventsByIdRsvp"];
         options?: never;
         head?: never;
@@ -604,10 +923,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Barcha tadbirlar (qoralamalar bilan), yangisidan eskisiga */
+        /**
+         * Barcha tadbirlar (qoralamalar bilan), yangisidan eskisiga
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminEvents"];
         put?: never;
-        /** Tadbir yaratish (DRAFT) */
+        /**
+         * Tadbir yaratish (DRAFT)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminEvents"];
         delete?: never;
         options?: never;
@@ -628,7 +953,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Tahrirlash. Vaqt/joy o'zgarsa yozilganlarga bildirishnoma (version oshadi) */
+        /**
+         * Tahrirlash. Vaqt/joy o'zgarsa yozilganlarga bildirishnoma (version oshadi)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         patch: operations["patchAdminEventsById"];
         trace?: never;
     };
@@ -641,7 +969,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Nashr qilish (idempotent) */
+        /**
+         * Nashr qilish (idempotent)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminEventsByIdPublish"];
         delete?: never;
         options?: never;
@@ -658,7 +989,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Bekor qilish (yozilganlarga bildirishnoma; idempotent) */
+        /**
+         * Bekor qilish (yozilganlarga bildirishnoma; idempotent)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminEventsByIdCancel"];
         delete?: never;
         options?: never;
@@ -675,7 +1009,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Yakunlash: natija matni va foto (ixtiyoriy) */
+        /**
+         * Yakunlash: natija matni va foto (ixtiyoriy)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminEventsByIdComplete"];
         delete?: never;
         options?: never;
@@ -690,7 +1027,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Yozilganlar ro'yxati */
+        /**
+         * Yozilganlar ro'yxati
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminEventsByIdAttendees"];
         put?: never;
         post?: never;
@@ -707,7 +1047,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** E'lonlar (admin qoralamalarni ham ko'radi) */
+        /**
+         * E'lonlar (admin qoralamalarni ham ko'radi)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getAnnouncements"];
         put?: never;
         post?: never;
@@ -724,7 +1067,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** E'lon */
+        /**
+         * E'lon
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getAnnouncementsById"];
         put?: never;
         post?: never;
@@ -743,7 +1089,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** E'lon yaratish (DRAFT) */
+        /**
+         * E'lon yaratish (DRAFT)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminAnnouncements"];
         delete?: never;
         options?: never;
@@ -761,11 +1110,17 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** O'chirish (faqat qoralama) */
+        /**
+         * O'chirish (faqat qoralama)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         delete: operations["deleteAdminAnnouncementsById"];
         options?: never;
         head?: never;
-        /** E'lonni tahrirlash */
+        /**
+         * E'lonni tahrirlash
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         patch: operations["patchAdminAnnouncementsById"];
         trace?: never;
     };
@@ -778,7 +1133,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Nashr qilish (idempotent). Muhim e'lon a'zolarga fon vazifasida (fan-out) bildirishnoma qiladi */
+        /**
+         * Nashr qilish (idempotent). Muhim e'lon a'zolarga fon vazifasida (fan-out) bildirishnoma qiladi
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminAnnouncementsByIdPublish"];
         delete?: never;
         options?: never;
@@ -793,7 +1151,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Bildirishnomalar (yangisidan eskisiga) */
+        /**
+         * Bildirishnomalar (yangisidan eskisiga)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getNotifications"];
         put?: never;
         post?: never;
@@ -810,7 +1171,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** O'qilmaganlar soni (qisman indeks bo'yicha) */
+        /**
+         * O'qilmaganlar soni (qisman indeks bo'yicha)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         get: operations["getNotificationsUnreadCount"];
         put?: never;
         post?: never;
@@ -829,7 +1193,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Hammasini o'qilgan deb belgilash */
+        /**
+         * Hammasini o'qilgan deb belgilash
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         post: operations["postNotificationsReadAll"];
         delete?: never;
         options?: never;
@@ -846,7 +1213,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** O'qilgan deb belgilash (idempotent) */
+        /**
+         * O'qilgan deb belgilash (idempotent)
+         * @description **Rol:** har qanday kirgan foydalanuvchi (aholi yoki admin)
+         */
         post: operations["postNotificationsByIdRead"];
         delete?: never;
         options?: never;
@@ -861,10 +1231,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Aholi ro'yxati */
+        /**
+         * Aholi ro'yxati
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminResidents"];
         put?: never;
-        /** Aholi akkaunti yaratish (vaqtinchalik parol bir marta qaytadi) */
+        /**
+         * Aholi akkaunti yaratish (vaqtinchalik parol bir marta qaytadi)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminResidents"];
         delete?: never;
         options?: never;
@@ -879,7 +1255,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Aholi a'zosi */
+        /**
+         * Aholi a'zosi
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminResidentsById"];
         put?: never;
         post?: never;
@@ -898,7 +1277,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Parolni tiklash (yangi vaqtinchalik parol, barcha sessiyalar bekor) */
+        /**
+         * Parolni tiklash (yangi vaqtinchalik parol, barcha sessiyalar bekor)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminResidentsByIdResetPassword"];
         delete?: never;
         options?: never;
@@ -915,7 +1297,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Bloklash (barcha sessiyalar darhol bekor) */
+        /**
+         * Bloklash (barcha sessiyalar darhol bekor)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminResidentsByIdBlock"];
         delete?: never;
         options?: never;
@@ -932,7 +1317,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Blokdan chiqarish */
+        /**
+         * Blokdan chiqarish
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminResidentsByIdUnblock"];
         delete?: never;
         options?: never;
@@ -947,7 +1335,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Moderatsiya navbati (PENDING_REVIEW, eskisi birinchi) */
+        /**
+         * Moderatsiya navbati (PENDING_REVIEW, eskisi birinchi)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminModerationQueue"];
         put?: never;
         post?: never;
@@ -966,7 +1357,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Tasdiqlash: OPEN, nashr sanasi qo'yiladi, joriy davrga qo'shiladi */
+        /**
+         * Tasdiqlash: OPEN, nashr sanasi qo'yiladi, joriy davrga qo'shiladi
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminIssuesByIdApprove"];
         delete?: never;
         options?: never;
@@ -983,7 +1377,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Rad etish (sabab majburiy, muallifga ko'rinadi) */
+        /**
+         * Rad etish (sabab majburiy, muallifga ko'rinadi)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminIssuesByIdReject"];
         delete?: never;
         options?: never;
@@ -1000,7 +1397,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Dublikat sifatida asosiy postga birlashtirish (muallif asosiy postni avtomatik kuzatadi) */
+        /**
+         * Dublikat sifatida asosiy postga birlashtirish (muallif asosiy postni avtomatik kuzatadi)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminIssuesByIdMerge"];
         delete?: never;
         options?: never;
@@ -1015,7 +1415,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Barcha muammolar (holat va muddati o'tganlar bo'yicha filtr) */
+        /**
+         * Barcha muammolar (holat va muddati o'tganlar bo'yicha filtr)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminIssues"];
         put?: never;
         post?: never;
@@ -1032,7 +1435,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Muammo (admin ko'rinishi: yashirilgan ham, tarix bilan) */
+        /**
+         * Muammo (admin ko'rinishi: yashirilgan ham, tarix bilan)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminIssuesById"];
         put?: never;
         post?: never;
@@ -1053,7 +1459,9 @@ export interface paths {
         put?: never;
         /**
          * Holatni o'tkazish: IN_PROGRESS / REFERRED / RESOLVED (majburiy maydonlar holatga bog'liq)
-         * @description IN_PROGRESS: responsible, nextStep, dueDate. REFERRED: referredOrg, referredAt, followUpAt. RESOLVED: resolutionText (+ixtiyoriy mediaIds). RESOLVED -> IN_PROGRESS: reason. Boshqa o'tish -> 409 INVALID_STATUS_TRANSITION.
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         *
+         *     IN_PROGRESS: responsible, nextStep, dueDate. REFERRED: referredOrg, referredAt, followUpAt. RESOLVED: resolutionText (+ixtiyoriy mediaIds). RESOLVED -> IN_PROGRESS: reason. Boshqa o'tish -> 409 INVALID_STATUS_TRANSITION.
          */
         post: operations["postAdminIssuesByIdTransition"];
         delete?: never;
@@ -1075,7 +1483,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Mas'ul/qadam/muddatni o'zgartirish (holat o'zgarmaydi; sabab majburiy, tarixga yoziladi) */
+        /**
+         * Mas'ul/qadam/muddatni o'zgartirish (holat o'zgarmaydi; sabab majburiy, tarixga yoziladi)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         patch: operations["patchAdminIssuesByIdWork"];
         trace?: never;
     };
@@ -1088,7 +1499,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** G'olib bo'lmagan ochiq muammoni joriy davrga 0 ovoz bilan o'tkazish */
+        /**
+         * G'olib bo'lmagan ochiq muammoni joriy davrga 0 ovoz bilan o'tkazish
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminIssuesByIdCarryOver"];
         delete?: never;
         options?: never;
@@ -1105,7 +1519,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Kontentni yashirish (post | comment | chat_message; sabab majburiy) */
+        /**
+         * Kontentni yashirish (post | comment | chat_message; sabab majburiy)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminContentByTypeByIdHide"];
         delete?: never;
         options?: never;
@@ -1122,7 +1539,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Yashirilgan kontentni qaytarish */
+        /**
+         * Yashirilgan kontentni qaytarish
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         post: operations["postAdminContentByTypeByIdUnhide"];
         delete?: never;
         options?: never;
@@ -1137,7 +1557,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Bosh sahifa: faol ovoz beruvchilar, moderatsiya, muddati o'tgan ishlar, tadbir, shikoyatlar */
+        /**
+         * Bosh sahifa: faol ovoz beruvchilar, moderatsiya, muddati o'tgan ishlar, tadbir, shikoyatlar
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminDashboard"];
         put?: never;
         post?: never;
@@ -1154,7 +1577,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Audit jurnali (parol/token/push token hech qachon yozilmaydi) */
+        /**
+         * Audit jurnali (parol/token/push token hech qachon yozilmaydi)
+         * @description **Rol:** mahalla admini (`MAHALLA_ADMIN`)
+         */
         get: operations["getAdminAudit"];
         put?: never;
         post?: never;
@@ -1226,6 +1652,11 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "status": "ok"
+                     *     }
+                     */
                     "application/json": {
                         /** @enum {string} */
                         status: "ok";
@@ -1249,6 +1680,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "status": "ok",
+                     *       "checks": {
+                     *         "db": "ok",
+                     *         "cache": "ok",
+                     *         "storage": "ok"
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Ready"];
                 };
             };
@@ -1258,6 +1699,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "status": "fail",
+                     *       "checks": {
+                     *         "db": "ok",
+                     *         "cache": "fail",
+                     *         "storage": "ok"
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Ready"];
                 };
             };
@@ -1287,6 +1738,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "token": "Zk3QXw0hY1mJb7pS4nVd8eAcF2uLgT9rKiOyWq5Ni_M",
+                     *       "user": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "login": "ali.yunusobod",
+                     *         "displayName": "Ali Valiyev",
+                     *         "phone": "+998905928589",
+                     *         "role": "RESIDENT",
+                     *         "mahalla": {
+                     *           "id": "01a211e2-e141-719d-9a91-4d9b71c87ca3",
+                     *           "name": "Demo Yunusobod",
+                     *           "slug": "demo-yunusobod"
+                     *         }
+                     *       },
+                     *       "mustChangePassword": false
+                     *     }
+                     */
                     "application/json": {
                         /** @description Faqat mobil (client=mobile) */
                         token?: string;
@@ -1309,7 +1778,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1318,7 +1787,33 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /**
+             * @description **INVALID_CREDENTIALS** — Login yoki parol noto'g'ri
+             *
+             *     **TEMP_PASSWORD_EXPIRED** — Vaqtinchalik parol muddati tugagan. Mahalla adminiga murojaat qiling
+             */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **TOO_MANY_ATTEMPTS** — Juda ko'p urinish. Birozdan keyin qayta urinib ko'ring
+             *
+             *     **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring
+             */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1345,7 +1840,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1354,7 +1849,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1363,7 +1862,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1397,7 +1896,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1406,7 +1905,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1415,7 +1914,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1424,7 +1927,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1450,6 +1953,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "user": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "login": "ali.yunusobod",
+                     *         "displayName": "Ali Valiyev",
+                     *         "phone": "+998905928589",
+                     *         "role": "RESIDENT",
+                     *         "mahalla": {
+                     *           "id": "01a211e2-e141-719d-9a91-4d9b71c87ca3",
+                     *           "name": "Demo Yunusobod",
+                     *           "slug": "demo-yunusobod"
+                     *         }
+                     *       },
+                     *       "mahalla": {
+                     *         "id": "01a211e2-e141-719d-9a91-4d9b71c87ca3",
+                     *         "name": "Demo Yunusobod",
+                     *         "slug": "demo-yunusobod"
+                     *       },
+                     *       "role": "RESIDENT",
+                     *       "mustChangePassword": false,
+                     *       "unreadNotifications": 2
+                     *     }
+                     */
                     "application/json": {
                         user: {
                             /** Format: uuid */
@@ -1479,7 +2006,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1488,7 +2015,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /** @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1497,7 +2024,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1532,7 +2059,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1541,7 +2068,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1550,7 +2077,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1559,7 +2092,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1588,7 +2121,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1597,7 +2130,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1606,7 +2139,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1615,7 +2154,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -1624,7 +2163,379 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getAuthMahallas: {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Muvaffaqiyatli */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    postAuthAccessRequests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    fullName: string;
+                    phone: string;
+                    /** Format: uuid */
+                    mahallaId?: string;
+                    mahallaName?: string;
+                    address?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Yaratildi */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getAuthAccessRequestsById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Muvaffaqiyatli */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **NOT_FOUND** — Topilmadi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getAdminAccessRequests: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+                status?: "PENDING" | "APPROVED" | "REJECTED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Muvaffaqiyatli */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    postAdminAccessRequestsByIdApprove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    login: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Muvaffaqiyatli */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **NOT_FOUND** — Topilmadi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    postAdminAccessRequestsByIdReject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Muvaffaqiyatli */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **NOT_FOUND** — Topilmadi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1650,12 +2561,64 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "round": {
+                     *         "periodEnd": "2026-11-30T19:00:00.000Z",
+                     *         "votesLeft": 1
+                     *       },
+                     *       "weeklyRound": {
+                     *         "periodEnd": "2026-11-29T19:00:00.000Z",
+                     *         "votesLeft": 3
+                     *       },
+                     *       "weeklyIssue": {
+                     *         "id": "01a211e2-e2a7-75a0-be37-75b25f869db4",
+                     *         "title": "Kirish yo'lagidagi chuqurni ko'mish",
+                     *         "status": "IN_PROGRESS",
+                     *         "statusLabel": "Jarayonda",
+                     *         "dueDate": "2026-11-29"
+                     *       },
+                     *       "featuredIssue": {
+                     *         "id": "01a211e2-e14d-775d-a9f9-35a754dc5d25",
+                     *         "title": "Maktab oldidagi yo'lga svetofor o'rnatish",
+                     *         "status": "SELECTED",
+                     *         "statusLabel": "Oylik ovozda tanlandi"
+                     *       },
+                     *       "nextEvent": {
+                     *         "id": "01a211e2-e2ae-753a-9fd2-b324291ff7b4",
+                     *         "title": "Hashar: hovli va skverni tozalash",
+                     *         "startsAt": "2026-12-02T08:46:51.146Z",
+                     *         "location": "Markaziy hovli"
+                     *       },
+                     *       "latestImportantAnnouncement": {
+                     *         "id": "01a211e2-e2ef-779c-8342-a00812db14f8",
+                     *         "title": "Ertaga suv o'chiriladi",
+                     *         "publishedAt": "2026-11-24T12:46:51.146Z"
+                     *       },
+                     *       "unreadNotifications": 2
+                     *     }
+                     */
                     "application/json": {
                         round: {
                             /** Format: date-time */
                             periodEnd: string;
                             votesLeft: number;
                         };
+                        /** @description Haftalik davr: qolgan ovozlar */
+                        weeklyRound: {
+                            /** Format: date-time */
+                            periodEnd: string;
+                            votesLeft: number;
+                        };
+                        /** @description Oxirgi haftalik g'olib (hal qilinmagan bo'lsa) — 1 hafta ichida hal qilinishi kerak */
+                        weeklyIssue: {
+                            /** Format: uuid */
+                            id: string;
+                            title: string;
+                            status: string;
+                            statusLabel: string;
+                            dueDate: string | null;
+                        } | null;
                         featuredIssue: {
                             /** Format: uuid */
                             id: string;
@@ -1682,7 +2645,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1691,7 +2654,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1700,7 +2667,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1726,6 +2693,36 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "value": "ROAD",
+                     *           "label": "Yo'l"
+                     *         },
+                     *         {
+                     *           "value": "LIGHTING",
+                     *           "label": "Yoritish"
+                     *         },
+                     *         {
+                     *           "value": "WASTE",
+                     *           "label": "Chiqindi"
+                     *         },
+                     *         {
+                     *           "value": "WATER",
+                     *           "label": "Suv"
+                     *         },
+                     *         {
+                     *           "value": "LANDSCAPING",
+                     *           "label": "Obodonlashtirish"
+                     *         },
+                     *         {
+                     *           "value": "OTHER",
+                     *           "label": "Boshqa"
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             value: string;
@@ -1734,7 +2731,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1743,7 +2740,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1752,7 +2753,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1781,6 +2782,105 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e29f-7632-9425-ec659b458a78",
+                     *           "title": "Avtobus bekati tomi singan",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "PENDING_REVIEW",
+                     *           "statusLabel": "Moderatsiyada",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-25T06:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2ab-7263-86a6-ac8c764ef531",
+                     *           "title": "Bekatdagi o'rindiq singan",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-22T21:00:00.000Z",
+                     *           "createdAt": "2026-11-22T20:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 1,
+                     *           "myVote": false,
+                     *           "roundKind": "WEEKLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *           "title": "Ko'cha chirog'i ishlamayapti",
+                     *           "category": "LIGHTING",
+                     *           "categoryLabel": "Yoritish",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-21T04:46:51.146Z",
+                     *           "createdAt": "2026-11-20T08:46:51.146Z",
+                     *           "commentCount": 2,
+                     *           "voteCount": 3,
+                     *           "myVote": true,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc_t.jpg?exp=1795596712&sig=2f028988562313ae006658abf8eda6e4a9c3b3f26aaa4fef17848a42a2e65192",
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e14d-775d-a9f9-35a754dc5d25",
+                     *           "title": "Maktab oldidagi yo'lga svetofor o'rnatish",
+                     *           "category": "ROAD",
+                     *           "categoryLabel": "Yo'l",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "SELECTED",
+                     *           "statusLabel": "Oylik ovozda tanlandi",
+                     *           "publishedAt": "2026-10-03T19:00:00.000Z",
+                     *           "createdAt": "2026-10-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e15a-7046-8279-cccc0c392c8f_t.jpg?exp=1795596712&sig=1977898df88669bec514e30cac18fbdfe5178ac9f44459a8a0423b8f13ecd98b",
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -1798,6 +2898,11 @@ export interface operations {
                             commentCount: number;
                             voteCount: number | null;
                             myVote: boolean;
+                            /**
+                             * @description Ovoz davri turi: oylik yoki haftalik (1 hafta ichida hal qilinadi)
+                             * @enum {string}
+                             */
+                            roundKind: "MONTHLY" | "WEEKLY";
                             isFollowing: boolean;
                             thumbUrl: string | null;
                             authorName: string;
@@ -1815,7 +2920,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1824,7 +2929,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1833,7 +2938,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1842,7 +2951,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1861,6 +2970,7 @@ export interface operations {
                 category?: "ROAD" | "LIGHTING" | "WASTE" | "WATER" | "LANDSCAPING" | "OTHER";
                 status?: "PENDING_REVIEW" | "OPEN" | "REJECTED" | "MERGED" | "SELECTED" | "IN_PROGRESS" | "REFERRED" | "RESOLVED";
                 period?: "current";
+                roundKind?: "MONTHLY" | "WEEKLY";
                 sort?: "newest" | "top";
             };
             header?: never;
@@ -1875,6 +2985,128 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *           "title": "Ko'cha chirog'i ishlamayapti",
+                     *           "category": "LIGHTING",
+                     *           "categoryLabel": "Yoritish",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-21T04:46:51.146Z",
+                     *           "createdAt": "2026-11-20T08:46:51.146Z",
+                     *           "commentCount": 2,
+                     *           "voteCount": 3,
+                     *           "myVote": true,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc_t.jpg?exp=1795596712&sig=2f028988562313ae006658abf8eda6e4a9c3b3f26aaa4fef17848a42a2e65192",
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2ac-72e2-b675-effe86449098",
+                     *           "title": "Kanalizatsiya qopqog'i ochiq qolgan",
+                     *           "category": "WATER",
+                     *           "categoryLabel": "Suv",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-22T22:00:00.000Z",
+                     *           "createdAt": "2026-11-22T21:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 2,
+                     *           "myVote": false,
+                     *           "roundKind": "WEEKLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e23d-709e-bd0f-6c0afce618f2",
+                     *           "title": "Hovli yo'lagi ta'mirlanmagan",
+                     *           "category": "ROAD",
+                     *           "categoryLabel": "Yo'l",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-22T00:46:51.146Z",
+                     *           "createdAt": "2026-11-21T14:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 2,
+                     *           "myVote": true,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e261-7665-807b-b505747dc9bb_t.jpg?exp=1795596712&sig=80581e308142a40abfdeab66bb6e1a64eaa7566940448cabd5e307fe405340c6",
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e23d-709f-bfa4-f6c526ce4983",
+                     *           "title": "Chiqindi konteyneri to'lib ketgan",
+                     *           "category": "WASTE",
+                     *           "categoryLabel": "Chiqindi",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-23T06:46:51.146Z",
+                     *           "createdAt": "2026-11-22T20:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 1,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e27f-7152-9c2b-ce691af23c54_t.jpg?exp=1795596712&sig=17db57ded3ccf6fb1d0651bf6c7df5f0b6e61e94154dce10ea82b9e5b77efe6f",
+                     *           "authorName": "Sara Karimova",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2ab-7263-86a6-ac8c764ef531",
+                     *           "title": "Bekatdagi o'rindiq singan",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-22T21:00:00.000Z",
+                     *           "createdAt": "2026-11-22T20:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 1,
+                     *           "myVote": false,
+                     *           "roundKind": "WEEKLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -1892,6 +3124,11 @@ export interface operations {
                             commentCount: number;
                             voteCount: number | null;
                             myVote: boolean;
+                            /**
+                             * @description Ovoz davri turi: oylik yoki haftalik (1 hafta ichida hal qilinadi)
+                             * @enum {string}
+                             */
+                            roundKind: "MONTHLY" | "WEEKLY";
                             isFollowing: boolean;
                             thumbUrl: string | null;
                             authorName: string;
@@ -1909,7 +3146,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1918,7 +3155,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1927,7 +3164,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1936,7 +3177,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -1951,7 +3192,10 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description 8–100 belgi; qayta yuborish o'sha postni qaytaradi */
+                /**
+                 * @description 8–100 belgi; qayta yuborish o'sha postni qaytaradi (200)
+                 * @example issue-2026-11-24-0001
+                 */
                 "Idempotency-Key": string;
             };
             path?: never;
@@ -1967,6 +3211,11 @@ export interface operations {
                     locationText: string;
                     /** @default [] */
                     mediaIds?: string[];
+                    /**
+                     * @default MONTHLY
+                     * @enum {string}
+                     */
+                    roundKind?: "MONTHLY" | "WEEKLY";
                 };
             };
         };
@@ -1977,6 +3226,44 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e57b-764b-9734-c279992ad4f7",
+                     *       "title": "Yo'l chetida axlat to'planib qolgan",
+                     *       "category": "WASTE",
+                     *       "categoryLabel": "Chiqindi",
+                     *       "status": "PENDING_REVIEW",
+                     *       "statusLabel": "Moderatsiyada",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "displayName": "Ali Valiyev"
+                     *       },
+                     *       "createdAt": "2026-11-25T08:46:52.282Z",
+                     *       "publishedAt": null,
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Maktab yo'lagidagi axlat haftalardan beri olib ketilmayapti",
+                     *       "locationText": "Maktab yo'lagi",
+                     *       "media": [],
+                     *       "voteCount": null,
+                     *       "roundId": null,
+                     *       "myVote": false,
+                     *       "isFollowing": true,
+                     *       "canVote": false,
+                     *       "commentCount": 0,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": null,
+                     *       "responsible": null,
+                     *       "nextStep": null,
+                     *       "dueDate": null,
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": []
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -1986,6 +3273,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -2069,7 +3361,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2078,7 +3370,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2087,7 +3379,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2096,7 +3394,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2124,6 +3431,68 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *       "title": "Ko'cha chirog'i ishlamayapti",
+                     *       "category": "LIGHTING",
+                     *       "categoryLabel": "Yoritish",
+                     *       "status": "OPEN",
+                     *       "statusLabel": "Ovoz berilmoqda",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "displayName": "Ali Valiyev"
+                     *       },
+                     *       "createdAt": "2026-11-20T08:46:51.146Z",
+                     *       "publishedAt": "2026-11-21T04:46:51.146Z",
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Navoiy ko'chasi 12-uy yonidagi chiroq ikki haftadan beri yonmayapti, kechasi juda qorong'i.",
+                     *       "locationText": "Mahalla markazi, 12-uy yonida",
+                     *       "media": [
+                     *         {
+                     *           "id": "01a211e2-e244-7381-865b-707e7467e3dc",
+                     *           "kind": "IMAGE",
+                     *           "url": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc.jpg?exp=1795596712&sig=80d740411050f3f642ae893ea29fe8cd9722795f250815e1fb7f1a8c39367a45",
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc_t.jpg?exp=1795596712&sig=2f028988562313ae006658abf8eda6e4a9c3b3f26aaa4fef17848a42a2e65192",
+                     *           "width": 1024,
+                     *           "height": 768,
+                     *           "mime": "image/jpeg",
+                     *           "sizeBytes": 19560,
+                     *           "expiresAt": "2026-11-25T08:51:52.189Z"
+                     *         }
+                     *       ],
+                     *       "voteCount": 3,
+                     *       "roundId": "01a211e2-e23b-7237-b7d4-5fcb2d66c196",
+                     *       "myVote": true,
+                     *       "isFollowing": false,
+                     *       "canVote": false,
+                     *       "commentCount": 2,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": null,
+                     *       "responsible": null,
+                     *       "nextStep": null,
+                     *       "dueDate": null,
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": [
+                     *         {
+                     *           "id": "01a211e2-e244-7380-8ea8-95194fc900c1",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "PENDING_REVIEW",
+                     *           "toStatus": "OPEN",
+                     *           "reason": null,
+                     *           "payload": {},
+                     *           "createdAt": "2026-11-21T04:46:51.146Z",
+                     *           "actorName": null,
+                     *           "media": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -2133,6 +3502,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -2216,7 +3590,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2225,7 +3599,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2234,7 +3608,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2243,7 +3621,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2252,7 +3630,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2281,7 +3659,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2290,7 +3668,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2299,7 +3677,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2308,7 +3692,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2317,7 +3701,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2346,6 +3739,8 @@ export interface operations {
                     category?: "ROAD" | "LIGHTING" | "WASTE" | "WATER" | "LANDSCAPING" | "OTHER";
                     locationText?: string;
                     mediaIds?: string[];
+                    /** @enum {string} */
+                    roundKind?: "MONTHLY" | "WEEKLY";
                 };
             };
         };
@@ -2356,6 +3751,44 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e57b-764b-9734-c279992ad4f7",
+                     *       "title": "Yo'l chetida axlat to'planib qolgan (aniqlandi)",
+                     *       "category": "WASTE",
+                     *       "categoryLabel": "Chiqindi",
+                     *       "status": "PENDING_REVIEW",
+                     *       "statusLabel": "Moderatsiyada",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "displayName": "Ali Valiyev"
+                     *       },
+                     *       "createdAt": "2026-11-25T08:46:52.282Z",
+                     *       "publishedAt": null,
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Maktab yo'lagidagi axlat haftalardan beri olib ketilmayapti",
+                     *       "locationText": "Maktab yo'lagi",
+                     *       "media": [],
+                     *       "voteCount": null,
+                     *       "roundId": null,
+                     *       "myVote": false,
+                     *       "isFollowing": true,
+                     *       "canVote": false,
+                     *       "commentCount": 0,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": null,
+                     *       "responsible": null,
+                     *       "nextStep": null,
+                     *       "dueDate": null,
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": []
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -2365,6 +3798,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -2448,7 +3886,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2457,7 +3895,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2466,7 +3904,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2475,7 +3919,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2484,7 +3928,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2521,6 +3974,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -2604,7 +4062,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2613,7 +4071,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2622,7 +4080,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2631,7 +4095,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2640,7 +4104,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **INVALID_STATUS_TRANSITION** — Bu holatga o'tkazib bo'lmaydi */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2669,7 +4142,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2678,7 +4151,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2687,7 +4160,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2696,7 +4175,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2705,7 +4184,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2734,7 +4213,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2743,7 +4222,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2752,7 +4231,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2761,7 +4246,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2770,7 +4255,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2821,7 +4306,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2830,7 +4315,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2839,7 +4324,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2848,7 +4339,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2857,7 +4348,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2888,6 +4388,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e2a3-71a9-913f-266b64725030",
+                     *           "text": "Men ham har kuni shu yerdan o'taman, juda qorong'i",
+                     *           "authorId": "01a211e2-e146-75fb-b147-771145e63c3d",
+                     *           "authorName": "Vali Aliyev",
+                     *           "createdAt": "2026-11-21T14:46:51.146Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2a5-7752-94b9-1f5b415a8b50",
+                     *           "text": "Qo'llab-quvvatlayman, tezroq hal qilinsin",
+                     *           "authorId": "01a211e2-e147-76b1-9204-51bc4d1f9914",
+                     *           "authorName": "Sara Karimova",
+                     *           "createdAt": "2026-11-22T10:46:51.146Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -2904,7 +4425,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2913,7 +4434,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -2922,7 +4443,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2931,7 +4456,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2940,7 +4465,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2974,6 +4499,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e56d-7084-bc16-5791a7f47014",
+                     *       "text": "Men ham har kuni shu yerdan o'taman",
+                     *       "authorId": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *       "authorName": "Ali Valiyev",
+                     *       "createdAt": "2026-11-25T08:46:52.268Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -2987,7 +4521,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -2996,7 +4530,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3005,7 +4539,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3014,7 +4554,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3023,7 +4563,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3049,10 +4598,53 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "round": {
+                     *         "id": "01a211e2-e23b-7237-b7d4-5fcb2d66c196",
+                     *         "kind": "MONTHLY",
+                     *         "status": "OPEN",
+                     *         "periodStart": "2026-10-31T19:00:00.000Z",
+                     *         "periodEnd": "2026-11-30T19:00:00.000Z"
+                     *       },
+                     *       "periodStart": "2026-10-31T19:00:00.000Z",
+                     *       "periodEnd": "2026-11-30T19:00:00.000Z",
+                     *       "votesUsed": 2,
+                     *       "votesLeft": 1,
+                     *       "myVotes": [
+                     *         {
+                     *           "issueId": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *           "title": "Ko'cha chirog'i ishlamayapti",
+                     *           "slot": 1
+                     *         },
+                     *         {
+                     *           "issueId": "01a211e2-e23d-709e-bd0f-6c0afce618f2",
+                     *           "title": "Hovli yo'lagi ta'mirlanmagan",
+                     *           "slot": 2
+                     *         }
+                     *       ],
+                     *       "weekly": {
+                     *         "round": {
+                     *           "id": "01a211e2-e2ab-7262-b263-af3257bb65c1",
+                     *           "kind": "WEEKLY",
+                     *           "status": "OPEN",
+                     *           "periodStart": "2026-11-22T19:00:00.000Z",
+                     *           "periodEnd": "2026-11-29T19:00:00.000Z"
+                     *         },
+                     *         "periodStart": "2026-11-22T19:00:00.000Z",
+                     *         "periodEnd": "2026-11-29T19:00:00.000Z",
+                     *         "votesUsed": 0,
+                     *         "votesLeft": 3,
+                     *         "myVotes": []
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         round: {
                             /** Format: uuid */
                             id: string;
+                            /** @enum {string} */
+                            kind: "MONTHLY" | "WEEKLY";
                             /** @enum {string} */
                             status: "OPEN" | "CLOSED";
                             /** Format: date-time */
@@ -3072,10 +4664,37 @@ export interface operations {
                             title: string;
                             slot: number;
                         }[];
+                        /** @description Parallel haftalik davr (dushanba–dushanba): alohida 3 ta ovoz */
+                        weekly: {
+                            round: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "MONTHLY" | "WEEKLY";
+                                /** @enum {string} */
+                                status: "OPEN" | "CLOSED";
+                                /** Format: date-time */
+                                periodStart: string;
+                                /** Format: date-time */
+                                periodEnd: string;
+                            };
+                            /** Format: date-time */
+                            periodStart: string;
+                            /** Format: date-time */
+                            periodEnd: string;
+                            votesUsed: number;
+                            votesLeft: number;
+                            myVotes: {
+                                /** Format: uuid */
+                                issueId: string;
+                                title: string;
+                                slot: number;
+                            }[];
+                        };
                     };
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3084,7 +4703,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3093,7 +4716,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3109,6 +4732,7 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
+                kind?: "MONTHLY" | "WEEKLY";
             };
             header?: never;
             path?: never;
@@ -3122,10 +4746,109 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e2ab-7262-b263-af3257bb65c1",
+                     *           "kind": "WEEKLY",
+                     *           "periodStart": "2026-11-22T19:00:00.000Z",
+                     *           "periodEnd": "2026-11-29T19:00:00.000Z",
+                     *           "status": "OPEN",
+                     *           "winner": null,
+                     *           "totalVoters": null,
+                     *           "totalVotes": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2a7-759f-8a2a-2c8abba0ea9b",
+                     *           "kind": "WEEKLY",
+                     *           "periodStart": "2026-11-15T19:00:00.000Z",
+                     *           "periodEnd": "2026-11-22T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e2a7-75a0-be37-75b25f869db4",
+                     *             "title": "Kirish yo'lagidagi chuqurni ko'mish",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 3,
+                     *           "totalVotes": 3
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e23b-7237-b7d4-5fcb2d66c196",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-10-31T19:00:00.000Z",
+                     *           "periodEnd": "2026-11-30T19:00:00.000Z",
+                     *           "status": "OPEN",
+                     *           "winner": null,
+                     *           "totalVoters": null,
+                     *           "totalVotes": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e14f-7609-b8c8-cc1c69c2611a",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-09-30T19:00:00.000Z",
+                     *           "periodEnd": "2026-10-31T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e14d-775d-a9f9-35a754dc5d25",
+                     *             "title": "Maktab oldidagi yo'lga svetofor o'rnatish",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 4,
+                     *           "totalVotes": 4
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e191-7501-b1c8-35f97bbdc008",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-08-31T19:00:00.000Z",
+                     *           "periodEnd": "2026-09-30T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e18e-707f-a549-8ca8b32f13f5",
+                     *             "title": "Bolalar maydonchasi qoplamasini yangilash",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 4,
+                     *           "totalVotes": 4
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e1b8-70e5-9e52-c11d369ec1dc",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-07-31T19:00:00.000Z",
+                     *           "periodEnd": "2026-08-31T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e1b6-7194-a21d-d1895b60ab58",
+                     *             "title": "Markaziy quvurdagi suv oqishini bartaraf etish",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 4,
+                     *           "totalVotes": 4
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e1fe-7357-834a-d3db078d5d20",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-06-30T19:00:00.000Z",
+                     *           "periodEnd": "2026-07-31T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e1fd-701f-91ef-fb9b1230c72e",
+                     *             "title": "Ko'cha chiroqlarini LED ga almashtirish",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 4,
+                     *           "totalVotes": 4
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
                             id: string;
+                            /** @enum {string} */
+                            kind: "MONTHLY" | "WEEKLY";
                             /** Format: date-time */
                             periodStart: string;
                             /** Format: date-time */
@@ -3145,7 +4868,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3154,7 +4877,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3163,7 +4886,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3172,7 +4899,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3200,9 +4927,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "roundId": "01a211e2-e2a7-759f-8a2a-2c8abba0ea9b",
+                     *       "kind": "WEEKLY",
+                     *       "periodStart": "2026-11-15T19:00:00.000Z",
+                     *       "periodEnd": "2026-11-22T19:00:00.000Z",
+                     *       "closedAt": "2026-11-22T19:00:00.000Z",
+                     *       "winner": {
+                     *         "rank": 1,
+                     *         "title": "Kirish yo'lagidagi chuqurni ko'mish",
+                     *         "votes": 3,
+                     *         "issueId": "01a211e2-e2a7-75a0-be37-75b25f869db4"
+                     *       },
+                     *       "ranking": [
+                     *         {
+                     *           "rank": 1,
+                     *           "title": "Kirish yo'lagidagi chuqurni ko'mish",
+                     *           "votes": 3,
+                     *           "issueId": "01a211e2-e2a7-75a0-be37-75b25f869db4"
+                     *         }
+                     *       ],
+                     *       "totalVoters": 3,
+                     *       "totalVotes": 3,
+                     *       "message": "«Kirish yo'lagidagi chuqurni ko'mish» 3 ta ovoz bilan g'olib bo'ldi"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         roundId: string;
+                        /** @enum {string} */
+                        kind: "MONTHLY" | "WEEKLY";
                         /** Format: date-time */
                         periodStart: string;
                         /** Format: date-time */
@@ -3229,7 +4984,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3238,7 +4993,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3247,7 +5002,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3256,7 +5015,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3265,7 +5024,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3293,6 +5052,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "issueId": "01a211e2-e2ac-72e2-b675-effe86449098",
+                     *       "voted": true,
+                     *       "slot": 1,
+                     *       "votesUsed": 1,
+                     *       "votesLeft": 2,
+                     *       "roundKind": "WEEKLY"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         issueId: string;
@@ -3300,10 +5069,15 @@ export interface operations {
                         slot: number | null;
                         votesUsed: number;
                         votesLeft: number;
+                        /**
+                         * @description Ovoz qaysi davrda hisoblandi; votesUsed/votesLeft shu davrga tegishli
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3312,7 +5086,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3321,7 +5095,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3330,7 +5110,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3339,7 +5119,22 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /**
+             * @description **ROUND_CLOSED** — Ovoz berish davri yopilgan
+             *
+             *     **ISSUE_NOT_VOTABLE** — Bu muammoga ovoz berib bo'lmaydi
+             *
+             *     **VOTE_LIMIT_REACHED** — Bu oy uchun 3 ta ovozingizdan foydalandingiz
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3368,7 +5163,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3377,7 +5172,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3386,7 +5181,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3395,7 +5196,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3404,7 +5205,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **ROUND_CLOSED** — Ovoz berish davri yopilgan */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3420,6 +5230,7 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
+                kind?: "MONTHLY" | "WEEKLY";
             };
             header?: never;
             path?: never;
@@ -3433,10 +5244,109 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e2ab-7262-b263-af3257bb65c1",
+                     *           "kind": "WEEKLY",
+                     *           "periodStart": "2026-11-22T19:00:00.000Z",
+                     *           "periodEnd": "2026-11-29T19:00:00.000Z",
+                     *           "status": "OPEN",
+                     *           "winner": null,
+                     *           "totalVoters": null,
+                     *           "totalVotes": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2a7-759f-8a2a-2c8abba0ea9b",
+                     *           "kind": "WEEKLY",
+                     *           "periodStart": "2026-11-15T19:00:00.000Z",
+                     *           "periodEnd": "2026-11-22T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e2a7-75a0-be37-75b25f869db4",
+                     *             "title": "Kirish yo'lagidagi chuqurni ko'mish",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 3,
+                     *           "totalVotes": 3
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e23b-7237-b7d4-5fcb2d66c196",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-10-31T19:00:00.000Z",
+                     *           "periodEnd": "2026-11-30T19:00:00.000Z",
+                     *           "status": "OPEN",
+                     *           "winner": null,
+                     *           "totalVoters": null,
+                     *           "totalVotes": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e14f-7609-b8c8-cc1c69c2611a",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-09-30T19:00:00.000Z",
+                     *           "periodEnd": "2026-10-31T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e14d-775d-a9f9-35a754dc5d25",
+                     *             "title": "Maktab oldidagi yo'lga svetofor o'rnatish",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 4,
+                     *           "totalVotes": 4
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e191-7501-b1c8-35f97bbdc008",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-08-31T19:00:00.000Z",
+                     *           "periodEnd": "2026-09-30T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e18e-707f-a549-8ca8b32f13f5",
+                     *             "title": "Bolalar maydonchasi qoplamasini yangilash",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 4,
+                     *           "totalVotes": 4
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e1b8-70e5-9e52-c11d369ec1dc",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-07-31T19:00:00.000Z",
+                     *           "periodEnd": "2026-08-31T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e1b6-7194-a21d-d1895b60ab58",
+                     *             "title": "Markaziy quvurdagi suv oqishini bartaraf etish",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 4,
+                     *           "totalVotes": 4
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e1fe-7357-834a-d3db078d5d20",
+                     *           "kind": "MONTHLY",
+                     *           "periodStart": "2026-06-30T19:00:00.000Z",
+                     *           "periodEnd": "2026-07-31T19:00:00.000Z",
+                     *           "status": "CLOSED",
+                     *           "winner": {
+                     *             "issueId": "01a211e2-e1fd-701f-91ef-fb9b1230c72e",
+                     *             "title": "Ko'cha chiroqlarini LED ga almashtirish",
+                     *             "votes": 3
+                     *           },
+                     *           "totalVoters": 4,
+                     *           "totalVotes": 4
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
                             id: string;
+                            /** @enum {string} */
+                            kind: "MONTHLY" | "WEEKLY";
                             /** Format: date-time */
                             periodStart: string;
                             /** Format: date-time */
@@ -3456,7 +5366,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3465,7 +5375,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3474,7 +5384,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3483,7 +5397,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3511,9 +5425,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "roundId": "01a211e2-e2a7-759f-8a2a-2c8abba0ea9b",
+                     *       "kind": "WEEKLY",
+                     *       "periodStart": "2026-11-15T19:00:00.000Z",
+                     *       "periodEnd": "2026-11-22T19:00:00.000Z",
+                     *       "closedAt": "2026-11-22T19:00:00.000Z",
+                     *       "winner": {
+                     *         "rank": 1,
+                     *         "title": "Kirish yo'lagidagi chuqurni ko'mish",
+                     *         "votes": 3,
+                     *         "issueId": "01a211e2-e2a7-75a0-be37-75b25f869db4"
+                     *       },
+                     *       "ranking": [
+                     *         {
+                     *           "rank": 1,
+                     *           "title": "Kirish yo'lagidagi chuqurni ko'mish",
+                     *           "votes": 3,
+                     *           "issueId": "01a211e2-e2a7-75a0-be37-75b25f869db4"
+                     *         }
+                     *       ],
+                     *       "totalVoters": 3,
+                     *       "totalVotes": 3,
+                     *       "message": "«Kirish yo'lagidagi chuqurni ko'mish» 3 ta ovoz bilan g'olib bo'ldi"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         roundId: string;
+                        /** @enum {string} */
+                        kind: "MONTHLY" | "WEEKLY";
                         /** Format: date-time */
                         periodStart: string;
                         /** Format: date-time */
@@ -3540,7 +5482,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3549,7 +5491,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3558,7 +5500,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3567,7 +5513,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3576,7 +5522,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3622,7 +5568,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3631,7 +5577,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3640,7 +5586,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3649,7 +5601,25 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **FILE_TOO_LARGE** — Fayl hajmi juda katta */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **UNSUPPORTED_MEDIA_TYPE** — Fayl turi qo'llab-quvvatlanmaydi */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3677,6 +5647,13 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "url": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc.jpg?exp=1795596712&sig=80d740411050f3f642ae893ea29fe8cd9722795f250815e1fb7f1a8c39367a45",
+                     *       "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc_t.jpg?exp=1795596712&sig=2f028988562313ae006658abf8eda6e4a9c3b3f26aaa4fef17848a42a2e65192",
+                     *       "expiresAt": "2026-11-25T08:51:52.202Z"
+                     *     }
+                     */
                     "application/json": {
                         url: string;
                         thumbUrl: string | null;
@@ -3685,7 +5662,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3694,7 +5671,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3703,7 +5680,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3712,7 +5693,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -3721,7 +5702,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3751,6 +5732,67 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e2f4-763a-b0ee-e02ca02b797c",
+                     *           "text": "Men ovoz berdim, rahmat eslatganingiz uchun!",
+                     *           "senderId": "01a211e2-e148-7432-8ee5-515d10599555",
+                     *           "senderName": "Dilnoza Rahimova",
+                     *           "senderRole": "RESIDENT",
+                     *           "mine": false,
+                     *           "createdAt": "2026-11-25T08:36:51.146Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2f3-7559-ac4b-9ffd9aebb43a",
+                     *           "text": "Chiroq masalasiga ovoz berishni unutmanglar",
+                     *           "senderId": "01a211e2-e146-75fb-b147-771145e63c3d",
+                     *           "senderName": "Vali Aliyev",
+                     *           "senderRole": "RESIDENT",
+                     *           "mine": false,
+                     *           "createdAt": "2026-11-25T08:26:51.146Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2f3-7558-b0d9-bf2dea224733",
+                     *           "text": "Men ham keladigan bo'ldim, asbob-uskunalar olib kelaman",
+                     *           "senderId": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *           "senderName": "Ali Valiyev",
+                     *           "senderRole": "RESIDENT",
+                     *           "mine": true,
+                     *           "createdAt": "2026-11-25T08:16:51.146Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2f2-75cc-8079-63e63e4c677c",
+                     *           "text": "Albatta, bolalar bilan kelaman",
+                     *           "senderId": "01a211e2-e147-76b1-9204-51bc4d1f9914",
+                     *           "senderName": "Sara Karimova",
+                     *           "senderRole": "RESIDENT",
+                     *           "mine": false,
+                     *           "createdAt": "2026-11-25T08:06:51.146Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2f2-75cb-9327-9899491605f8",
+                     *           "text": "Vaalaykum assalom! Ertaga hashar bor ekan, kelasizlarmi?",
+                     *           "senderId": "01a211e2-e146-75fb-b147-771145e63c3d",
+                     *           "senderName": "Vali Aliyev",
+                     *           "senderRole": "RESIDENT",
+                     *           "mine": false,
+                     *           "createdAt": "2026-11-25T07:56:51.146Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2f1-7092-b9d7-d8f5caf9f5c3",
+                     *           "text": "Assalomu alaykum, qo'shnilar!",
+                     *           "senderId": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *           "senderName": "Ali Valiyev",
+                     *           "senderRole": "RESIDENT",
+                     *           "mine": true,
+                     *           "createdAt": "2026-11-25T07:46:51.146Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -3759,6 +5801,8 @@ export interface operations {
                             /** Format: uuid */
                             senderId: string;
                             senderName: string;
+                            /** @enum {string} */
+                            senderRole: "RESIDENT" | "MAHALLA_ADMIN";
                             mine: boolean;
                             /** Format: date-time */
                             createdAt: string;
@@ -3768,7 +5812,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3777,7 +5821,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3786,7 +5830,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3795,7 +5843,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3828,6 +5876,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e55a-713a-a18c-be8727374d49",
+                     *       "text": "Assalomu alaykum, qo'shnilar!",
+                     *       "senderId": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *       "senderName": "Ali Valiyev",
+                     *       "senderRole": "RESIDENT",
+                     *       "mine": true,
+                     *       "createdAt": "2026-11-25T08:46:52.249Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -3835,13 +5894,15 @@ export interface operations {
                         /** Format: uuid */
                         senderId: string;
                         senderName: string;
+                        /** @enum {string} */
+                        senderRole: "RESIDENT" | "MAHALLA_ADMIN";
                         mine: boolean;
                         /** Format: date-time */
                         createdAt: string;
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3850,7 +5911,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3859,7 +5920,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3868,7 +5935,432 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSupportMessages: {
+        parameters: {
+            query?: {
+                before?: string;
+                after?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Muvaffaqiyatli */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e55d-7054-b7d4-2ce55f64d29d",
+                     *           "text": "Assalomu alaykum, hovlidagi chiroq yonmayapti",
+                     *           "senderId": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *           "senderName": "Ali Valiyev",
+                     *           "senderRole": "RESIDENT",
+                     *           "mine": true,
+                     *           "createdAt": "2026-11-25T08:46:52.252Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    postSupportMessages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    text: string;
+                    clientMessageId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Yaratildi */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e55d-7054-b7d4-2ce55f64d29d",
+                     *       "text": "Assalomu alaykum, hovlidagi chiroq yonmayapti",
+                     *       "senderId": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *       "senderName": "Ali Valiyev",
+                     *       "senderRole": "RESIDENT",
+                     *       "mine": true,
+                     *       "createdAt": "2026-11-25T08:46:52.252Z"
+                     *     }
+                     */
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getAdminSupportThreads: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Muvaffaqiyatli */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "residentId": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *           "residentName": "Ali Valiyev",
+                     *           "lastText": "Assalomu alaykum, hovlidagi chiroq yonmayapti",
+                     *           "lastAt": "2026-11-25T08:46:52.252Z",
+                     *           "awaitingReply": true
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getAdminSupportThreadsByResidentIdMessages: {
+        parameters: {
+            query?: {
+                before?: string;
+                after?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                residentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Muvaffaqiyatli */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e567-7596-a682-b40f311460d6",
+                     *           "text": "Salom! Ertaga ko'rib chiqamiz",
+                     *           "senderId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "senderName": "Admin Demo Yunusobod",
+                     *           "senderRole": "MAHALLA_ADMIN",
+                     *           "mine": true,
+                     *           "createdAt": "2026-11-25T08:46:52.262Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e55d-7054-b7d4-2ce55f64d29d",
+                     *           "text": "Assalomu alaykum, hovlidagi chiroq yonmayapti",
+                     *           "senderId": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *           "senderName": "Ali Valiyev",
+                     *           "senderRole": "RESIDENT",
+                     *           "mine": false,
+                     *           "createdAt": "2026-11-25T08:46:52.252Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **NOT_FOUND** — Topilmadi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    postAdminSupportThreadsByResidentIdMessages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                residentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    text: string;
+                    clientMessageId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Yaratildi */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e567-7596-a682-b40f311460d6",
+                     *       "text": "Salom! Ertaga ko'rib chiqamiz",
+                     *       "senderId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *       "senderName": "Admin Demo Yunusobod",
+                     *       "senderRole": "MAHALLA_ADMIN",
+                     *       "mine": true,
+                     *       "createdAt": "2026-11-25T08:46:52.262Z"
+                     *     }
+                     */
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **NOT_FOUND** — Topilmadi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3904,6 +6396,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e572-774a-a73a-c294ec1e673a",
+                     *       "targetType": "CHAT_MESSAGE",
+                     *       "targetId": "01a211e2-e2f4-763a-b0ee-e02ca02b797c",
+                     *       "reason": "Reklama xarakteridagi xabar",
+                     *       "status": "OPEN",
+                     *       "resolution": null,
+                     *       "createdAt": "2026-11-25T08:46:52.273Z",
+                     *       "resolvedAt": null
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -3922,7 +6426,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -3931,7 +6435,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3940,7 +6444,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3949,7 +6459,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **NOT_FOUND** — Topilmadi */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -3979,6 +6498,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e572-774a-a73a-c294ec1e673a",
+                     *           "targetType": "CHAT_MESSAGE",
+                     *           "targetId": "01a211e2-e2f4-763a-b0ee-e02ca02b797c",
+                     *           "reason": "Reklama xarakteridagi xabar",
+                     *           "status": "OPEN",
+                     *           "resolution": null,
+                     *           "createdAt": "2026-11-25T08:46:52.273Z",
+                     *           "resolvedAt": null,
+                     *           "reporterName": "Ali Valiyev",
+                     *           "contentPreview": "Men ovoz berdim, rahmat eslatganingiz uchun!",
+                     *           "contentHidden": false
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2f4-763b-88f5-c42e063c9c30",
+                     *           "targetType": "CHAT_MESSAGE",
+                     *           "targetId": "01a211e2-e2f3-7559-ac4b-9ffd9aebb43a",
+                     *           "reason": "Reklama xarakteridagi xabar",
+                     *           "status": "OPEN",
+                     *           "resolution": null,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z",
+                     *           "resolvedAt": null,
+                     *           "reporterName": "Sara Karimova",
+                     *           "contentPreview": "Chiroq masalasiga ovoz berishni unutmanglar",
+                     *           "contentHidden": false
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -4003,7 +6555,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4012,7 +6564,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4021,7 +6573,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4030,7 +6586,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4064,6 +6620,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e572-774a-a73a-c294ec1e673a",
+                     *       "status": "ACTIONED"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -4072,7 +6634,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4081,7 +6643,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4090,7 +6652,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4099,7 +6667,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4108,7 +6676,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4142,6 +6719,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e615-7582-846b-07019b54c61e",
+                     *       "status": "DISMISSED"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -4150,7 +6733,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4159,7 +6742,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4168,7 +6751,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4177,7 +6766,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4186,7 +6775,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4216,6 +6814,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e2ae-753a-9fd2-b324291ff7b4",
+                     *           "title": "Hashar: hovli va skverni tozalash",
+                     *           "description": "Birgalikda hovli va skverni tozalaymiz, asbob-uskunalar tayyor bo'ladi.",
+                     *           "startsAt": "2026-12-02T08:46:51.146Z",
+                     *           "endsAt": null,
+                     *           "location": "Markaziy hovli",
+                     *           "organizer": "Mahalla qo'mitasi",
+                     *           "status": "PUBLISHED",
+                     *           "version": 1,
+                     *           "resultText": null,
+                     *           "rsvpCount": 2,
+                     *           "myRsvp": true,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -4255,7 +6875,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4264,7 +6884,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4273,7 +6893,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4282,7 +6906,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4310,6 +6934,36 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e2ae-753a-9fd2-b324291ff7b4",
+                     *       "title": "Hashar: hovli va skverni tozalash",
+                     *       "description": "Birgalikda hovli va skverni tozalaymiz, asbob-uskunalar tayyor bo'ladi.",
+                     *       "startsAt": "2026-12-02T08:46:51.146Z",
+                     *       "endsAt": null,
+                     *       "location": "Markaziy hovli",
+                     *       "organizer": "Mahalla qo'mitasi",
+                     *       "status": "PUBLISHED",
+                     *       "version": 1,
+                     *       "resultText": null,
+                     *       "rsvpCount": 2,
+                     *       "myRsvp": true,
+                     *       "createdAt": "2026-11-25T08:46:51.200Z",
+                     *       "media": [
+                     *         {
+                     *           "id": "01a211e2-e2d2-7589-a381-bf158203ebfa",
+                     *           "kind": "IMAGE",
+                     *           "url": "http://localhost:3000/api/v1/files/01a211e2-e2d2-7589-a381-bf158203ebfa.jpg?exp=1795596712&sig=2f22d1eebe9222978d4f601717c836a875dde0f4066a5de36ea67b44934d51f4",
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e2d2-7589-a381-bf158203ebfa_t.jpg?exp=1795596712&sig=e009b73fb79b7d361693d15e3e85f3fd4597b798f4ea2bcd22f75b1e61db1e7f",
+                     *           "width": 1024,
+                     *           "height": 768,
+                     *           "mime": "image/jpeg",
+                     *           "sizeBytes": 17938,
+                     *           "expiresAt": "2026-11-25T08:51:52.228Z"
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -4346,7 +7000,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4355,7 +7009,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4364,7 +7018,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4373,7 +7031,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4382,7 +7040,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4410,13 +7068,19 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "going": true,
+                     *       "rsvpCount": 2
+                     *     }
+                     */
                     "application/json": {
                         going: boolean;
                         rsvpCount: number;
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4425,7 +7089,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4434,7 +7098,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4443,7 +7113,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4452,7 +7122,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4481,7 +7160,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4490,7 +7169,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4499,7 +7178,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4508,7 +7193,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4517,7 +7202,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4547,6 +7232,58 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e2ee-7719-807d-c75a3a3358cd",
+                     *           "title": "Yangi yil oldi yarmarkasi (qoralama)",
+                     *           "description": "Hali tasdiqlanmagan tadbir loyihasi.",
+                     *           "startsAt": "2026-12-20T08:46:51.146Z",
+                     *           "endsAt": null,
+                     *           "location": "Markaziy hovli",
+                     *           "organizer": "Mahalla qo'mitasi",
+                     *           "status": "DRAFT",
+                     *           "version": 1,
+                     *           "resultText": null,
+                     *           "rsvpCount": 0,
+                     *           "myRsvp": false,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2ae-753a-9fd2-b324291ff7b4",
+                     *           "title": "Hashar: hovli va skverni tozalash",
+                     *           "description": "Birgalikda hovli va skverni tozalaymiz, asbob-uskunalar tayyor bo'ladi.",
+                     *           "startsAt": "2026-12-02T08:46:51.146Z",
+                     *           "endsAt": null,
+                     *           "location": "Markaziy hovli",
+                     *           "organizer": "Mahalla qo'mitasi",
+                     *           "status": "PUBLISHED",
+                     *           "version": 1,
+                     *           "resultText": null,
+                     *           "rsvpCount": 2,
+                     *           "myRsvp": false,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2af-733a-a53f-f1cd42467072",
+                     *           "title": "Navro'z bayrami tantanasi",
+                     *           "description": "Mahalla aholisi bilan bayram dasturxoni va bolalar o'yinlari.",
+                     *           "startsAt": "2026-10-16T08:46:51.146Z",
+                     *           "endsAt": null,
+                     *           "location": "Markaziy hovli",
+                     *           "organizer": "Mahalla qo'mitasi",
+                     *           "status": "COMPLETED",
+                     *           "version": 1,
+                     *           "resultText": "120 dan ortiq kishi qatnashdi, bolalar uchun sovg'alar tarqatildi",
+                     *           "rsvpCount": 3,
+                     *           "myRsvp": false,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -4586,7 +7323,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4595,7 +7332,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4604,7 +7341,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4613,7 +7354,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4650,6 +7391,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e662-7137-bb6a-eb90e9bdeeac",
+                     *       "title": "Hashar: hovli tozalash",
+                     *       "description": "Mahalla hovlisini birgalikda tozalaymiz",
+                     *       "startsAt": "2026-12-04T08:46:52.512Z",
+                     *       "endsAt": null,
+                     *       "location": "Markaziy hovli",
+                     *       "organizer": "Mahalla qo‘mitasi",
+                     *       "status": "DRAFT",
+                     *       "version": 1,
+                     *       "resultText": null,
+                     *       "rsvpCount": 0,
+                     *       "myRsvp": false,
+                     *       "createdAt": "2026-11-25T08:46:52.513Z",
+                     *       "media": []
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -4686,7 +7445,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4695,7 +7454,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4704,7 +7463,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4713,7 +7478,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4752,6 +7517,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e662-7137-bb6a-eb90e9bdeeac",
+                     *       "title": "Hashar: hovli tozalash",
+                     *       "description": "Mahalla hovlisini birgalikda tozalaymiz",
+                     *       "startsAt": "2026-12-05T08:46:52.520Z",
+                     *       "endsAt": null,
+                     *       "location": "Markaziy hovli",
+                     *       "organizer": "Mahalla qo‘mitasi",
+                     *       "status": "PUBLISHED",
+                     *       "version": 2,
+                     *       "resultText": null,
+                     *       "rsvpCount": 0,
+                     *       "myRsvp": false,
+                     *       "createdAt": "2026-11-25T08:46:52.513Z",
+                     *       "media": []
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -4788,7 +7571,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4797,7 +7580,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4806,7 +7589,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4815,7 +7604,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4824,7 +7613,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4852,6 +7650,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e662-7137-bb6a-eb90e9bdeeac",
+                     *       "title": "Hashar: hovli tozalash",
+                     *       "description": "Mahalla hovlisini birgalikda tozalaymiz",
+                     *       "startsAt": "2026-12-04T08:46:52.512Z",
+                     *       "endsAt": null,
+                     *       "location": "Markaziy hovli",
+                     *       "organizer": "Mahalla qo‘mitasi",
+                     *       "status": "PUBLISHED",
+                     *       "version": 1,
+                     *       "resultText": null,
+                     *       "rsvpCount": 0,
+                     *       "myRsvp": false,
+                     *       "createdAt": "2026-11-25T08:46:52.513Z",
+                     *       "media": []
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -4888,7 +7704,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4897,7 +7713,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4906,7 +7722,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4915,7 +7737,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -4924,7 +7746,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -4958,6 +7789,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e662-7137-bb6a-eb90e9bdeeac",
+                     *       "title": "Hashar: hovli tozalash",
+                     *       "description": "Mahalla hovlisini birgalikda tozalaymiz",
+                     *       "startsAt": "2026-12-05T08:46:52.520Z",
+                     *       "endsAt": null,
+                     *       "location": "Markaziy hovli",
+                     *       "organizer": "Mahalla qo‘mitasi",
+                     *       "status": "CANCELLED",
+                     *       "version": 3,
+                     *       "resultText": null,
+                     *       "rsvpCount": 0,
+                     *       "myRsvp": false,
+                     *       "createdAt": "2026-11-25T08:46:52.513Z",
+                     *       "media": []
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -4994,7 +7843,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5003,7 +7852,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5012,7 +7861,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5021,7 +7876,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5030,7 +7885,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5066,6 +7930,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e673-7652-8cad-2a85a50eb8f2",
+                     *       "title": "Daraxt ekish",
+                     *       "description": "Mahalla hovlisini birgalikda tozalaymiz",
+                     *       "startsAt": "2026-12-04T08:46:52.531Z",
+                     *       "endsAt": null,
+                     *       "location": "Markaziy hovli",
+                     *       "organizer": "Mahalla qo‘mitasi",
+                     *       "status": "COMPLETED",
+                     *       "version": 1,
+                     *       "resultText": "25 kishi qatnashdi, 40 ta ko‘chat o‘tkazildi",
+                     *       "rsvpCount": 0,
+                     *       "myRsvp": false,
+                     *       "createdAt": "2026-11-25T08:46:52.531Z",
+                     *       "media": []
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -5102,7 +7984,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5111,7 +7993,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5120,7 +8002,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5129,7 +8017,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5138,7 +8026,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5166,6 +8063,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *           "login": "ali.yunusobod",
+                     *           "displayName": "Ali Valiyev",
+                     *           "phone": "+998905928589",
+                     *           "rsvpAt": "2026-11-25T08:46:51.200Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e146-75fb-b147-771145e63c3d",
+                     *           "login": "vali.yunusobod",
+                     *           "displayName": "Vali Aliyev",
+                     *           "phone": "+998906698322",
+                     *           "rsvpAt": "2026-11-25T08:46:51.200Z"
+                     *         }
+                     *       ],
+                     *       "total": 2
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -5180,7 +8098,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5189,7 +8107,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5198,7 +8116,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5207,7 +8129,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5216,7 +8138,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5245,6 +8167,31 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e2ef-779c-8342-a00812db14f8",
+                     *           "title": "Ertaga suv o'chiriladi",
+                     *           "body": "Ertaga soat 09:00 dan 14:00 gacha profilaktika ishlari sababli suv o'chiriladi. Iltimos, oldindan zaxira qiling.",
+                     *           "isImportant": true,
+                     *           "status": "PUBLISHED",
+                     *           "publishedAt": "2026-11-24T12:46:51.146Z",
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2f0-70fc-a3eb-a280e0c8c541",
+                     *           "title": "Chiqindi olib ketish jadvali o'zgardi",
+                     *           "body": "Endi chiqindi dushanba, chorshanba va juma kunlari olib ketiladi.",
+                     *           "isImportant": false,
+                     *           "status": "PUBLISHED",
+                     *           "publishedAt": "2026-11-21T04:46:51.146Z",
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -5263,7 +8210,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5272,7 +8219,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5281,7 +8228,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5290,7 +8241,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5318,6 +8269,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e2ef-779c-8342-a00812db14f8",
+                     *       "title": "Ertaga suv o'chiriladi",
+                     *       "body": "Ertaga soat 09:00 dan 14:00 gacha profilaktika ishlari sababli suv o'chiriladi. Iltimos, oldindan zaxira qiling.",
+                     *       "isImportant": true,
+                     *       "status": "PUBLISHED",
+                     *       "publishedAt": "2026-11-24T12:46:51.146Z",
+                     *       "createdAt": "2026-11-25T08:46:51.200Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -5333,7 +8295,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5342,7 +8304,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5351,7 +8313,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5360,7 +8326,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5369,7 +8335,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5404,6 +8370,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e681-76cb-86cc-0d1cf3760cf5",
+                     *       "title": "Ertaga suv o'chadi",
+                     *       "body": "Ertaga soat 9 dan 14 gacha suv o'chiriladi",
+                     *       "isImportant": true,
+                     *       "status": "DRAFT",
+                     *       "publishedAt": null,
+                     *       "createdAt": "2026-11-25T08:46:52.544Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -5419,7 +8396,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5428,7 +8405,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5437,7 +8414,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5446,7 +8429,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5475,7 +8458,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5484,7 +8467,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5493,7 +8476,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5502,7 +8491,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5511,7 +8500,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5548,6 +8546,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e681-76cb-86cc-0d1cf3760cf5",
+                     *       "title": "Ertaga suv o'chadi (yangilandi)",
+                     *       "body": "Ertaga soat 9 dan 14 gacha suv o'chiriladi",
+                     *       "isImportant": false,
+                     *       "status": "DRAFT",
+                     *       "publishedAt": null,
+                     *       "createdAt": "2026-11-25T08:46:52.544Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -5563,7 +8572,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5572,7 +8581,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5581,7 +8590,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5590,7 +8605,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5599,7 +8614,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5627,6 +8642,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e681-76cb-86cc-0d1cf3760cf5",
+                     *       "title": "Ertaga suv o'chadi (yangilandi)",
+                     *       "body": "Ertaga soat 9 dan 14 gacha suv o'chiriladi",
+                     *       "isImportant": false,
+                     *       "status": "PUBLISHED",
+                     *       "publishedAt": "2026-11-25T08:46:52.550Z",
+                     *       "createdAt": "2026-11-25T08:46:52.544Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -5642,7 +8668,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5651,7 +8677,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5660,7 +8686,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5669,7 +8701,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5678,7 +8710,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5707,6 +8739,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "4f64faca-e2b5-42ce-b845-d5dc860c67ab",
+                     *           "type": "IMPORTANT_ANNOUNCEMENT",
+                     *           "title": "Ertaga suv o'chiriladi",
+                     *           "body": "Ertaga soat 09:00 dan 14:00 gacha profilaktika ishlari sababli suv o'chiriladi. Iltimos, oldindan zaxira qiling.",
+                     *           "entityType": "ANNOUNCEMENT",
+                     *           "entityId": "01a211e2-e2ef-779c-8342-a00812db14f8",
+                     *           "read": false,
+                     *           "readAt": null,
+                     *           "createdAt": "2026-11-25T08:46:51.997Z"
+                     *         },
+                     *         {
+                     *           "id": "afda06ad-c776-48ca-9691-9c7682c6d502",
+                     *           "type": "ISSUE_STATUS_CHANGED",
+                     *           "title": "Muammo tasdiqlandi",
+                     *           "body": "«Ko'cha chirog'i ishlamayapti» ovoz berishga qo'yildi",
+                     *           "entityType": "ISSUE",
+                     *           "entityId": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *           "read": false,
+                     *           "readAt": null,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -5728,7 +8789,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5737,7 +8798,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5746,7 +8807,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5755,7 +8820,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5781,12 +8846,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "count": 2
+                     *     }
+                     */
                     "application/json": {
                         count: number;
                     };
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5795,7 +8865,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5804,7 +8878,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5831,7 +8905,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5840,7 +8914,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5849,7 +8929,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5878,7 +8958,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5887,7 +8967,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5896,7 +8976,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5905,7 +8991,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -5914,7 +9000,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -5945,6 +9031,57 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e148-7432-8ee5-515d10599555",
+                     *           "login": "dilnoza.yunusobod",
+                     *           "displayName": "Dilnoza Rahimova",
+                     *           "phone": "+998908024151",
+                     *           "status": "ACTIVE",
+                     *           "blockedReason": null,
+                     *           "mustChangePassword": true,
+                     *           "tempPasswordExpiresAt": "2026-11-28T08:46:51.146Z",
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e147-76b1-9204-51bc4d1f9914",
+                     *           "login": "sara.yunusobod",
+                     *           "displayName": "Sara Karimova",
+                     *           "phone": "+998904897846",
+                     *           "status": "ACTIVE",
+                     *           "blockedReason": null,
+                     *           "mustChangePassword": false,
+                     *           "tempPasswordExpiresAt": null,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e146-75fb-b147-771145e63c3d",
+                     *           "login": "vali.yunusobod",
+                     *           "displayName": "Vali Aliyev",
+                     *           "phone": "+998906698322",
+                     *           "status": "ACTIVE",
+                     *           "blockedReason": null,
+                     *           "mustChangePassword": false,
+                     *           "tempPasswordExpiresAt": null,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *           "login": "ali.yunusobod",
+                     *           "displayName": "Ali Valiyev",
+                     *           "phone": "+998905928589",
+                     *           "status": "ACTIVE",
+                     *           "blockedReason": null,
+                     *           "mustChangePassword": false,
+                     *           "tempPasswordExpiresAt": null,
+                     *           "createdAt": "2026-11-25T08:46:51.200Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -5965,7 +9102,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5974,7 +9111,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5983,7 +9120,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5992,7 +9133,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6026,6 +9167,23 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "user": {
+                     *         "id": "01a211e2-e637-73cc-9386-0040efce766c",
+                     *         "login": "ali.valiyev",
+                     *         "displayName": "Ali Valiyev",
+                     *         "phone": "+998901234567",
+                     *         "status": "ACTIVE",
+                     *         "blockedReason": null,
+                     *         "mustChangePassword": true,
+                     *         "tempPasswordExpiresAt": "2026-11-28T08:46:52.445Z",
+                     *         "createdAt": "2026-11-25T08:46:52.445Z"
+                     *       },
+                     *       "temporaryPassword": "Hn4Rk8Tm3Q",
+                     *       "expiresAt": "2026-11-28T08:46:52.445Z"
+                     *     }
+                     */
                     "application/json": {
                         user: {
                             /** Format: uuid */
@@ -6049,7 +9207,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6058,7 +9216,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6067,7 +9225,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6076,7 +9240,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6104,6 +9277,19 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e148-7432-8ee5-515d10599555",
+                     *       "login": "dilnoza.yunusobod",
+                     *       "displayName": "Dilnoza Rahimova",
+                     *       "phone": "+998908024151",
+                     *       "status": "ACTIVE",
+                     *       "blockedReason": null,
+                     *       "mustChangePassword": true,
+                     *       "tempPasswordExpiresAt": "2026-11-28T08:46:51.146Z",
+                     *       "createdAt": "2026-11-25T08:46:51.200Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -6121,7 +9307,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6130,7 +9316,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6139,7 +9325,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6148,7 +9338,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6157,7 +9347,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6185,6 +9375,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "temporaryPassword": "Hn4Rk8Tm3Q",
+                     *       "expiresAt": "2026-11-28T08:46:52.476Z"
+                     *     }
+                     */
                     "application/json": {
                         temporaryPassword: string;
                         /** Format: date-time */
@@ -6192,7 +9388,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6201,7 +9397,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6210,7 +9406,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6219,7 +9421,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6228,7 +9430,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6262,6 +9464,19 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e637-73cc-9386-0040efce766c",
+                     *       "login": "ali.valiyev",
+                     *       "displayName": "Ali Valiyev",
+                     *       "phone": "+998901234567",
+                     *       "status": "BLOCKED",
+                     *       "blockedReason": "Qoidabuzarlik",
+                     *       "mustChangePassword": true,
+                     *       "tempPasswordExpiresAt": "2026-11-28T08:46:52.476Z",
+                     *       "createdAt": "2026-11-25T08:46:52.445Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -6279,7 +9494,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6288,7 +9503,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6297,7 +9512,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6306,7 +9527,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6315,7 +9536,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6343,6 +9564,19 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e637-73cc-9386-0040efce766c",
+                     *       "login": "ali.valiyev",
+                     *       "displayName": "Ali Valiyev",
+                     *       "phone": "+998901234567",
+                     *       "status": "ACTIVE",
+                     *       "blockedReason": null,
+                     *       "mustChangePassword": true,
+                     *       "tempPasswordExpiresAt": "2026-11-28T08:46:52.476Z",
+                     *       "createdAt": "2026-11-25T08:46:52.445Z"
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -6360,7 +9594,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6369,7 +9603,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6378,7 +9612,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6387,7 +9627,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6396,7 +9636,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6425,6 +9665,82 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e29e-73dc-bd72-09db1aa2ba16",
+                     *           "title": "Bolalar maydonchasida qum yetishmaydi",
+                     *           "category": "LANDSCAPING",
+                     *           "categoryLabel": "Obodonlashtirish",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "PENDING_REVIEW",
+                     *           "statusLabel": "Moderatsiyada",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-25T03:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Dilnoza Rahimova",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e29f-7632-9425-ec659b458a78",
+                     *           "title": "Avtobus bekati tomi singan",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "PENDING_REVIEW",
+                     *           "statusLabel": "Moderatsiyada",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-25T06:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e57b-764b-9734-c279992ad4f7",
+                     *           "title": "Yo'l chetida axlat to'planib qolgan (aniqlandi)",
+                     *           "category": "WASTE",
+                     *           "categoryLabel": "Chiqindi",
+                     *           "locationText": "Maktab yo'lagi",
+                     *           "status": "PENDING_REVIEW",
+                     *           "statusLabel": "Moderatsiyada",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-25T08:46:52.282Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -6442,6 +9758,11 @@ export interface operations {
                             commentCount: number;
                             voteCount: number | null;
                             myVote: boolean;
+                            /**
+                             * @description Ovoz davri turi: oylik yoki haftalik (1 hafta ichida hal qilinadi)
+                             * @enum {string}
+                             */
+                            roundKind: "MONTHLY" | "WEEKLY";
                             isFollowing: boolean;
                             thumbUrl: string | null;
                             authorName: string;
@@ -6459,7 +9780,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6468,7 +9789,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6477,7 +9798,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6486,7 +9811,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6514,6 +9839,58 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e29e-73dc-bd72-09db1aa2ba16",
+                     *       "title": "Bolalar maydonchasida qum yetishmaydi",
+                     *       "category": "LANDSCAPING",
+                     *       "categoryLabel": "Obodonlashtirish",
+                     *       "status": "OPEN",
+                     *       "statusLabel": "Ovoz berilmoqda",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e148-7432-8ee5-515d10599555",
+                     *         "displayName": "Dilnoza Rahimova"
+                     *       },
+                     *       "createdAt": "2026-11-25T03:46:51.146Z",
+                     *       "publishedAt": "2026-11-25T08:46:52.347Z",
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Qum qutisi deyarli bo'sh, bolalar o'ynay olmayapti.",
+                     *       "locationText": "Mahalla markazi, 12-uy yonida",
+                     *       "media": [],
+                     *       "voteCount": 0,
+                     *       "roundId": "01a211e2-e23b-7237-b7d4-5fcb2d66c196",
+                     *       "myVote": false,
+                     *       "isFollowing": false,
+                     *       "canVote": false,
+                     *       "commentCount": 0,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": null,
+                     *       "responsible": null,
+                     *       "nextStep": null,
+                     *       "dueDate": null,
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": [
+                     *         {
+                     *           "id": "01a211e2-e5bf-7407-8f04-c0fa6bc1e75d",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "PENDING_REVIEW",
+                     *           "toStatus": "OPEN",
+                     *           "reason": null,
+                     *           "payload": {
+                     *             "roundId": "01a211e2-e23b-7237-b7d4-5fcb2d66c196"
+                     *           },
+                     *           "createdAt": "2026-11-25T08:46:52.347Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -6523,6 +9900,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -6606,7 +9988,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6615,7 +9997,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6624,7 +10006,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6633,7 +10021,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6642,7 +10030,20 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /**
+             * @description **INVALID_STATUS_TRANSITION** — Bu holatga o'tkazib bo'lmaydi
+             *
+             *     **ROUND_CLOSED** — Ovoz berish davri yopilgan
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6676,6 +10077,56 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e29f-7632-9425-ec659b458a78",
+                     *       "title": "Avtobus bekati tomi singan",
+                     *       "category": "OTHER",
+                     *       "categoryLabel": "Boshqa",
+                     *       "status": "REJECTED",
+                     *       "statusLabel": "Tuzatish kerak",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "displayName": "Ali Valiyev"
+                     *       },
+                     *       "createdAt": "2026-11-25T06:46:51.146Z",
+                     *       "publishedAt": null,
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Yomg'irli kunlarda odamlar ho'l bo'lib turadi, tom qismi qulagan.",
+                     *       "locationText": "Mahalla markazi, 12-uy yonida",
+                     *       "media": [],
+                     *       "voteCount": null,
+                     *       "roundId": null,
+                     *       "myVote": false,
+                     *       "isFollowing": false,
+                     *       "canVote": false,
+                     *       "commentCount": 0,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": "Aniq manzil ko'rsatilmagan",
+                     *       "responsible": null,
+                     *       "nextStep": null,
+                     *       "dueDate": null,
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": [
+                     *         {
+                     *           "id": "01a211e2-e5cc-73f4-a6c6-dd4be5af0b88",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "PENDING_REVIEW",
+                     *           "toStatus": "REJECTED",
+                     *           "reason": "Aniq manzil ko'rsatilmagan",
+                     *           "payload": {},
+                     *           "createdAt": "2026-11-25T08:46:52.361Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -6685,6 +10136,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -6768,7 +10224,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6777,7 +10233,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6786,7 +10242,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6795,7 +10257,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6804,7 +10266,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **INVALID_STATUS_TRANSITION** — Bu holatga o'tkazib bo'lmaydi */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6839,6 +10310,64 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e57b-764b-9734-c279992ad4f7",
+                     *       "title": "Yo'l chetida axlat to'planib qolgan (aniqlandi)",
+                     *       "category": "WASTE",
+                     *       "categoryLabel": "Chiqindi",
+                     *       "status": "MERGED",
+                     *       "statusLabel": "Birlashtirilgan",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "displayName": "Ali Valiyev"
+                     *       },
+                     *       "createdAt": "2026-11-25T08:46:52.282Z",
+                     *       "publishedAt": null,
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Maktab yo'lagidagi axlat haftalardan beri olib ketilmayapti",
+                     *       "locationText": "Maktab yo'lagi",
+                     *       "media": [],
+                     *       "voteCount": null,
+                     *       "roundId": null,
+                     *       "myVote": false,
+                     *       "isFollowing": false,
+                     *       "canVote": false,
+                     *       "commentCount": 0,
+                     *       "duplicateOf": {
+                     *         "id": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *         "title": "Ko'cha chirog'i ishlamayapti"
+                     *       },
+                     *       "rejectedReason": null,
+                     *       "responsible": null,
+                     *       "nextStep": null,
+                     *       "dueDate": null,
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": [
+                     *         {
+                     *           "id": "01a211e2-e5d9-74ea-9b59-4670ac2838fb",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "PENDING_REVIEW",
+                     *           "toStatus": "MERGED",
+                     *           "reason": null,
+                     *           "payload": {
+                     *             "duplicateOf": {
+                     *               "id": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *               "title": "Ko'cha chirog'i ishlamayapti"
+                     *             }
+                     *           },
+                     *           "createdAt": "2026-11-25T08:46:52.373Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -6848,6 +10377,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -6931,7 +10465,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -6940,7 +10474,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6949,7 +10483,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -6958,7 +10498,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -6967,7 +10507,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **INVALID_STATUS_TRANSITION** — Bu holatga o'tkazib bo'lmaydi */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -6999,6 +10548,453 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e57b-764b-9734-c279992ad4f7",
+                     *           "title": "Yo'l chetida axlat to'planib qolgan (aniqlandi)",
+                     *           "category": "WASTE",
+                     *           "categoryLabel": "Chiqindi",
+                     *           "locationText": "Maktab yo'lagi",
+                     *           "status": "PENDING_REVIEW",
+                     *           "statusLabel": "Moderatsiyada",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-25T08:46:52.282Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e29f-7632-9425-ec659b458a78",
+                     *           "title": "Avtobus bekati tomi singan",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "PENDING_REVIEW",
+                     *           "statusLabel": "Moderatsiyada",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-25T06:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e29e-73dc-bd72-09db1aa2ba16",
+                     *           "title": "Bolalar maydonchasida qum yetishmaydi",
+                     *           "category": "LANDSCAPING",
+                     *           "categoryLabel": "Obodonlashtirish",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "PENDING_REVIEW",
+                     *           "statusLabel": "Moderatsiyada",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-25T03:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Dilnoza Rahimova",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e23d-709f-bfa4-f6c526ce4983",
+                     *           "title": "Chiqindi konteyneri to'lib ketgan",
+                     *           "category": "WASTE",
+                     *           "categoryLabel": "Chiqindi",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-23T06:46:51.146Z",
+                     *           "createdAt": "2026-11-22T20:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 1,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e27f-7152-9c2b-ce691af23c54_t.jpg?exp=1795596712&sig=17db57ded3ccf6fb1d0651bf6c7df5f0b6e61e94154dce10ea82b9e5b77efe6f",
+                     *           "authorName": "Sara Karimova",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2a1-76ba-aba8-6b2b32d7f75d",
+                     *           "title": "Navoiy ko'chasidagi chiroq o'chgan (dublikat)",
+                     *           "category": "LIGHTING",
+                     *           "categoryLabel": "Yoritish",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "MERGED",
+                     *           "statusLabel": "Birlashtirilgan",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-23T01:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Sara Karimova",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": {
+                     *             "id": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *             "title": "Ko'cha chirog'i ishlamayapti"
+                     *           }
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2ac-72e2-b675-effe86449098",
+                     *           "title": "Kanalizatsiya qopqog'i ochiq qolgan",
+                     *           "category": "WATER",
+                     *           "categoryLabel": "Suv",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-22T22:00:00.000Z",
+                     *           "createdAt": "2026-11-22T21:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 3,
+                     *           "myVote": false,
+                     *           "roundKind": "WEEKLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2ab-7263-86a6-ac8c764ef531",
+                     *           "title": "Bekatdagi o'rindiq singan",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-22T21:00:00.000Z",
+                     *           "createdAt": "2026-11-22T20:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 1,
+                     *           "myVote": false,
+                     *           "roundKind": "WEEKLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2a0-7604-b74e-0bfbc6b94a46",
+                     *           "title": "Qo'shni hovlida shovqin",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "REJECTED",
+                     *           "statusLabel": "Tuzatish kerak",
+                     *           "publishedAt": null,
+                     *           "createdAt": "2026-11-22T10:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": "Bu mahalla infratuzilmasi masalasi emas; ichki ishlar organlariga murojaat qiling",
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e23d-709e-bd0f-6c0afce618f2",
+                     *           "title": "Hovli yo'lagi ta'mirlanmagan",
+                     *           "category": "ROAD",
+                     *           "categoryLabel": "Yo'l",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-22T00:46:51.146Z",
+                     *           "createdAt": "2026-11-21T14:46:51.146Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": 2,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e261-7665-807b-b505747dc9bb_t.jpg?exp=1795596712&sig=80581e308142a40abfdeab66bb6e1a64eaa7566940448cabd5e307fe405340c6",
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *           "title": "Ko'cha chirog'i ishlamayapti",
+                     *           "category": "LIGHTING",
+                     *           "categoryLabel": "Yoritish",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ovoz berilmoqda",
+                     *           "publishedAt": "2026-11-21T04:46:51.146Z",
+                     *           "createdAt": "2026-11-20T08:46:51.146Z",
+                     *           "commentCount": 3,
+                     *           "voteCount": 3,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc_t.jpg?exp=1795596712&sig=2f028988562313ae006658abf8eda6e4a9c3b3f26aaa4fef17848a42a2e65192",
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e2a7-75a0-be37-75b25f869db4",
+                     *           "title": "Kirish yo'lagidagi chuqurni ko'mish",
+                     *           "category": "ROAD",
+                     *           "categoryLabel": "Yo'l",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "IN_PROGRESS",
+                     *           "statusLabel": "Jarayonda",
+                     *           "publishedAt": "2026-11-16T20:00:00.000Z",
+                     *           "createdAt": "2026-11-16T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "WEEKLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Sara Karimova",
+                     *           "responsible": "Yo'l xizmati",
+                     *           "dueDate": "2026-11-29",
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e14f-7608-b30c-bfa8013cbf2e",
+                     *           "title": "Skver o'rindiqlarini ta'mirlash (2026-10)",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ochiq",
+                     *           "publishedAt": "2026-10-03T19:00:00.000Z",
+                     *           "createdAt": "2026-10-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e14d-775d-a9f9-35a754dc5d25",
+                     *           "title": "Maktab oldidagi yo'lga svetofor o'rnatish",
+                     *           "category": "ROAD",
+                     *           "categoryLabel": "Yo'l",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "SELECTED",
+                     *           "statusLabel": "Oylik ovozda tanlandi",
+                     *           "publishedAt": "2026-10-03T19:00:00.000Z",
+                     *           "createdAt": "2026-10-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e15a-7046-8279-cccc0c392c8f_t.jpg?exp=1795596712&sig=1977898df88669bec514e30cac18fbdfe5178ac9f44459a8a0423b8f13ecd98b",
+                     *           "authorName": "Ali Valiyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e190-70f3-a3b2-3c4677760b27",
+                     *           "title": "Skver o'rindiqlarini ta'mirlash (2026-09)",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ochiq",
+                     *           "publishedAt": "2026-09-03T19:00:00.000Z",
+                     *           "createdAt": "2026-09-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e18e-707f-a549-8ca8b32f13f5",
+                     *           "title": "Bolalar maydonchasi qoplamasini yangilash",
+                     *           "category": "LANDSCAPING",
+                     *           "categoryLabel": "Obodonlashtirish",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "IN_PROGRESS",
+                     *           "statusLabel": "Jarayonda",
+                     *           "publishedAt": "2026-09-03T19:00:00.000Z",
+                     *           "createdAt": "2026-09-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e19a-753c-9333-77a2f9176514_t.jpg?exp=1795596712&sig=7c22076a24abf96217897871788832257d6cf9bb25e26df9e160d7f4f553c812",
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": "Obodonlashtirish xizmati",
+                     *           "dueDate": "2026-12-02",
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e1b7-7485-b5ae-2b2e3467bc32",
+                     *           "title": "Skver o'rindiqlarini ta'mirlash (2026-08)",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ochiq",
+                     *           "publishedAt": "2026-08-03T19:00:00.000Z",
+                     *           "createdAt": "2026-08-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e1b6-7194-a21d-d1895b60ab58",
+                     *           "title": "Markaziy quvurdagi suv oqishini bartaraf etish",
+                     *           "category": "WATER",
+                     *           "categoryLabel": "Suv",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "REFERRED",
+                     *           "statusLabel": "Tashkilotdan javob kutilmoqda",
+                     *           "publishedAt": "2026-08-03T19:00:00.000Z",
+                     *           "createdAt": "2026-08-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e1d2-7677-917a-76f952362e50_t.jpg?exp=1795596712&sig=afb8b4d3c056b7267077601c8b9105d3a18fc2cebfe102e01d2d919de8b5a9b9",
+                     *           "authorName": "Sara Karimova",
+                     *           "responsible": "Suv kanal xodimi",
+                     *           "dueDate": "2026-11-22",
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e1fd-7020-aa23-da255bd49cc3",
+                     *           "title": "Skver o'rindiqlarini ta'mirlash (2026-07)",
+                     *           "category": "OTHER",
+                     *           "categoryLabel": "Boshqa",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "OPEN",
+                     *           "statusLabel": "Ochiq",
+                     *           "publishedAt": "2026-07-03T19:00:00.000Z",
+                     *           "createdAt": "2026-07-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": null,
+                     *           "authorName": "Vali Aliyev",
+                     *           "responsible": null,
+                     *           "dueDate": null,
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e1fd-701f-91ef-fb9b1230c72e",
+                     *           "title": "Ko'cha chiroqlarini LED ga almashtirish",
+                     *           "category": "LIGHTING",
+                     *           "categoryLabel": "Yoritish",
+                     *           "locationText": "Mahalla markazi, 12-uy yonida",
+                     *           "status": "RESOLVED",
+                     *           "statusLabel": "Hal qilingan",
+                     *           "publishedAt": "2026-07-03T19:00:00.000Z",
+                     *           "createdAt": "2026-07-02T19:00:00.000Z",
+                     *           "commentCount": 0,
+                     *           "voteCount": null,
+                     *           "myVote": false,
+                     *           "roundKind": "MONTHLY",
+                     *           "isFollowing": false,
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e21f-70d4-bd04-063a216e7c98_t.jpg?exp=1795596712&sig=94b7d9a33924eb398c18c83af9c8a618b97047fafd469533784f0bcc775b5583",
+                     *           "authorName": "Dilnoza Rahimova",
+                     *           "responsible": "Elektr tarmoqlari",
+                     *           "dueDate": "2026-08-10",
+                     *           "hidden": false,
+                     *           "rejectedReason": null,
+                     *           "duplicateOf": null
+                     *         }
+                     *       ],
+                     *       "nextCursor": null
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -7016,6 +11012,11 @@ export interface operations {
                             commentCount: number;
                             voteCount: number | null;
                             myVote: boolean;
+                            /**
+                             * @description Ovoz davri turi: oylik yoki haftalik (1 hafta ichida hal qilinadi)
+                             * @enum {string}
+                             */
+                            roundKind: "MONTHLY" | "WEEKLY";
                             isFollowing: boolean;
                             thumbUrl: string | null;
                             authorName: string;
@@ -7033,7 +11034,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7042,7 +11043,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7051,7 +11052,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7060,7 +11065,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -7088,6 +11093,68 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e23c-75e6-8ce7-69e9a4603a44",
+                     *       "title": "Ko'cha chirog'i ishlamayapti",
+                     *       "category": "LIGHTING",
+                     *       "categoryLabel": "Yoritish",
+                     *       "status": "OPEN",
+                     *       "statusLabel": "Ovoz berilmoqda",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "displayName": "Ali Valiyev"
+                     *       },
+                     *       "createdAt": "2026-11-20T08:46:51.146Z",
+                     *       "publishedAt": "2026-11-21T04:46:51.146Z",
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Navoiy ko'chasi 12-uy yonidagi chiroq ikki haftadan beri yonmayapti, kechasi juda qorong'i.",
+                     *       "locationText": "Mahalla markazi, 12-uy yonida",
+                     *       "media": [
+                     *         {
+                     *           "id": "01a211e2-e244-7381-865b-707e7467e3dc",
+                     *           "kind": "IMAGE",
+                     *           "url": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc.jpg?exp=1795596712&sig=80d740411050f3f642ae893ea29fe8cd9722795f250815e1fb7f1a8c39367a45",
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e244-7381-865b-707e7467e3dc_t.jpg?exp=1795596712&sig=2f028988562313ae006658abf8eda6e4a9c3b3f26aaa4fef17848a42a2e65192",
+                     *           "width": 1024,
+                     *           "height": 768,
+                     *           "mime": "image/jpeg",
+                     *           "sizeBytes": 19560,
+                     *           "expiresAt": "2026-11-25T08:51:52.315Z"
+                     *         }
+                     *       ],
+                     *       "voteCount": 3,
+                     *       "roundId": "01a211e2-e23b-7237-b7d4-5fcb2d66c196",
+                     *       "myVote": false,
+                     *       "isFollowing": false,
+                     *       "canVote": false,
+                     *       "commentCount": 3,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": null,
+                     *       "responsible": null,
+                     *       "nextStep": null,
+                     *       "dueDate": null,
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": [
+                     *         {
+                     *           "id": "01a211e2-e244-7380-8ea8-95194fc900c1",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "PENDING_REVIEW",
+                     *           "toStatus": "OPEN",
+                     *           "reason": null,
+                     *           "payload": {},
+                     *           "createdAt": "2026-11-21T04:46:51.146Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -7097,6 +11164,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -7180,7 +11252,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7189,7 +11261,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7198,7 +11270,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7207,7 +11283,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7216,7 +11292,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -7261,6 +11337,94 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e14d-775d-a9f9-35a754dc5d25",
+                     *       "title": "Maktab oldidagi yo'lga svetofor o'rnatish",
+                     *       "category": "ROAD",
+                     *       "categoryLabel": "Yo'l",
+                     *       "status": "IN_PROGRESS",
+                     *       "statusLabel": "Jarayonda",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "displayName": "Ali Valiyev"
+                     *       },
+                     *       "createdAt": "2026-10-02T19:00:00.000Z",
+                     *       "publishedAt": "2026-10-03T19:00:00.000Z",
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Maktab oldidagi yo'lga svetofor o'rnatish. Aholi tomonidan ko'p marta so'ralgan, tezkor yechim kerak.",
+                     *       "locationText": "Mahalla markazi, 12-uy yonida",
+                     *       "media": [
+                     *         {
+                     *           "id": "01a211e2-e15a-7046-8279-cccc0c392c8f",
+                     *           "kind": "IMAGE",
+                     *           "url": "http://localhost:3000/api/v1/files/01a211e2-e15a-7046-8279-cccc0c392c8f.jpg?exp=1795596712&sig=8117b5649aa217ce1891b0af179795ca131731068b650675a577f0d13c5b9cc6",
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e15a-7046-8279-cccc0c392c8f_t.jpg?exp=1795596712&sig=1977898df88669bec514e30cac18fbdfe5178ac9f44459a8a0423b8f13ecd98b",
+                     *           "width": 1024,
+                     *           "height": 768,
+                     *           "mime": "image/jpeg",
+                     *           "sizeBytes": 18530,
+                     *           "expiresAt": "2026-11-25T08:51:52.390Z"
+                     *         }
+                     *       ],
+                     *       "voteCount": 3,
+                     *       "roundId": "01a211e2-e14f-7609-b8c8-cc1c69c2611a",
+                     *       "myVote": false,
+                     *       "isFollowing": false,
+                     *       "canVote": false,
+                     *       "commentCount": 0,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": null,
+                     *       "responsible": "Elektr tarmoqlari xodimi Karimov",
+                     *       "nextStep": "Yangi lampochka olib kelish",
+                     *       "dueDate": "2026-12-10",
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": [
+                     *         {
+                     *           "id": "01a211e2-e158-72b4-8e88-a7926c322681",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "PENDING_REVIEW",
+                     *           "toStatus": "OPEN",
+                     *           "reason": null,
+                     *           "payload": {},
+                     *           "createdAt": "2026-10-03T19:00:00.000Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e159-73ae-8541-9cf6169beb4a",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "OPEN",
+                     *           "toStatus": "SELECTED",
+                     *           "reason": "Oy g'olibi",
+                     *           "payload": {},
+                     *           "createdAt": "2026-10-31T19:00:00.000Z",
+                     *           "actorName": null,
+                     *           "media": []
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e5e9-7026-a104-276f6dba6c27",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "SELECTED",
+                     *           "toStatus": "IN_PROGRESS",
+                     *           "reason": null,
+                     *           "payload": {
+                     *             "dueDate": "2026-12-10",
+                     *             "nextStep": "Yangi lampochka olib kelish",
+                     *             "responsible": "Elektr tarmoqlari xodimi Karimov"
+                     *           },
+                     *           "createdAt": "2026-11-25T08:46:52.390Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -7270,6 +11434,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -7353,7 +11522,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7362,7 +11531,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7371,7 +11540,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7380,7 +11555,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7389,7 +11564,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **INVALID_STATUS_TRANSITION** — Bu holatga o'tkazib bo'lmaydi */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -7426,6 +11610,116 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e14d-775d-a9f9-35a754dc5d25",
+                     *       "title": "Maktab oldidagi yo'lga svetofor o'rnatish",
+                     *       "category": "ROAD",
+                     *       "categoryLabel": "Yo'l",
+                     *       "status": "IN_PROGRESS",
+                     *       "statusLabel": "Jarayonda",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e145-729c-be9b-acfea9794522",
+                     *         "displayName": "Ali Valiyev"
+                     *       },
+                     *       "createdAt": "2026-10-02T19:00:00.000Z",
+                     *       "publishedAt": "2026-10-03T19:00:00.000Z",
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "Maktab oldidagi yo'lga svetofor o'rnatish. Aholi tomonidan ko'p marta so'ralgan, tezkor yechim kerak.",
+                     *       "locationText": "Mahalla markazi, 12-uy yonida",
+                     *       "media": [
+                     *         {
+                     *           "id": "01a211e2-e15a-7046-8279-cccc0c392c8f",
+                     *           "kind": "IMAGE",
+                     *           "url": "http://localhost:3000/api/v1/files/01a211e2-e15a-7046-8279-cccc0c392c8f.jpg?exp=1795596712&sig=8117b5649aa217ce1891b0af179795ca131731068b650675a577f0d13c5b9cc6",
+                     *           "thumbUrl": "http://localhost:3000/api/v1/files/01a211e2-e15a-7046-8279-cccc0c392c8f_t.jpg?exp=1795596712&sig=1977898df88669bec514e30cac18fbdfe5178ac9f44459a8a0423b8f13ecd98b",
+                     *           "width": 1024,
+                     *           "height": 768,
+                     *           "mime": "image/jpeg",
+                     *           "sizeBytes": 18530,
+                     *           "expiresAt": "2026-11-25T08:51:52.401Z"
+                     *         }
+                     *       ],
+                     *       "voteCount": 3,
+                     *       "roundId": "01a211e2-e14f-7609-b8c8-cc1c69c2611a",
+                     *       "myVote": false,
+                     *       "isFollowing": false,
+                     *       "canVote": false,
+                     *       "commentCount": 0,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": null,
+                     *       "responsible": "Vali Aliyev",
+                     *       "nextStep": "Yangi lampochka olib kelish",
+                     *       "dueDate": "2026-12-15",
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": [
+                     *         {
+                     *           "id": "01a211e2-e158-72b4-8e88-a7926c322681",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "PENDING_REVIEW",
+                     *           "toStatus": "OPEN",
+                     *           "reason": null,
+                     *           "payload": {},
+                     *           "createdAt": "2026-10-03T19:00:00.000Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e159-73ae-8541-9cf6169beb4a",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "OPEN",
+                     *           "toStatus": "SELECTED",
+                     *           "reason": "Oy g'olibi",
+                     *           "payload": {},
+                     *           "createdAt": "2026-10-31T19:00:00.000Z",
+                     *           "actorName": null,
+                     *           "media": []
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e5e9-7026-a104-276f6dba6c27",
+                     *           "type": "STATUS_CHANGE",
+                     *           "fromStatus": "SELECTED",
+                     *           "toStatus": "IN_PROGRESS",
+                     *           "reason": null,
+                     *           "payload": {
+                     *             "dueDate": "2026-12-10",
+                     *             "nextStep": "Yangi lampochka olib kelish",
+                     *             "responsible": "Elektr tarmoqlari xodimi Karimov"
+                     *           },
+                     *           "createdAt": "2026-11-25T08:46:52.390Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e5f4-77da-acd5-65735bd6268d",
+                     *           "type": "DETAILS_CHANGE",
+                     *           "fromStatus": null,
+                     *           "toStatus": null,
+                     *           "reason": "Mas'ul almashdi",
+                     *           "payload": {
+                     *             "after": {
+                     *               "dueDate": "2026-12-15",
+                     *               "nextStep": "Yangi lampochka olib kelish",
+                     *               "responsible": "Vali Aliyev"
+                     *             },
+                     *             "before": {
+                     *               "dueDate": "2026-12-10",
+                     *               "nextStep": "Yangi lampochka olib kelish",
+                     *               "responsible": "Elektr tarmoqlari xodimi Karimov"
+                     *             }
+                     *           },
+                     *           "createdAt": "2026-11-25T08:46:52.401Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -7435,6 +11729,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -7518,7 +11817,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7527,7 +11826,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7536,7 +11835,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7545,7 +11850,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7554,7 +11859,16 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **CONFLICT** — Holat ziddiyati */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -7582,6 +11896,58 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "01a211e2-e14f-7608-b30c-bfa8013cbf2e",
+                     *       "title": "Skver o'rindiqlarini ta'mirlash (2026-10)",
+                     *       "category": "OTHER",
+                     *       "categoryLabel": "Boshqa",
+                     *       "status": "OPEN",
+                     *       "statusLabel": "Ovoz berilmoqda",
+                     *       "hidden": false,
+                     *       "author": {
+                     *         "id": "01a211e2-e146-75fb-b147-771145e63c3d",
+                     *         "displayName": "Vali Aliyev"
+                     *       },
+                     *       "createdAt": "2026-10-02T19:00:00.000Z",
+                     *       "publishedAt": "2026-10-03T19:00:00.000Z",
+                     *       "roundKind": "MONTHLY",
+                     *       "description": "O'rindiqlar sinib qolgan, ta'mir kerak.",
+                     *       "locationText": "Mahalla markazi, 12-uy yonida",
+                     *       "media": [],
+                     *       "voteCount": 0,
+                     *       "roundId": "01a211e2-e23b-7237-b7d4-5fcb2d66c196",
+                     *       "myVote": false,
+                     *       "isFollowing": false,
+                     *       "canVote": false,
+                     *       "commentCount": 0,
+                     *       "duplicateOf": null,
+                     *       "rejectedReason": null,
+                     *       "responsible": null,
+                     *       "nextStep": null,
+                     *       "dueDate": null,
+                     *       "referredOrg": null,
+                     *       "referredAt": null,
+                     *       "followUpAt": null,
+                     *       "resolutionText": null,
+                     *       "hiddenReason": null,
+                     *       "history": [
+                     *         {
+                     *           "id": "01a211e2-e605-71de-a642-dff61e739383",
+                     *           "type": "CARRY_OVER",
+                     *           "fromStatus": null,
+                     *           "toStatus": null,
+                     *           "reason": "Keyingi davrga o'tkazildi",
+                     *           "payload": {
+                     *             "roundId": "01a211e2-e23b-7237-b7d4-5fcb2d66c196"
+                     *           },
+                     *           "createdAt": "2026-11-25T08:46:52.418Z",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "media": []
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": {
                         /** Format: uuid */
                         id: string;
@@ -7591,6 +11957,11 @@ export interface operations {
                         status: string;
                         statusLabel: string;
                         hidden: boolean;
+                        /**
+                         * @description Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)
+                         * @enum {string}
+                         */
+                        roundKind: "MONTHLY" | "WEEKLY";
                         /** @description Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz) */
                         hiddenNotice?: string;
                         author: {
@@ -7674,7 +12045,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7683,7 +12054,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7692,7 +12063,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7701,7 +12078,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7710,7 +12087,20 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /**
+             * @description **CONFLICT** — Holat ziddiyati
+             *
+             *     **ROUND_CLOSED** — Ovoz berish davri yopilgan
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -7746,7 +12136,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7755,7 +12145,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7764,7 +12154,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7773,7 +12169,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7782,7 +12178,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -7812,7 +12208,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7821,7 +12217,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7830,7 +12226,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             *
+             *     **CSRF_INVALID** — Xavfsizlik tekshiruvidan o'tmadi. Sahifani yangilang
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7839,7 +12241,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description NOT_FOUND: topilmadi (boshqa mahalla obyekti ham shunday) */
+            /** @description **NOT_FOUND** — Topilmadi */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7848,7 +12250,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -7874,6 +12276,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "round": {
+                     *         "id": "01a211e2-e23b-7237-b7d4-5fcb2d66c196",
+                     *         "periodStart": "2026-10-31T19:00:00.000Z",
+                     *         "periodEnd": "2026-11-30T19:00:00.000Z",
+                     *         "status": "OPEN"
+                     *       },
+                     *       "activeVoters": 3,
+                     *       "totalResidents": 4,
+                     *       "pendingModeration": 3,
+                     *       "overdueIssues": 1,
+                     *       "openReports": 2,
+                     *       "nextEvent": {
+                     *         "id": "01a211e2-e2ae-753a-9fd2-b324291ff7b4",
+                     *         "title": "Hashar: hovli va skverni tozalash",
+                     *         "startsAt": "2026-12-02T08:46:51.146Z",
+                     *         "location": "Markaziy hovli",
+                     *         "rsvpCount": 2
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         round: {
                             /** Format: uuid */
@@ -7902,7 +12326,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7911,7 +12335,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7920,7 +12348,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -7951,6 +12379,270 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "items": [
+                     *         {
+                     *           "id": "01a211e2-e687-73d6-b0f4-b5f628aba78a",
+                     *           "action": "announcement.publish",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "ANNOUNCEMENT",
+                     *           "targetId": "01a211e2-e681-76cb-86cc-0d1cf3760cf5",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.551Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e685-74c6-b1a8-872d918c0866",
+                     *           "action": "announcement.update",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "ANNOUNCEMENT",
+                     *           "targetId": "01a211e2-e681-76cb-86cc-0d1cf3760cf5",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.549Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e681-76cc-aa21-1c3dd5ebfb7b",
+                     *           "action": "announcement.create",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "ANNOUNCEMENT",
+                     *           "targetId": "01a211e2-e681-76cb-86cc-0d1cf3760cf5",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.545Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e67d-70d4-be01-d4d21dfbc500",
+                     *           "action": "event.complete",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "EVENT",
+                     *           "targetId": "01a211e2-e673-7652-8cad-2a85a50eb8f2",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.539Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e678-7184-82a0-7c230a0bbfa6",
+                     *           "action": "event.publish",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "EVENT",
+                     *           "targetId": "01a211e2-e673-7652-8cad-2a85a50eb8f2",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.536Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e674-705e-9ecb-d8116b9d57e6",
+                     *           "action": "event.create",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "EVENT",
+                     *           "targetId": "01a211e2-e673-7652-8cad-2a85a50eb8f2",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.532Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e671-70c3-bc24-9fc73da97d5a",
+                     *           "action": "event.cancel",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "EVENT",
+                     *           "targetId": "01a211e2-e662-7137-bb6a-eb90e9bdeeac",
+                     *           "reason": "Ob-havo yomon",
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.527Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e66b-7172-abe6-2655fd71d318",
+                     *           "action": "event.update",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "EVENT",
+                     *           "targetId": "01a211e2-e662-7137-bb6a-eb90e9bdeeac",
+                     *           "reason": null,
+                     *           "meta": {
+                     *             "version": 2
+                     *           },
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.522Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e666-72c3-b460-43aae2558dd6",
+                     *           "action": "event.publish",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "EVENT",
+                     *           "targetId": "01a211e2-e662-7137-bb6a-eb90e9bdeeac",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.518Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e662-7138-9bc9-5d815f281ebb",
+                     *           "action": "event.create",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "EVENT",
+                     *           "targetId": "01a211e2-e662-7137-bb6a-eb90e9bdeeac",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.514Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e65f-73ab-b597-b10b864bdc6d",
+                     *           "action": "resident.unblock",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "USER",
+                     *           "targetId": "01a211e2-e637-73cc-9386-0040efce766c",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.511Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e65a-764c-8762-a3fc73643916",
+                     *           "action": "resident.block",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "USER",
+                     *           "targetId": "01a211e2-e637-73cc-9386-0040efce766c",
+                     *           "reason": "Qoidabuzarlik",
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.506Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e656-746a-9254-c2f4c7578856",
+                     *           "action": "resident.reset_password",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "USER",
+                     *           "targetId": "01a211e2-e637-73cc-9386-0040efce766c",
+                     *           "reason": null,
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.502Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e63a-7306-a0d3-5cb8b33f628a",
+                     *           "action": "resident.create",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "USER",
+                     *           "targetId": "01a211e2-e637-73cc-9386-0040efce766c",
+                     *           "reason": null,
+                     *           "meta": {
+                     *             "login": "ali.valiyev"
+                     *           },
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.472Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e61c-71b9-97c9-ecd817f0d8f8",
+                     *           "action": "content.hide",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "COMMENT",
+                     *           "targetId": "01a211e2-e56d-7084-bc16-5791a7f47014",
+                     *           "reason": "Nomaqbul kontent",
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.442Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e618-753a-9110-07de4e065f35",
+                     *           "action": "report.dismiss",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "REPORT",
+                     *           "targetId": "01a211e2-e615-7582-846b-07019b54c61e",
+                     *           "reason": "Asossiz",
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.440Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e612-719d-b581-3d9754b372b6",
+                     *           "action": "report.hide",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "REPORT",
+                     *           "targetId": "01a211e2-e572-774a-a73a-c294ec1e673a",
+                     *           "reason": "Qoidabuzarlik",
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.431Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e611-7375-90af-93cd4a937177",
+                     *           "action": "content.hide",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "CHAT_MESSAGE",
+                     *           "targetId": "01a211e2-e2f4-763a-b0ee-e02ca02b797c",
+                     *           "reason": "Qoidabuzarlik",
+                     *           "meta": {},
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.431Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e606-7315-b75e-4013c28c19f7",
+                     *           "action": "issue.carry_over",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "ISSUE",
+                     *           "targetId": "01a211e2-e14f-7608-b30c-bfa8013cbf2e",
+                     *           "reason": null,
+                     *           "meta": {
+                     *             "roundId": "01a211e2-e23b-7237-b7d4-5fcb2d66c196"
+                     *           },
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.418Z"
+                     *         },
+                     *         {
+                     *           "id": "01a211e2-e5f6-7613-98cd-0f56100b469e",
+                     *           "action": "issue.work_update",
+                     *           "actorId": "01a211e2-e141-719e-a6ae-de27786708df",
+                     *           "actorName": "Admin Demo Yunusobod",
+                     *           "targetType": "ISSUE",
+                     *           "targetId": "01a211e2-e14d-775d-a9f9-35a754dc5d25",
+                     *           "reason": "Mas'ul almashdi",
+                     *           "meta": {
+                     *             "after": {
+                     *               "dueDate": "2026-12-15",
+                     *               "nextStep": "Yangi lampochka olib kelish",
+                     *               "responsible": "Vali Aliyev"
+                     *             },
+                     *             "before": {
+                     *               "dueDate": "2026-12-10",
+                     *               "nextStep": "Yangi lampochka olib kelish",
+                     *               "responsible": "Elektr tarmoqlari xodimi Karimov"
+                     *             }
+                     *           },
+                     *           "ip": "127.0.0.1",
+                     *           "createdAt": "2026-11-25T08:46:52.402Z"
+                     *         }
+                     *       ],
+                     *       "nextCursor": "eyJ0IjoiMjAyNi0xMS0yNVQwODo0Njo1Mi40MDJaIiwiaWQiOiIwMWEyMTFlMi1lNWY2LTc2MTMtOThjZC0wZjU2MTAwYjQ2OWUifQ"
+                     *     }
+                     */
                     "application/json": {
                         items: {
                             /** Format: uuid */
@@ -7973,7 +12665,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description VALIDATION_ERROR: so'rov noto'g'ri (details.fields) */
+            /** @description **VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7982,7 +12674,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description UNAUTHENTICATED: sessiya yo‘q yoki bekor qilingan */
+            /** @description **UNAUTHENTICATED** — Tizimga kirish talab qilinadi */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7991,7 +12683,11 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN / PASSWORD_CHANGE_REQUIRED / CSRF_INVALID */
+            /**
+             * @description **FORBIDDEN** — Bu amal uchun ruxsat yo'q
+             *
+             *     **PASSWORD_CHANGE_REQUIRED** — Avval parolni almashtiring
+             */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8000,7 +12696,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description RATE_LIMITED / TOO_MANY_ATTEMPTS (Retry-After header) */
+            /** @description **RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring */
             429: {
                 headers: {
                     [name: string]: unknown;

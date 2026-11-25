@@ -16,11 +16,14 @@
     "api:mock": "pnpm dlx @stoplight/prism-cli@5.16.0 mock -p 4010 -h 0.0.0.0 ../backend/openapi.yaml"
   },
   "dependencies": {
+    "@expo-google-fonts/lora": "^0.4.2",
+    "@expo-google-fonts/onest": "^0.4.2",
     "@expo/vector-icons": "^15.0.2",
     "expo": "~58.0.26",
     "expo-constants": "~58.0.16",
     "expo-device": "~58.0.5",
     "expo-font": "~58.0.12",
+    "expo-haptics": "~58.0.8",
     "expo-image": "~58.0.18",
     "expo-image-manipulator": "~58.0.16",
     "expo-image-picker": "~58.0.10",
@@ -35,6 +38,7 @@
     "react": "19.3.0",
     "react-native": "0.88.1",
     "react-native-gesture-handler": "~3.3.0",
+    "react-native-keyboard-controller": "1.22.7",
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.11.1",
     "react-native-screens": "~4.30.1",

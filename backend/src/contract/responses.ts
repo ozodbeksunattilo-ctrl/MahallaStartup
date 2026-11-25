@@ -19,6 +19,7 @@ export const issueDetailSchema = z.object({
   status: z.string(),
   statusLabel: z.string(),
   hidden: z.boolean(),
+  roundKind: z.enum(['MONTHLY', 'WEEKLY']).describe("Ovoz davri turi: oylik yoki haftalik (haftalik g'olib 1 hafta ichida hal qilinadi)"),
   hiddenNotice: z.string().optional().describe("Muallif o'z yashirilgan postini ko'rganda faqat shu belgi keladi (media/tarixsiz)"),
   author: z.object({ id: uuid, displayName: z.string() }),
   createdAt: dt,
@@ -60,10 +61,19 @@ export const issueDetailSchema = z.object({
 });
 
 const comment = z.object({ id: uuid, text: z.string(), authorId: uuid, authorName: z.string(), createdAt: dt, hidden: z.boolean().optional() });
-const voteState = z.object({ issueId: uuid, voted: z.boolean(), slot: z.number().int().nullable(), votesUsed: z.number().int(), votesLeft: z.number().int() });
+const roundKind = z.enum(['MONTHLY', 'WEEKLY']);
+const voteState = z.object({
+  issueId: uuid,
+  voted: z.boolean(),
+  slot: z.number().int().nullable(),
+  votesUsed: z.number().int(),
+  votesLeft: z.number().int(),
+  roundKind: roundKind.describe('Ovoz qaysi davrda hisoblandi; votesUsed/votesLeft shu davrga tegishli'),
+});
 const ranked = z.object({ issueId: uuid, title: z.string(), votes: z.number().int(), rank: z.number().int() });
 const roundResult = z.object({
   roundId: uuid,
+  kind: roundKind,
   periodStart: dt,
   periodEnd: dt,
   closedAt: dt,
@@ -73,8 +83,17 @@ const roundResult = z.object({
   totalVotes: z.number().int(),
   message: z.string(),
 });
+const currentRoundState = z.object({
+  round: z.object({ id: uuid, kind: roundKind, status: z.enum(['OPEN', 'CLOSED']), periodStart: dt, periodEnd: dt }),
+  periodStart: dt,
+  periodEnd: dt,
+  votesUsed: z.number().int(),
+  votesLeft: z.number().int(),
+  myVotes: z.array(z.object({ issueId: uuid, title: z.string(), slot: z.number().int() })),
+});
 const roundListItem = z.object({
   id: uuid,
+  kind: roundKind,
   periodStart: dt,
   periodEnd: dt,
   status: z.enum(['OPEN', 'CLOSED']),
@@ -146,6 +165,11 @@ export const responseSchemas: Record<string, z.ZodType> = {
   'GET /me': z.object({ user: userSchema, mahalla, role: z.enum(['RESIDENT', 'MAHALLA_ADMIN']), mustChangePassword: z.boolean(), unreadNotifications: z.number().int() }),
   'GET /home': z.object({
     round: z.object({ periodEnd: dt, votesLeft: z.number().int() }),
+    weeklyRound: z.object({ periodEnd: dt, votesLeft: z.number().int() }).describe('Haftalik davr: qolgan ovozlar'),
+    weeklyIssue: z
+      .object({ id: uuid, title: z.string(), status: z.string(), statusLabel: z.string(), dueDate: z.string().nullable() })
+      .nullable()
+      .describe("Oxirgi haftalik g'olib (hal qilinmagan bo'lsa) — 1 hafta ichida hal qilinishi kerak"),
     featuredIssue: z.object({ id: uuid, title: z.string(), status: z.string(), statusLabel: z.string() }).nullable(),
     nextEvent: z.object({ id: uuid, title: z.string(), startsAt: dt, location: z.string() }).nullable(),
     latestImportantAnnouncement: z.object({ id: uuid, title: z.string(), publishedAt: nullableDt }).nullable(),
@@ -162,13 +186,8 @@ export const responseSchemas: Record<string, z.ZodType> = {
   'GET /issues/:id/comments': page(comment),
   'POST /issues/:id/comments': comment,
   'PUT /issues/:id/vote': voteState,
-  'GET /rounds/current': z.object({
-    round: z.object({ id: uuid, status: z.enum(['OPEN', 'CLOSED']), periodStart: dt, periodEnd: dt }),
-    periodStart: dt,
-    periodEnd: dt,
-    votesUsed: z.number().int(),
-    votesLeft: z.number().int(),
-    myVotes: z.array(z.object({ issueId: uuid, title: z.string(), slot: z.number().int() })),
+  'GET /rounds/current': currentRoundState.extend({
+    weekly: currentRoundState.describe("Parallel haftalik davr (dushanba–dushanba): alohida 3 ta ovoz"),
   }),
   'GET /rounds': page(roundListItem),
   'GET /rounds/:id/result': roundResult,

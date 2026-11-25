@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import { AppError } from '../../common/app-error';
 import type { Db } from '../../core/db';
+import type { Deps } from '../../core/deps';
 import { route } from '../../core/http';
 import { decodeCursor, pageQuery, toPage } from '../../core/pagination';
 import { idParam } from '../../core/schemas';
 import { Params } from '../../core/sql';
 import type { AuthUser } from '../../core/types';
-import { periodFor } from './period';
+import { periodForKind, type RoundKind } from './period';
 import { castVote, currentRound, loadRoundResult, removeVote } from './service';
 
 const vote = route({
@@ -35,46 +36,65 @@ const unvote = route({
   },
 });
 
+/** Bitta tur bo'yicha joriy davr holati: davr, ishlatilgan/qolgan ovozlar va mening ovozlarim. */
+async function currentState(deps: Deps, user: AuthUser, now: Date, kind: RoundKind) {
+  // Mahalla bo'yicha umumiy qism 10 s keshlanadi (kalitda davr bor: davr almashganda eskirmaydi)
+  const key = `round:current:${user.mahallaId}:${periodForKind(kind, now).key}`;
+  let shared = await deps.kv.get(key).then((v) => (v ? (JSON.parse(v) as Record<string, unknown>) : null));
+  if (!shared) {
+    const r = await currentRound(deps.db, user.mahallaId, now, kind);
+    shared = { id: r.id, kind: r.kind, status: r.status, periodStart: r.period_start, periodEnd: r.period_end };
+    await deps.kv.set(key, JSON.stringify(shared), 10);
+  }
+  const mine = await deps.db.query<{ issue_id: string; slot: number; title: string }>(
+    `SELECT v.issue_id, v.slot, i.title FROM votes v JOIN issues i ON i.id = v.issue_id
+      WHERE v.round_id = $1 AND v.voter_id = $2 ORDER BY v.slot`,
+    [shared['id'], user.userId],
+  );
+  return {
+    round: shared,
+    periodStart: shared['periodStart'],
+    periodEnd: shared['periodEnd'],
+    votesUsed: mine.rows.length,
+    votesLeft: Math.max(0, 3 - mine.rows.length),
+    myVotes: mine.rows.map((v) => ({ issueId: v.issue_id, title: v.title, slot: v.slot })),
+  };
+}
+
 const current = route({
   method: 'get',
   path: '/rounds/current',
   auth: 'user',
   tag: 'Ovoz',
   summary: 'Joriy davr, ishlatilgan/qolgan ovozlar va mening ovozlarim',
+  description:
+    "Yuqori darajadagi maydonlar — oylik davr (orqaga moslik). `weekly` — parallel ishlaydigan haftalik davr " +
+    "(dushanba–dushanba, Toshkent vaqti); har bir davrda alohida 3 tadan ovoz.",
   handler: async ({ deps, user, now }) => {
-    // Mahalla bo'yicha umumiy qism 10 s keshlanadi (kalitda davr bor: davr almashganda eskirmaydi)
-    const key = `round:current:${user.mahallaId}:${periodFor(now).key}`;
-    let shared = await deps.kv.get(key).then((v) => (v ? (JSON.parse(v) as Record<string, unknown>) : null));
-    if (!shared) {
-      const r = await currentRound(deps.db, user.mahallaId, now);
-      shared = { id: r.id, status: r.status, periodStart: r.period_start, periodEnd: r.period_end };
-      await deps.kv.set(key, JSON.stringify(shared), 10);
-    }
-    const mine = await deps.db.query<{ issue_id: string; slot: number; title: string }>(
-      `SELECT v.issue_id, v.slot, i.title FROM votes v JOIN issues i ON i.id = v.issue_id
-        WHERE v.round_id = $1 AND v.voter_id = $2 ORDER BY v.slot`,
-      [shared['id'], user.userId],
-    );
-    return {
-      round: shared,
-      periodStart: shared['periodStart'],
-      periodEnd: shared['periodEnd'],
-      votesUsed: mine.rows.length,
-      votesLeft: Math.max(0, 3 - mine.rows.length),
-      myVotes: mine.rows.map((v) => ({ issueId: v.issue_id, title: v.title, slot: v.slot })),
-    };
+    const [monthly, weekly] = await Promise.all([
+      currentState(deps, user, now, 'MONTHLY'),
+      currentState(deps, user, now, 'WEEKLY'),
+    ]);
+    return { ...monthly, weekly };
   },
 });
 
 const cursorSchema = z.object({ t: z.string() });
+const roundsQuery = pageQuery.extend({ kind: z.enum(['MONTHLY', 'WEEKLY']).optional() });
 
-async function listRounds(deps: { db: Db }, user: AuthUser, query: { cursor?: string | undefined; limit: number }) {
+async function listRounds(
+  deps: { db: Db },
+  user: AuthUser,
+  query: { cursor?: string | undefined; limit: number; kind?: RoundKind | undefined },
+) {
   const p = new Params();
   const where = [`vr.mahalla_id = ${p.add(user.mahallaId)}`];
+  if (query.kind) where.push(`vr.kind = ${p.add(query.kind)}`);
   const cur = decodeCursor(query.cursor, cursorSchema);
   if (cur) where.push(`vr.period_start < ${p.add(new Date(cur.t))}`);
   const r = await deps.db.query<{
     id: string;
+    kind: RoundKind;
     period_start: Date;
     period_end: Date;
     status: 'OPEN' | 'CLOSED';
@@ -83,7 +103,7 @@ async function listRounds(deps: { db: Db }, user: AuthUser, query: { cursor?: st
     total_votes: number | null;
     snapshot: { title: string; votes: number }[] | null;
   }>(
-    `SELECT vr.id, vr.period_start, vr.period_end, vr.status, rr.winner_issue_id, rr.total_voters, rr.total_votes, rr.snapshot
+    `SELECT vr.id, vr.kind, vr.period_start, vr.period_end, vr.status, rr.winner_issue_id, rr.total_voters, rr.total_votes, rr.snapshot
        FROM voting_rounds vr LEFT JOIN round_results rr ON rr.round_id = vr.id
       WHERE ${where.join(' AND ')} ORDER BY vr.period_start DESC LIMIT ${query.limit + 1}`,
     p.values,
@@ -92,6 +112,7 @@ async function listRounds(deps: { db: Db }, user: AuthUser, query: { cursor?: st
   return {
     items: page.items.map((x) => ({
       id: x.id,
+      kind: x.kind,
       periodStart: x.period_start,
       periodEnd: x.period_end,
       status: x.status,
@@ -117,7 +138,8 @@ const list = route({
   auth: 'user',
   tag: 'Ovoz',
   summary: "Davrlar ro'yxati (yangisidan eskisiga)",
-  query: pageQuery,
+  description: "`kind` — faqat oylik yoki haftalik davrlar; berilmasa ikkalasi aralash.",
+  query: roundsQuery,
   handler: ({ deps, user, query }) => listRounds(deps, user, query),
 });
 
@@ -137,7 +159,7 @@ const adminList = route({
   auth: 'admin',
   tag: 'Admin: davrlar',
   summary: "Davrlar ro'yxati",
-  query: pageQuery,
+  query: roundsQuery,
   handler: ({ deps, user, query }) => listRounds(deps, user, query),
 });
 

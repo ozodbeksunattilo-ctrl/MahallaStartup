@@ -80,7 +80,9 @@ function AdminSupport() {
               }}
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text variant="label">{th.residentName}</Text>
+                <Text variant="label" raw>
+                  {th.residentName}
+                </Text>
                 <Text variant="muted">{timeAgo(th.lastAt)}</Text>
               </View>
               <Text variant="muted" numberOfLines={1}>

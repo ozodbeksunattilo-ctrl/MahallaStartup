@@ -29,6 +29,7 @@ export default function EditIssueScreen() {
                   description: i.description,
                   locationText: i.locationText,
                   category: i.category,
+                  roundKind: i.roundKind ?? 'MONTHLY',
                   media: i.media,
                 }}
                 submitLabel={i.status === 'REJECTED' ? 'Tuzatib qayta yuborish' : 'Saqlash'}

@@ -20,6 +20,16 @@ export const CATEGORIES: Array<{ value: string; label: string }> = [
   { value: 'OTHER', label: 'Boshqa' },
 ];
 
+/** Toifa ikonkasi va rangi (kartochka va filtrlarda) */
+export const CATEGORY_STYLE: Record<string, { icon: string; tone: 'blue' | 'orange' | 'green' | 'purple' | 'rose' | 'teal' }> = {
+  ROAD: { icon: 'car-outline', tone: 'orange' },
+  LIGHTING: { icon: 'bulb-outline', tone: 'purple' },
+  WASTE: { icon: 'trash-outline', tone: 'green' },
+  WATER: { icon: 'water-outline', tone: 'blue' },
+  LANDSCAPING: { icon: 'leaf-outline', tone: 'teal' },
+  OTHER: { icon: 'ellipsis-horizontal-circle-outline', tone: 'rose' },
+};
+
 export const EVENT_STATUS: Record<string, string> = {
   PUBLISHED: 'Nashr qilingan',
   CANCELLED: 'Bekor qilingan',

@@ -20,7 +20,7 @@ import {
   requireVisibleIssue,
 } from './service';
 import { checkTransition } from './status-machine';
-import { issueStatusEnum } from './enums';
+import { issueStatusEnum, roundKindEnum } from './enums';
 
 const IDEMPOTENCY_ERROR = {
   fields: { 'Idempotency-Key': 'Idempotency-Key header majburiy (8–100 belgi)' },
@@ -53,11 +53,13 @@ const list = route({
   auth: 'user',
   tag: 'Muammolar',
   summary: 'Muammolar lentasi',
-  description: "`period=current` — faqat joriy davrda ovoz berilayotganlar; `sort=top` — ovoz bo'yicha.",
+  description:
+    "`period=current` — faqat joriy davrda ovoz berilayotganlar; `roundKind` — oylik yoki haftalik muammolar; `sort=top` — ovoz bo'yicha.",
   query: pageQuery.extend({
     category: z.enum(CATEGORIES).optional(),
     status: issueStatusEnum.optional(),
     period: z.enum(['current']).optional(),
+    roundKind: roundKindEnum.optional(),
     sort: z.enum(['newest', 'top']).default('newest'),
   }),
   response: z.object({ items: z.array(issueListItemSchema), nextCursor: z.string().nullable() }),
@@ -67,6 +69,7 @@ const list = route({
       category: query.category,
       status: query.status,
       periodCurrent: query.period === 'current',
+      roundKind: query.roundKind,
       sort: query.sort,
       cursor: query.cursor,
       limit: query.limit,
@@ -79,13 +82,16 @@ const create = route({
   auth: 'resident',
   tag: 'Muammolar',
   summary: 'Muammo yuborish (moderatsiyaga tushadi)',
-  description: "`Idempotency-Key` header majburiy: qayta yuborish o'sha postni qaytaradi (200).",
+  description:
+    "`Idempotency-Key` header majburiy: qayta yuborish o'sha postni qaytaradi (200). " +
+    "`roundKind`: MONTHLY (standart, oylik ovoz) yoki WEEKLY (haftalik ovoz, g'olib 1 hafta ichida hal qilinadi).",
   body: z.object({
     title: text(5, 120),
     description: text(10, 2000),
     category: z.enum(CATEGORIES),
     locationText: text(3, 200),
     mediaIds: z.array(uuid).max(4).default([]),
+    roundKind: roundKindEnum.default('MONTHLY'),
   }),
   limit: { name: 'issue-create', limit: 10, windowSec: 3600 },
   status: 201,
@@ -100,11 +106,11 @@ const create = route({
       const id = uuidv7();
       const ins = await q.query<{ id: string }>(
         `INSERT INTO issues (id, mahalla_id, author_id, title, description, category, location_text,
-                             idempotency_key, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)
+                             round_kind, idempotency_key, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10)
          ON CONFLICT (author_id, idempotency_key) DO NOTHING
          RETURNING id`,
-        [id, user.mahallaId, user.userId, body.title, body.description, body.category, body.locationText, key, now],
+        [id, user.mahallaId, user.userId, body.title, body.description, body.category, body.locationText, body.roundKind, key, now],
       );
       if (!ins.rows[0]) {
         const existing = await q.query<{ id: string }>(
@@ -163,6 +169,7 @@ const patch = route({
     category: z.enum(CATEGORIES).optional(),
     locationText: text(3, 200).optional(),
     mediaIds: z.array(uuid).max(4).optional(),
+    roundKind: roundKindEnum.optional(),
   }),
   handler: async ({ deps, user, params, body, now }) => {
     const issue = await requireIssue(deps.db, user.mahallaId, params.id);
@@ -173,9 +180,10 @@ const patch = route({
     await deps.db.tx(async (q) => {
       await q.query(
         `UPDATE issues SET title = COALESCE($2, title), description = COALESCE($3, description),
-                category = COALESCE($4, category), location_text = COALESCE($5, location_text), updated_at = $6
+                category = COALESCE($4, category), location_text = COALESCE($5, location_text),
+                round_kind = COALESCE($7, round_kind), updated_at = $6
           WHERE id = $1`,
-        [issue.id, body.title ?? null, body.description ?? null, body.category ?? null, body.locationText ?? null, now],
+        [issue.id, body.title ?? null, body.description ?? null, body.category ?? null, body.locationText ?? null, now, body.roundKind ?? null],
       );
       if (body.mediaIds) {
         await replaceIssueMedia(q, {

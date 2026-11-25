@@ -9,9 +9,10 @@ import { Select } from './Select';
 import { Field } from './Field';
 import { Text } from './Text';
 import { ApiError, newKey } from '@/lib/api';
+import { haptic } from '@/lib/haptics';
 import { errorMessage } from '@/lib/hooks';
 import { CATEGORIES } from '@/lib/labels';
-import type { Media } from '@/lib/types';
+import type { Media, RoundKind } from '@/lib/types';
 import {
   MAX_IMAGES,
   MAX_IMAGE_BYTES,
@@ -29,6 +30,8 @@ export interface IssueValues {
   locationText: string;
   category: string;
   mediaIds: string[];
+  /** Oylik (standart) yoki haftalik ovoz davri */
+  roundKind: RoundKind;
 }
 
 interface IssueFormProps {
@@ -45,12 +48,63 @@ const EMERGENCY = [
 
 const mb = (b: number) => (b / 1024 / 1024).toFixed(1);
 
+/** Fayl yuklash xatosi: matni formada aynan ko'rsatiladi. */
+class UploadFailed extends Error {}
+
+const KINDS: Array<{ value: RoundKind; title: string; hint: string; icon: keyof typeof Ionicons.glyphMap }> = [
+  { value: 'MONTHLY', title: 'Oylik ovoz', hint: "Oy oxirida eng ko'p ovoz olgan muammo tanlanadi", icon: 'calendar-outline' },
+  { value: 'WEEKLY', title: 'Haftalik ovoz', hint: "Tezkor: g'olib 1 hafta ichida hal qilinadi", icon: 'flash-outline' },
+];
+
+/** Muammo qaysi ovoz davriga chiqadi: oylik yoki haftalik (parallel davrlar). */
+function RoundKindPicker({ value, onChange }: { value: RoundKind; onChange: (v: RoundKind) => void }) {
+  const { colors, radius, spacing } = useTheme();
+  return (
+    <View style={{ gap: spacing.xs }}>
+      <Text variant="label">Ovoz davri</Text>
+      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+        {KINDS.map((k) => {
+          const active = value === k.value;
+          return (
+            <Pressable
+              key={k.value}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: active }}
+              onPress={() => onChange(k.value)}
+              style={{
+                flex: 1,
+                gap: 4,
+                padding: spacing.md,
+                borderRadius: radius.md,
+                borderWidth: 1,
+                borderColor: active ? colors.primary : colors.border,
+                backgroundColor: active ? colors.primarySoft : colors.surface,
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name={k.icon} size={16} color={active ? colors.primary : colors.muted} />
+                <Text variant="label" style={{ color: active ? colors.primary : colors.text }}>
+                  {k.title}
+                </Text>
+              </View>
+              <Text variant="muted" style={{ fontSize: 12, lineHeight: 16 }}>
+                {k.hint}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 export function IssueForm({ initial, submitLabel, onSubmit }: IssueFormProps) {
   const { colors, radius, spacing } = useTheme();
   const [title, setTitle] = useState(initial?.title ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
   const [location, setLocation] = useState(initial?.locationText ?? '');
   const [category, setCategory] = useState<string | null>(initial?.category ?? null);
+  const [roundKind, setRoundKind] = useState<RoundKind>(initial?.roundKind ?? 'MONTHLY');
   const [kept, setKept] = useState<Media[]>(initial?.media ?? []);
   const [files, setFiles] = useState<Attachment[]>([]);
   // Bir forma = bitta kalit: tarmoq uzilib qayta yuborilsa dublikat post yaratilmaydi
@@ -62,11 +116,15 @@ export function IssueForm({ initial, submitLabel, onSubmit }: IssueFormProps) {
   const imageCount = kept.filter((m) => m.kind === 'IMAGE').length + files.filter((f) => f.kind === 'IMAGE').length;
   const videoCount = kept.filter((m) => m.kind === 'VIDEO').length + files.filter((f) => f.kind === 'VIDEO').length;
 
-  const valid =
-    title.trim().length >= 5 &&
-    description.trim().length >= 10 &&
-    location.trim().length >= 3 &&
-    category !== null;
+  /** Yuborishdan oldin tekshiruv: tugma o'chiq turmaydi, nima yetishmasligi maydon ostida ko'rsatiladi */
+  function validate(): Record<string, string> {
+    const e: Record<string, string> = {};
+    if (title.trim().length < 5) e.title = "Sarlavha kamida 5 belgi bo'lsin";
+    if (description.trim().length < 10) e.description = "Tavsif kamida 10 belgi bo'lsin";
+    if (location.trim().length < 3) e.locationText = 'Joyni yozing (kamida 3 belgi)';
+    if (category === null) e.category = 'Toifani tanlang';
+    return e;
+  }
 
   async function addAssets(assets: ImagePicker.ImagePickerAsset[]) {
     let images = imageCount;
@@ -125,6 +183,13 @@ export function IssueForm({ initial, submitLabel, onSubmit }: IssueFormProps) {
   }
 
   async function submit() {
+    const invalid = validate();
+    if (Object.keys(invalid).length > 0) {
+      haptic.warning();
+      setFieldErrors(invalid);
+      setError(null);
+      return;
+    }
     setPending(true);
     setError(null);
     setFieldErrors({});
@@ -146,7 +211,8 @@ export function IssueForm({ initial, submitLabel, onSubmit }: IssueFormProps) {
           setFiles((prev) =>
             prev.map((p) => (p.localId === f.localId ? { ...p, status: 'error', error: errorMessage(e) } : p)),
           );
-          throw new Error('Ba‘zi fayllar yuklanmadi. “Qayta urinish” ni bosing yoki faylni olib tashlang.');
+          // Haqiqiy sabab (masalan, 413 hajm, 415 format, tarmoq) foydalanuvchiga ko'rinsin
+          throw new UploadFailed(`Fayl yuklanmadi: ${errorMessage(e)}. “Qayta urinish” ni bosing yoki faylni olib tashlang.`);
         }
       }
       // 2) Postni yuboramiz (bitta Idempotency-Key bilan)
@@ -156,16 +222,19 @@ export function IssueForm({ initial, submitLabel, onSubmit }: IssueFormProps) {
           description: description.trim(),
           locationText: location.trim(),
           category: category ?? 'OTHER',
+          roundKind,
           mediaIds: [...kept.map((m) => m.id), ...uploaded.map((u) => u.mediaId as string)],
         },
         idempotencyKey,
       );
     } catch (e) {
+      haptic.error();
       if (e instanceof ApiError && e.code === 'VALIDATION_ERROR') {
         const fields = (e.details as { fields?: Record<string, string> }).fields;
         if (fields) setFieldErrors(fields);
       }
-      setError(errorMessage(e));
+      // errorMessage() faqat ApiError'ni taniydi; yuklash xatosining matni yo'qolmasin
+      setError(e instanceof UploadFailed ? e.message : errorMessage(e));
     } finally {
       setPending(false);
     }
@@ -237,7 +306,17 @@ export function IssueForm({ initial, submitLabel, onSubmit }: IssueFormProps) {
         error={fieldErrors.locationText}
       />
 
-      <Select label="Toifa" icon="grid-outline" iconTone="purple" options={CATEGORIES} value={category} onChange={setCategory} />
+      <Select
+        label="Toifa"
+        icon="grid-outline"
+        iconTone="purple"
+        options={CATEGORIES}
+        value={category}
+        onChange={setCategory}
+        error={fieldErrors.category}
+      />
+
+      <RoundKindPicker value={roundKind} onChange={setRoundKind} />
 
       <Card title="Foto va video">
         <Text variant="muted">
@@ -289,8 +368,8 @@ export function IssueForm({ initial, submitLabel, onSubmit }: IssueFormProps) {
       <Button
         title={anyFailed ? 'Qayta urinish' : submitLabel}
         onPress={() => void submit()}
+        icon="paper-plane-outline"
         loading={pending}
-        disabled={!valid}
       />
     </>
   );

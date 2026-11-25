@@ -1,4 +1,5 @@
-import { Pressable, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
+import { PressableScale } from './PressableScale';
 import { Text } from './Text';
 import { useTheme } from '@/theme';
 
@@ -11,7 +12,7 @@ interface ChipsProps {
 }
 
 export function Chips({ options, value, onChange, allowAll = true }: ChipsProps) {
-  const { colors, radius, spacing, shadow } = useTheme();
+  const { colors, radius, spacing } = useTheme();
   const items = allowAll ? [{ value: '', label: 'Hammasi' }, ...options] : options;
 
   return (
@@ -23,23 +24,25 @@ export function Chips({ options, value, onChange, allowAll = true }: ChipsProps)
       {items.map((item) => {
         const active = (value ?? '') === item.value;
         return (
-          <Pressable
+          <PressableScale
             key={item.value || 'all'}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
+            scaleTo={0.94}
             onPress={() => onChange(item.value === '' ? null : item.value)}
-            style={[
-              {
+            style={{
                 paddingHorizontal: spacing.md,
-                paddingVertical: 7,
+                paddingVertical: 8,
                 borderRadius: radius.pill,
+                borderWidth: 1,
+                borderColor: active ? colors.primary : colors.border,
                 backgroundColor: active ? colors.primary : colors.surface,
-              },
-              active ? shadow.sm : null,
-            ]}
+              }}
           >
             <Text variant="label" style={{ color: active ? colors.primaryText : colors.muted }}>
               {item.label}
             </Text>
-          </Pressable>
+          </PressableScale>
         );
       })}
     </ScrollView>

@@ -1,17 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
+import { FlatList, Pressable, TextInput, View } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { KeyboardSpacer } from '@/components/KeyboardSpacer';
+import { PressableScale } from '@/components/PressableScale';
 import { ErrorState, Loading } from '@/components/StateView';
 import { Text } from '@/components/Text';
 import { api, newKey } from '@/lib/api';
 import { formatDate, formatTime } from '@/lib/format';
+import { haptic } from '@/lib/haptics';
 import { errorMessage } from '@/lib/hooks';
 import { useLang } from '@/lib/i18n';
 import { reportContent } from '@/lib/report';
 import type { ChatMessage, Page } from '@/lib/types';
-import { useTheme } from '@/theme';
+import { fonts, useTheme } from '@/theme';
 
 type LocalState = 'sending' | 'failed';
 interface Row extends ChatMessage {
@@ -21,6 +25,7 @@ interface Row extends ChatMessage {
 }
 
 const POLL_MS = 4000;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface ChatViewProps {
   /** API yo'li: '/chat/messages' (mahalla) yoki '/support/messages' (admin bilan) */
@@ -137,7 +142,9 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
         const withoutLocal = prev.filter((r) => r.id !== row.id);
         return withoutLocal.some((r) => r.id === saved.id) ? withoutLocal : [{ ...saved }, ...withoutLocal];
       });
+      haptic.tap();
     } catch (e) {
+      haptic.error();
       setSendError(errorMessage(e));
       setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, local: 'failed' } : r)));
     }
@@ -190,8 +197,9 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
             </Text>
           </View>
         ) : null}
-      <Pressable
-        accessibilityHint={mine ? undefined : 'Shikoyat qilish uchun bosib turing'}
+      <AnimatedPressable
+        entering={index === 0 ? FadeInUp.duration(220) : undefined}
+        accessibilityHint={mine ? undefined : t('Shikoyat qilish uchun bosib turing')}
         onLongPress={mine || item.local ? undefined : () => reportContent('CHAT_MESSAGE', item.id)}
         style={{
           flexDirection: 'row',
@@ -242,7 +250,7 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
             }}
           >
             {!mine && firstInGroup ? (
-              <Text variant="label" style={{ color: admin ? tones.blue.fg : colors.primary, fontSize: 12 }}>
+              <Text variant="label" style={{ color: admin ? tones.blue.fg : colors.primary, fontSize: 12 }} raw>
                 {admin ? `${t('Admin')} · ${item.senderName}` : item.senderName}
               </Text>
             ) : null}
@@ -268,14 +276,14 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
             </Pressable>
           ) : null}
         </View>
-      </Pressable>
+      </AnimatedPressable>
       </>
     );
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['left', 'right']}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={100}>
+      <View style={{ flex: 1 }}>
         <View
           style={{
             flexDirection: 'row',
@@ -341,6 +349,8 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
               flex: 1,
               maxHeight: 110,
               minHeight: 44,
+              fontFamily: fonts.regular,
+              fontSize: 15,
               backgroundColor: colors.bg,
               borderWidth: 1,
               borderColor: colors.border,
@@ -349,14 +359,14 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
               paddingTop: 12,
               paddingBottom: 10,
               color: colors.text,
-              fontSize: 15,
             }}
           />
-          <Pressable
+          <PressableScale
             accessibilityRole="button"
-            accessibilityLabel="Yuborish"
+            accessibilityLabel={t('Yuborish')}
             disabled={!text.trim()}
             onPress={send}
+            scaleTo={0.9}
             style={{
               width: 44,
               height: 44,
@@ -367,10 +377,12 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
               opacity: text.trim() ? 1 : 0.4,
             }}
           >
-            <Ionicons name="send" size={20} color={colors.primaryText} />
-          </Pressable>
+            <Ionicons name="arrow-up" size={22} color={colors.primaryText} />
+          </PressableScale>
         </View>
-      </KeyboardAvoidingView>
+        {/* Tab bar klaviatura ochilganda yashiriladi, shuning uchun panel to'g'ridan-to'g'ri klaviatura ustiga chiqadi */}
+        <KeyboardSpacer />
+      </View>
     </SafeAreaView>
   );
 }

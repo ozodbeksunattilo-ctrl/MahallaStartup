@@ -224,6 +224,7 @@ export interface ListOptions {
   category?: Category | undefined;
   status?: IssueStatus | undefined;
   periodCurrent?: boolean | undefined;
+  roundKind?: 'MONTHLY' | 'WEEKLY' | undefined;
   sort: 'newest' | 'top';
   overdue?: boolean | undefined;
   /** Moderatsiya navbati: eng eskisi birinchi */
@@ -242,7 +243,10 @@ interface ListRow extends IssueRow {
   sort_at: Date;
 }
 
-/** Lenta: 1 so'rov postlar + 3 ta `IN`/`ANY` so'rov (ovoz, kuzatuv, thumbnail); N+1 yo'q. */
+/**
+ * Lenta: 1 so'rov postlar + 3 ta `IN`/`ANY` so'rov (ovoz, kuzatuv, thumbnail); N+1 yo'q.
+ * Har bir muammo o'z turidagi joriy davrga (oylik / haftalik) qarab hisoblanadi.
+ */
 export async function listIssues(
   deps: Deps,
   user: AuthUser,
@@ -250,7 +254,10 @@ export async function listIssues(
   o: ListOptions,
 ): Promise<Page<IssueListItem>> {
   const q = deps.db;
-  const round = await currentRound(q, user.mahallaId, now);
+  const [monthly, weekly] = await Promise.all([
+    currentRound(q, user.mahallaId, now, 'MONTHLY'),
+    currentRound(q, user.mahallaId, now, 'WEEKLY'),
+  ]);
   const p = new Params();
 
   const where = [`i.mahalla_id = ${p.add(user.mahallaId)}`, 'i.deleted_at IS NULL'];
@@ -259,6 +266,7 @@ export async function listIssues(
   if (o.category) where.push(`i.category = ${p.add(o.category)}`);
   if (o.status) where.push(`i.status = ${p.add(o.status)}`);
   if (o.periodCurrent) where.push('re.id IS NOT NULL');
+  if (o.roundKind) where.push(`i.round_kind = ${p.add(o.roundKind)}`);
   if (o.overdue) {
     const today = p.add(tashkentToday(now));
     where.push(
@@ -282,7 +290,7 @@ export async function listIssues(
     }
   }
 
-  const roundParam = p.add(round.id);
+  const roundParam = `(CASE WHEN i.round_kind = 'WEEKLY' THEN ${p.add(weekly.id)}::uuid ELSE ${p.add(monthly.id)}::uuid END)`;
   const order = o.oldestFirst
     ? `${sortExpr} ASC, i.id ASC`
     : `${top ? 'COALESCE(re.vote_count, 0) DESC, ' : ''}${sortExpr} DESC, i.id DESC`;
@@ -305,8 +313,8 @@ export async function listIssues(
   const [votes, follows, thumbs] = ids.length
     ? await Promise.all([
         q.query<{ issue_id: string }>(
-          'SELECT issue_id FROM votes WHERE round_id = $1 AND voter_id = $2 AND issue_id = ANY($3::uuid[])',
-          [round.id, user.userId, pgArray(ids)],
+          'SELECT issue_id FROM votes WHERE round_id = ANY($1::uuid[]) AND voter_id = $2 AND issue_id = ANY($3::uuid[])',
+          [pgArray([monthly.id, weekly.id]), user.userId, pgArray(ids)],
         ),
         q.query<{ issue_id: string }>(
           'SELECT issue_id FROM issue_follows WHERE user_id = $1 AND issue_id = ANY($2::uuid[])',
@@ -343,6 +351,7 @@ export async function listIssues(
         commentCount: row.comment_count,
         voteCount: row.in_round ? (row.round_votes ?? 0) : null,
         myVote: voted.has(row.id),
+        roundKind: row.round_kind,
         isFollowing: followed.has(row.id),
         thumbUrl: key && mayShowMedia ? await deps.storage.signedUrl(key, 300, now) : null,
         authorName: row.author_name,
@@ -374,7 +383,8 @@ export async function buildIssueDetail(
 ) {
   const q = deps.db;
   const isAdmin = user.role === 'MAHALLA_ADMIN';
-  const round = await currentRound(q, user.mahallaId, now);
+  // Muammo o'z turidagi joriy davrda ovozga chiqadi (oylik yoki haftalik)
+  const round = await currentRound(q, user.mahallaId, now, issue.round_kind);
 
   const [entry, latest, mine, follow, dup] = await Promise.all([
     q.query<{ vote_count: number }>('SELECT vote_count FROM round_entries WHERE round_id = $1 AND issue_id = $2', [
@@ -410,6 +420,7 @@ export async function buildIssueDetail(
     author: { id: issue.author_id, displayName: issue.author_name },
     createdAt: issue.created_at,
     publishedAt: issue.published_at,
+    roundKind: issue.round_kind,
   };
 
   if (vis === 'hidden-notice') {

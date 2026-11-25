@@ -18,7 +18,6 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://frontend-production-8907b1e6.up.railway.app",
-        "EXPO_PUBLIC_DEMO": "false",
         "EXPO_PUBLIC_DEBUG": "true"
       }
     },
@@ -26,17 +25,6 @@
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_API_URL": "https://frontend-production-8907b1e6.up.railway.app"
-      }
-    },
-    "demo": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "env": {
-        "EXPO_PUBLIC_DEMO": "true",
-        "EXPO_PUBLIC_API_URL": "http://localhost:3000",
-        "EXPO_PUBLIC_DEBUG": "true"
       }
     }
   },

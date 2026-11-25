@@ -75,7 +75,7 @@ export const ISSUE_COLUMNS = `i.id, i.mahalla_id, i.author_id, i.title, i.descri
   i.status, i.published_at, i.rejected_reason, i.duplicate_of_id, i.responsible, i.next_step,
   i.due_date::text AS due_date, i.referred_org, i.referred_at::text AS referred_at,
   i.follow_up_at::text AS follow_up_at, i.resolution_text, i.hidden_at, i.hidden_reason,
-  i.comment_count, i.created_at, i.updated_at`;
+  i.comment_count, i.round_kind, i.created_at, i.updated_at`;
 
 export interface IssueRow {
   id: string;
@@ -99,6 +99,8 @@ export interface IssueRow {
   hidden_at: Date | null;
   hidden_reason: string | null;
   comment_count: number;
+  /** Qaysi davrda ovozga chiqadi: oylik yoki haftalik */
+  round_kind: 'MONTHLY' | 'WEEKLY';
   created_at: Date;
   updated_at: Date;
 }
@@ -118,6 +120,7 @@ export const issueListItemSchema = z.object({
   commentCount: z.number().int(),
   voteCount: z.number().int().nullable(),
   myVote: z.boolean(),
+  roundKind: z.enum(['MONTHLY', 'WEEKLY']).describe('Ovoz davri turi: oylik yoki haftalik (1 hafta ichida hal qilinadi)'),
   isFollowing: z.boolean(),
   thumbUrl: z.string().nullable(),
   authorName: z.string(),

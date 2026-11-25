@@ -1,17 +1,18 @@
 import { Platform } from 'react-native';
-import { useTheme } from '@/theme';
+import { fonts, useTheme } from '@/theme';
 
 /** Barcha Stack layout'lar uchun umumiy sarlavha uslubi. */
 export function useStackScreenOptions() {
   const { colors } = useTheme();
   return {
-    headerStyle: { backgroundColor: colors.surface },
+    headerStyle: { backgroundColor: colors.bg },
     headerTintColor: colors.primary,
-    headerTitleStyle: { fontWeight: '800' as const, fontSize: 18, color: colors.text },
+    headerTitleStyle: { fontFamily: fonts.serif, fontSize: 20, color: colors.text },
     headerTitleAlign: 'center' as const,
     headerBackButtonDisplayMode: 'minimal' as const,
     headerShadowVisible: false,
-    animation: Platform.OS === 'android' ? ('fade_from_bottom' as const) : ('default' as const),
+    // Android'da ham iOS uslubidagi yon tomondan silliq o'tish (fade_from_bottom «sakrab» ko'rinardi)
+    animation: Platform.OS === 'android' ? ('ios_from_right' as const) : ('default' as const),
     contentStyle: { backgroundColor: colors.bg },
   };
 }

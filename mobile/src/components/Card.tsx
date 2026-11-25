@@ -23,30 +23,17 @@ export function Card({ title, icon, tone = 'default', children, style }: CardPro
       style={[
         {
           backgroundColor: tone === 'soft' ? colors.primarySoft : colors.surface,
-          borderRadius: radius.lg,
+          borderRadius: radius.md,
           padding: spacing.lg,
           gap: spacing.sm,
         },
-        tone === 'default' ? shadow.sm : null,
+        shadow.sm,
         style,
       ]}
     >
       {title ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: 2 }}>
-          {icon ? (
-            <View
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 9,
-                backgroundColor: colors.primarySoft,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Ionicons name={icon} size={16} color={colors.primary} />
-            </View>
-          ) : null}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+          {icon ? <Ionicons name={icon} size={16} color={colors.secondary} /> : null}
           <Text variant="eyebrow">{title}</Text>
         </View>
       ) : null}

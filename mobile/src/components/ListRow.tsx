@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
+import { PressableScale } from './PressableScale';
 import { Text } from './Text';
 import { useTheme, type ToneName } from '@/theme';
 
@@ -21,16 +22,16 @@ export function ListRow({ title, subtitle, icon, badge, onPress, destructive, to
   const { colors, tones, spacing, radius } = useTheme();
   const tint = destructive ? colors.danger : tones[tone].fg;
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => ({
+      scaleTo={0.98}
+      style={{
         flexDirection: 'row',
         alignItems: 'center',
         gap: spacing.md,
         paddingVertical: spacing.sm + 2,
-        opacity: pressed ? 0.6 : 1,
-      })}
+      }}
     >
       {icon ? (
         <View
@@ -69,7 +70,7 @@ export function ListRow({ title, subtitle, icon, badge, onPress, destructive, to
           </Text>
         </View>
       ) : null}
-      <Ionicons name="chevron-forward" size={18} color={colors.muted} />
-    </Pressable>
+      {destructive ? null : <Ionicons name="chevron-forward" size={18} color={colors.muted} />}
+    </PressableScale>
   );
 }

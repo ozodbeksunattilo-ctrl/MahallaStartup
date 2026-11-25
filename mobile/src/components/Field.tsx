@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pressable, TextInput, View, type TextInputProps } from 'react-native';
 import { Text } from './Text';
 import { useLang } from '@/lib/i18n';
-import { useTheme, type ToneName } from '@/theme';
+import { fonts, useTheme, type ToneName } from '@/theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -17,8 +17,9 @@ interface FieldProps extends TextInputProps {
   iconTone?: ToneName;
 }
 
-export function Field({ label, hint, error, icon, iconTone = 'blue', multiline, secureTextEntry, style, ...props }: FieldProps) {
-  const { colors, tones, radius, spacing } = useTheme();
+// Dizayn: ikonka bir rangli (muted); `iconTone` moslik uchun qabul qilinadi
+export function Field({ label, hint, error, icon, multiline, secureTextEntry, style, ...props }: FieldProps) {
+  const { colors, radius, spacing } = useTheme();
   const { t } = useLang();
   const [focused, setFocused] = useState(false);
   // Parol maydonlarida «ko'z» tugmasi: parolni ko'rsatish / yashirish
@@ -34,7 +35,7 @@ export function Field({ label, hint, error, icon, iconTone = 'blue', multiline, 
           alignItems: multiline ? 'flex-start' : 'center',
           backgroundColor: colors.surface,
           borderColor: error ? colors.danger : focused ? colors.primary : colors.border,
-          borderWidth: focused || error ? 2 : 1,
+          borderWidth: 1,
           borderRadius: radius.md,
           paddingHorizontal: spacing.md,
           gap: spacing.sm,
@@ -44,7 +45,7 @@ export function Field({ label, hint, error, icon, iconTone = 'blue', multiline, 
           <Ionicons
             name={icon}
             size={20}
-            color={tones[iconTone].fg}
+            color={colors.muted}
             style={{ marginTop: multiline ? 14 : 0 }}
           />
         ) : null}
@@ -67,7 +68,8 @@ export function Field({ label, hint, error, icon, iconTone = 'blue', multiline, 
               flex: 1,
               paddingVertical: spacing.md,
               color: colors.text,
-              fontSize: 16,
+              fontSize: 15,
+              fontFamily: fonts.regular,
               minHeight: multiline ? 96 : 50,
               textAlignVertical: multiline ? 'top' : 'center',
             },

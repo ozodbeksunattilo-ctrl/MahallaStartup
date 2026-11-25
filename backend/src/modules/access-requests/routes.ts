@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { AppError } from '../../common/app-error';
 import { audit } from '../../core/audit';
+import type { Deps } from '../../core/deps';
 import { route } from '../../core/http';
 import { uuidv7 } from '../../core/ids';
 import { decodeCursor, pageQuery, toPage } from '../../core/pagination';
@@ -38,35 +39,67 @@ const toRequest = (r: RequestRow) => ({
   decidedAt: r.decided_at,
 });
 
+const mahallas = route({
+  method: 'get',
+  path: '/auth/mahallas',
+  auth: 'public',
+  tag: 'Auth',
+  summary: "Mahallalar ro'yxati (ro'yxatdan o'tish formasidagi tanlash uchun)",
+  query: z.object({ q: z.string().trim().max(100).optional() }),
+  handler: async ({ deps, query }) => {
+    const r = query.q
+      ? await deps.db.query<{ id: string; name: string }>(
+          'SELECT id, name FROM mahalla WHERE name ILIKE $1 ORDER BY name LIMIT 50',
+          [`%${escapeLike(query.q)}%`],
+        )
+      : await deps.db.query<{ id: string; name: string }>('SELECT id, name FROM mahalla ORDER BY name LIMIT 200');
+    return { items: r.rows };
+  },
+});
+
 const create = route({
   method: 'post',
   path: '/auth/access-requests',
   auth: 'public',
   tag: 'Auth',
   summary: "Kirish so'rovi (mobil «Ro'yxatdan o'tish»; akkauntni mahalla admini beradi)",
-  body: z.object({
-    fullName: text(3, 100),
-    phone: z
-      .string()
-      .trim()
-      .regex(/^\+?[0-9 ()-]{9,32}$/, "Telefon raqami noto'g'ri"),
-    mahallaName: text(2, 100),
-    address: z.string().trim().max(200).optional(),
-  }),
+  description:
+    "`mahallaId` (GET /auth/mahallas dan) yoki `mahallaName` dan biri kerak. Javobdagi `id` bilan holatni " +
+    'GET /auth/access-requests/{id} orqali tekshirish mumkin.',
+  body: z
+    .object({
+      fullName: text(3, 100),
+      phone: z
+        .string()
+        .trim()
+        .regex(/^\+?[0-9 ()-]{9,32}$/, "Telefon raqami noto'g'ri"),
+      mahallaId: z.uuid().optional(),
+      mahallaName: text(2, 100).optional(),
+      address: z.string().trim().max(200).optional(),
+    })
+    .refine((b) => b.mahallaId || b.mahallaName, { message: 'Mahallani tanlang', path: ['mahallaName'] }),
   status: 201,
   handler: async ({ deps, body, req, now }) => {
     await rateLimit(deps, { name: 'access-request-ip', limit: 5, windowSec: 3600, key: req.ip ?? 'unknown' });
 
+    if (body.mahallaId) {
+      const byId = await deps.db.query<{ id: string }>('SELECT id FROM mahalla WHERE id = $1', [body.mahallaId]);
+      if (!byId.rows[0]) {
+        throw new AppError('VALIDATION_ERROR', undefined, { fields: { mahallaId: 'Bunday mahalla topilmadi' } });
+      }
+      return insertRequest(deps, byId.rows[0].id, body, now);
+    }
+    const mahallaName = body.mahallaName ?? '';
     // Avval aniq moslik (nom yoki slug); bo'lmasa qisman moslik faqat bitta mahallaga tushsa —
     // aks holda so'rov noto'g'ri mahallaga (alifbo bo'yicha birinchisiga) ketib qolardi
     const exact = await deps.db.query<{ id: string }>(
       `SELECT id FROM mahalla WHERE lower(name) = lower($1) OR slug = lower($1) LIMIT 1`,
-      [body.mahallaName],
+      [mahallaName],
     );
     let mahalla = exact.rows[0];
     if (!mahalla) {
       const partial = await deps.db.query<{ id: string }>(`SELECT id FROM mahalla WHERE name ILIKE $1 LIMIT 2`, [
-        `%${escapeLike(body.mahallaName)}%`,
+        `%${escapeLike(mahallaName)}%`,
       ]);
       if (partial.rows.length > 1) {
         throw new AppError('VALIDATION_ERROR', undefined, {
@@ -78,19 +111,47 @@ const create = route({
     if (!mahalla) {
       throw new AppError('VALIDATION_ERROR', undefined, { fields: { mahallaName: 'Bunday mahalla topilmadi' } });
     }
-    const dup = await deps.db.query(
-      `SELECT 1 FROM access_requests WHERE mahalla_id = $1 AND phone = $2 AND status = 'PENDING'`,
-      [mahalla.id, body.phone],
-    );
-    if (dup.rows.length > 0) throw new AppError('CONFLICT', "Bu raqamdan so'rov allaqachon yuborilgan");
+    return insertRequest(deps, mahalla.id, body, now);
+  },
+});
 
-    const id = uuidv7();
-    await deps.db.query(
-      `INSERT INTO access_requests (id, mahalla_id, full_name, phone, address, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, mahalla.id, body.fullName, body.phone, body.address || null, now],
+async function insertRequest(
+  deps: Deps,
+  mahallaId: string,
+  body: { fullName: string; phone: string; address?: string },
+  now: Date,
+): Promise<{ id: string; status: 'PENDING' }> {
+  const dup = await deps.db.query(
+    `SELECT 1 FROM access_requests WHERE mahalla_id = $1 AND phone = $2 AND status = 'PENDING'`,
+    [mahallaId, body.phone],
+  );
+  if (dup.rows.length > 0) throw new AppError('CONFLICT', "Bu raqamdan so'rov allaqachon yuborilgan");
+
+  const id = uuidv7();
+  await deps.db.query(
+    `INSERT INTO access_requests (id, mahalla_id, full_name, phone, address, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6)`,
+    [id, mahallaId, body.fullName, body.phone, body.address || null, now],
+  );
+  return { id, status: 'PENDING' };
+}
+
+const status = route({
+  method: 'get',
+  path: '/auth/access-requests/:id',
+  auth: 'public',
+  tag: 'Auth',
+  summary: "Kirish so'rovi holati (PENDING / APPROVED / REJECTED); shaxsiy ma'lumot qaytarilmaydi",
+  params: idParam,
+  handler: async ({ deps, params }) => {
+    const r = await deps.db.query<{ status: RequestRow['status']; note: string | null; decided_at: Date | null; mahalla_name: string }>(
+      `SELECT a.status, a.note, a.decided_at, m.name AS mahalla_name
+         FROM access_requests a JOIN mahalla m ON m.id = a.mahalla_id WHERE a.id = $1`,
+      [params.id],
     );
-    return { id, status: 'PENDING' };
+    const row = r.rows[0];
+    if (!row) throw new AppError('NOT_FOUND');
+    return { id: params.id, status: row.status, note: row.note, decidedAt: row.decided_at, mahallaName: row.mahalla_name };
   },
 });
 
@@ -202,4 +263,4 @@ const reject = route({
   },
 });
 
-export const accessRequestRoutes = [create, list, approve, reject];
+export const accessRequestRoutes = [mahallas, create, status, list, approve, reject];

@@ -74,7 +74,7 @@ const approve = route({
     await deps.db.tx(async (q) => {
       const issue = await lockIssue(q, user, params.id);
       checkTransition({ from: issue.status, to: 'OPEN', actor: 'ADMIN', input: {} });
-      const round = await currentRound(q, user.mahallaId, now);
+      const round = await currentRound(q, user.mahallaId, now, issue.round_kind);
       if (!roundIsVotable(round, now)) throw new AppError('ROUND_CLOSED');
 
       await q.query(`UPDATE issues SET status = 'OPEN', published_at = $2, updated_at = $2 WHERE id = $1`, [issue.id, now]);
@@ -455,7 +455,7 @@ const carryOver = route({
       if (issue.status !== 'OPEN' || issue.hidden_at) {
         throw new AppError('CONFLICT', "Faqat ochiq (OPEN) muammoni keyingi davrga o'tkazish mumkin");
       }
-      const round = await currentRound(q, user.mahallaId, now);
+      const round = await currentRound(q, user.mahallaId, now, issue.round_kind);
       if (!roundIsVotable(round, now)) throw new AppError('ROUND_CLOSED');
 
       const inCurrent = await q.query('SELECT 1 FROM round_entries WHERE round_id = $1 AND issue_id = $2', [

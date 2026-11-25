@@ -8,7 +8,6 @@ import {
   type ReactNode,
 } from 'react';
 import { api, setSessionHandlers } from './api';
-import { DEMO, SKIP_AUTH } from './config';
 import { clearFetchCache } from './hooks';
 import { registerForPush, unregisterPush } from './push';
 import { clearToken, loadToken, saveToken } from './token';
@@ -28,11 +27,10 @@ interface SessionValue {
 const SessionContext = createContext<SessionValue | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [status, setStatus] = useState<Status>(SKIP_AUTH ? 'signedIn' : 'loading');
+  const [status, setStatus] = useState<Status>('loading');
   const [mustChangePassword, setMustChangePassword] = useState(false);
 
   useEffect(() => {
-    if (SKIP_AUTH) return;
     // SecureStore osilib qolsa ham 3s dan keyin login ekraniga o'tamiz
     const timer = setTimeout(() => setStatus((s) => (s === 'loading' ? 'signedOut' : s)), 3000);
     void loadToken().then((token) => setStatus(token ? 'signedIn' : 'signedOut'));
@@ -57,7 +55,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   // Parol almashtirilgach (boshqa bo'limlar ochilgach) push tokenini yozamiz
   useEffect(() => {
-    if (status === 'signedIn' && !mustChangePassword && !SKIP_AUTH && !DEMO) void registerForPush();
+    if (status === 'signedIn' && !mustChangePassword) void registerForPush();
   }, [status, mustChangePassword]);
 
   const passwordChanged = useCallback(() => setMustChangePassword(false), []);

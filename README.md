@@ -7,7 +7,7 @@ Uchta **alohida, mustaqil** loyiha — har biri o'z papkasida, o'z `package.json
 ```
 backend/    Express 5 + PostgreSQL — API (to'liq), CLI, migratsiyalar, testlar, openapi.yaml
 frontend/   Next.js 16 admin veb-panel — backend API'ga to'liq ulangan
-mobile/     Expo SDK 58 (Android/iOS) — skelet
+mobile/     Expo SDK 58 (Android/iOS) — aholi ilovasi, faqat haqiqiy API bilan (mock yo'q)
 docs/       DECISIONS.md, FOR_CLIENTS.md, ENDPOINTS.md
 legacy/     Eski Vite shabloni (kerak emas, o'chirish mumkin)
 ```
@@ -52,9 +52,9 @@ Ildizdagi qisqa buyruqlar: `pnpm install:all`, `pnpm dev:backend`, `pnpm dev:fro
 | Backend: bildirishnoma + push, chat (REST + Socket.IO), shikoyat, tadbir, e'lon, `/home`, dashboard, audit | tayyor |
 | Backend: seed, bench, OpenAPI (avtomatik), testlar | tayyor (`pnpm test`: 13 fayl, 80 test) |
 | Frontend (admin) | backendga ulangan: dashboard, moderatsiya, muammolar va holat o'tishlari, ovoz natijalari, aholi, tadbirlar, e'lonlar, shikoyatlar, audit (`pnpm test`: 4 test) |
-| Mobil | skelet (shu bosqichda o'zgartirilmadi) |
+| Mobil | barcha aholi ekranlari haqiqiy API'ga ulangan; ro'yxatdan o'tish, UZ/ЎЗ/RU/EN, klaviatura (react-native-keyboard-controller) |
 
-75 ta endpoint: [docs/ENDPOINTS.md](docs/ENDPOINTS.md) · shartnoma: [backend/openapi.yaml](backend/openapi.yaml) ·
+86 ta endpoint: [docs/ENDPOINTS.md](docs/ENDPOINTS.md) · shartnoma: [backend/openapi.yaml](backend/openapi.yaml) ·
 mijozlar uchun: [docs/FOR_CLIENTS.md](docs/FOR_CLIENTS.md) · qarorlar: [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Tekshirilmaganlar (halol ro'yxat)
@@ -64,7 +64,7 @@ mijozlar uchun: [docs/FOR_CLIENTS.md](docs/FOR_CLIENTS.md) · qarorlar: [docs/DE
 - **Push**: Expo API testlarda soxtalashtirilgan (yuborish, `DeviceNotRegistered` tokenni o'chirish tekshirilgan); real qurilmada va `EXPO_ACCESS_TOKEN` bilan sinalmadi. Receipt tekshiruvi xotirada (qayta ishga tushganda yo'qoladi).
 - **Video**: o'zgartirilmay saqlanadi — metadata (GPS) tozalash va transkodlash keyingi bosqich.
 - **TZ**: `MAHALLADOSH_TZ_CLAUDE.md` (ildizda). Mobil skeletining pastki navigatsiyasi TZ dan farq qiladi (TZ: Bosh sahifa, Muammolar, Tadbirlar, Chat, Profil) — mobil dasturchi moslashtiradi. Mobil dizayn topshirig'i va tokenlar: [docs/design/README.md](docs/design/README.md).
-- Frontend/mobil API'ga to'liq ulanmagan; mobilda `EXPO_PUBLIC_SKIP_AUTH=true` (ekranlarni ko'rish uchun).
+- Mobil ilovada mock/demo rejim yo'q: lokal sinov uchun backend ishlab turishi kerak (`pnpm db:seed:demo` — demo ma'lumot va rasmlar).
 
 ## Xato kodlari
 

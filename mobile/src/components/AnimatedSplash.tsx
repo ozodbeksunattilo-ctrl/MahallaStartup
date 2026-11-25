@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
@@ -15,10 +14,11 @@ import { Logo } from './Logo';
 /** Pastdagi to'lgich shuncha vaqtda to'liq to'ladi. */
 const FILL_MS = 2600;
 const BAR_WIDTH = 200;
-const SPLASH_BLUE = '#2563eb';
-const SPLASH_GREEN = '#1f8a4c';
+// Dizayn: qog'oz fon, to'q yashil to'lgich
+const SPLASH_BG = '#f7f4ea';
+const SPLASH_GREEN = '#253a2d';
 
-/** Ilova ochilganda: oq fon, markazda logotip, ostida ko'k→yashil to'lib boruvchi to'lgich; to'lgach ilovaga o'tadi. */
+/** Ilova ochilganda: qog'oz fon, markazda logotip, ostida yashil to'lib boruvchi to'lgich; to'lgach ilovaga o'tadi. */
 export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () => void }) {
   const scale = useSharedValue(0.85);
   const fill = useSharedValue(0);
@@ -69,7 +69,7 @@ export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () =
   const barStyle = useAnimatedStyle(() => ({ width: BAR_WIDTH * fill.value }));
 
   return (
-    <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: '#ffffff' }, rootStyle]} pointerEvents="auto">
+    <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: SPLASH_BG }, rootStyle]} pointerEvents="auto">
       <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center', gap: 36 }]}>
         <Animated.View style={logoStyle}>
           <Logo size={170} full />
@@ -79,18 +79,11 @@ export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () =
             width: BAR_WIDTH,
             height: 8,
             borderRadius: 4,
-            backgroundColor: 'rgba(15,34,24,0.10)',
+            backgroundColor: '#e3e6d8',
             overflow: 'hidden',
           }}
         >
-          <Animated.View style={[{ height: 8, borderRadius: 4, overflow: 'hidden' }, barStyle]}>
-            <LinearGradient
-              colors={[SPLASH_BLUE, SPLASH_GREEN]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ width: BAR_WIDTH, height: 8 }}
-            />
-          </Animated.View>
+          <Animated.View style={[{ height: 8, borderRadius: 4, backgroundColor: SPLASH_GREEN }, barStyle]} />
         </View>
       </View>
     </Animated.View>

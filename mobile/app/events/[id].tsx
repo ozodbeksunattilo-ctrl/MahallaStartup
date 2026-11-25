@@ -49,7 +49,9 @@ export default function EventScreen() {
           const open = e.status === 'PUBLISHED' && new Date(e.startsAt).getTime() > now;
           return (
             <>
-              <Text variant="title">{e.title}</Text>
+              <Text variant="title" raw>
+                {e.title}
+              </Text>
               <StatusBadge status={e.status} label={EVENT_STATUS[e.status] ?? e.status} />
               {e.status === 'CANCELLED' ? (
                 <Text style={{ color: colors.danger }}>Bu tadbir bekor qilingan.</Text>
@@ -71,11 +73,11 @@ export default function EventScreen() {
                 </View>
               </Card>
 
-              <Text>{e.description}</Text>
+              <Text raw>{e.description}</Text>
 
               {e.resultText ? (
                 <Card title="Tadbir natijasi">
-                  <Text>{e.resultText}</Text>
+                  <Text raw>{e.resultText}</Text>
                   <MediaGrid media={e.media} />
                 </Card>
               ) : null}

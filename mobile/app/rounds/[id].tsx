@@ -43,7 +43,7 @@ export default function RoundResultScreen() {
                     <Text variant="label" style={{ width: 24 }}>
                       {x.rank}.
                     </Text>
-                    <Text style={{ flex: 1 }} onPress={() => router.push(`/issues/${x.issueId}`)}>
+                    <Text style={{ flex: 1 }} onPress={() => router.push(`/issues/${x.issueId}`)} raw>
                       {x.title}
                     </Text>
                     <Text variant="label">{x.votes} ovoz</Text>

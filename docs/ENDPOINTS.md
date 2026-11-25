@@ -14,7 +14,9 @@ Avtomatik generatsiya: `pnpm contract:build` (qo'lda tahrirlamang). Prefiks: `/a
 | `GET` | `/me` | har qanday kirgan | Joriy foydalanuvchi |
 | `PUT` | `/devices` | har qanday kirgan | Push token'ni ro'yxatdan o'tkazish (idempotent) |
 | `DELETE` | `/devices/:token` | har qanday kirgan | Push token'ni o'chirish |
+| `GET` | `/auth/mahallas` | ochiq | Mahallalar ro'yxati (ro'yxatdan o'tish formasidagi tanlash uchun) |
 | `POST` | `/auth/access-requests` | ochiq | Kirish so'rovi (mobil «Ro'yxatdan o'tish»; akkauntni mahalla admini beradi) |
+| `GET` | `/auth/access-requests/:id` | ochiq | Kirish so'rovi holati (PENDING / APPROVED / REJECTED); shaxsiy ma'lumot qaytarilmaydi |
 
 ## Admin: kirish so'rovlari
 

@@ -28,8 +28,15 @@ export interface Page<T> {
   nextCursor: string | null;
 }
 
+/** Ovoz davri turi: oylik va haftalik davrlar parallel ishlaydi (har birida 3 tadan ovoz). */
+export type RoundKind = 'MONTHLY' | 'WEEKLY';
+
 export interface Home {
   round: { periodEnd: string; votesLeft: number } | null;
+  /** Haftalik davr: qolgan ovozlar */
+  weeklyRound?: { periodEnd: string; votesLeft: number };
+  /** Hafta muammosi: oxirgi haftalik g'olib (1 hafta ichida hal qilinishi kerak) */
+  weeklyIssue?: { id: string; title: string; status: string; statusLabel: string; dueDate: string | null } | null;
   featuredIssue: { id: string; title: string; status: string; statusLabel: string } | null;
   nextEvent: { id: string; title: string; startsAt: string; location: string } | null;
   latestImportantAnnouncement: { id: string; title: string; publishedAt: string } | null;
@@ -49,6 +56,7 @@ export interface IssueListItem {
   commentCount: number;
   voteCount: number | null;
   myVote: boolean;
+  roundKind: RoundKind;
   isFollowing: boolean;
   thumbUrl: string | null;
   authorName: string;
@@ -99,6 +107,7 @@ export interface IssueDetail {
   media: Media[];
   voteCount: number | null;
   roundId: string | null;
+  roundKind: RoundKind;
   myVote: boolean;
   isFollowing: boolean;
   canVote: boolean;
@@ -124,8 +133,9 @@ export interface Comment {
   createdAt: string;
 }
 
-export interface CurrentRound {
-  round: { id: string; status: string; periodStart: string; periodEnd: string } | null;
+/** Bitta davr turi bo'yicha holat: ishlatilgan/qolgan ovozlar va qaysi muammolarga ovoz berilgan. */
+export interface RoundState {
+  round: { id: string; kind?: RoundKind; status: string; periodStart: string; periodEnd: string } | null;
   periodStart: string;
   periodEnd: string;
   votesUsed: number;
@@ -133,16 +143,28 @@ export interface CurrentRound {
   myVotes: Array<{ issueId: string; title: string; slot: number }>;
 }
 
+/** GET /rounds/current: yuqori daraja — oylik davr, `weekly` — parallel haftalik davr. */
+export interface CurrentRound extends RoundState {
+  weekly?: RoundState;
+}
+
+/** Tanlangan turdagi davr holati (eski backend `weekly` bermasa — null). */
+export const roundOf = (c: CurrentRound | null, kind: RoundKind): RoundState | null =>
+  c === null ? null : kind === 'WEEKLY' ? (c.weekly ?? null) : c;
+
 export interface VoteResult {
   issueId: string;
   voted: boolean;
   slot: number | null;
   votesUsed: number;
   votesLeft: number;
+  /** Ovoz qaysi davrda hisoblandi */
+  roundKind?: RoundKind;
 }
 
 export interface RoundListItem {
   id: string;
+  kind?: RoundKind;
   status: string;
   periodStart: string;
   periodEnd: string;
@@ -153,6 +175,7 @@ export interface RoundListItem {
 
 export interface RoundResult {
   roundId: string;
+  kind?: RoundKind;
   periodStart: string;
   periodEnd: string;
   closedAt: string | null;

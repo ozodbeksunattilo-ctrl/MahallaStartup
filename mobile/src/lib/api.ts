@@ -2,9 +2,8 @@
 interface ErrorResponse {
   error: { code: string; message: string; details: Record<string, unknown> };
 }
-import { API_URL, DEMO } from './config';
+import { API_URL } from './config';
 import { log } from './log';
-import { mockResponse } from './mock';
 import { getToken } from './token';
 
 export class ApiError extends Error {
@@ -41,28 +40,6 @@ type ApiInit = Omit<RequestInit, 'body'> & {
 };
 
 export async function api<T = void>(path: string, init: ApiInit = {}): Promise<T> {
-  try {
-    return await request<T>(path, init);
-  } catch (e) {
-    // Faqat dev rejimida: server javob bermasa o'qish so'rovlarida namunaviy (mock) ma'lumot ko'rsatiladi.
-    // Haqiqiy build'da soxta ma'lumot ko'rsatilmaydi — aks holda ulanish yo'qligi «ishlayapti» bo'lib ko'rinadi.
-    const method = init.method ?? 'GET';
-    if (__DEV__ && method === 'GET' && e instanceof ApiError && (e.status === 0 || e.status >= 500)) {
-      const demo = mockResponse(path, 'GET');
-      if (demo !== undefined) {
-        log.warn('api', `GET ${path} -> ${e.status}: namunaviy ma'lumot ko'rsatilmoqda`);
-        return demo as T;
-      }
-    }
-    throw e;
-  }
-}
-
-async function request<T>(path: string, init: ApiInit): Promise<T> {
-  if (DEMO) {
-    await new Promise((r) => setTimeout(r, 250));
-    return mockResponse(path, init.method ?? 'GET', init.json) as T;
-  }
   const { json, form, idempotencyKey, headers, ...rest } = init;
   const h = new Headers(headers);
   h.set('Accept', 'application/json');

@@ -5,10 +5,12 @@ import { ActivityIndicator, FlatList, Pressable, RefreshControl, View } from 're
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Chips } from '@/components/Chips';
 import { EmptyState } from '@/components/EmptyState';
+import { PressableScale } from '@/components/PressableScale';
 import { ErrorState, Loading } from '@/components/StateView';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Text } from '@/components/Text';
 import { api } from '@/lib/api';
+import { haptic } from '@/lib/haptics';
 import { formatDateTime } from '@/lib/format';
 import { errorMessage, usePaged } from '@/lib/hooks';
 import { EVENT_STATUS } from '@/lib/labels';
@@ -47,7 +49,9 @@ export default function EventsScreen() {
       const going = res ? res.going : !ev.myRsvp;
       const count = res ? res.rsvpCount : Math.max(0, ev.rsvpCount - 1);
       list.setItems((prev) => prev.map((i) => (i.id === ev.id ? { ...i, myRsvp: going, rsvpCount: count } : i)));
+      if (going) haptic.success();
     } catch (e) {
+      haptic.error();
       setNotice(errorMessage(e));
     } finally {
       setBusy(null);
@@ -80,7 +84,9 @@ export default function EventsScreen() {
               }}
             >
               <Pressable accessibilityRole="button" onPress={() => router.push(`/events/${ev.id}`)} style={{ gap: 6 }}>
-                <Text variant="heading">{ev.title}</Text>
+                <Text variant="heading" raw>
+                  {ev.title}
+                </Text>
                 <Text variant="muted">
                   <Ionicons name="calendar-outline" size={13} color={colors.muted} /> {formatDateTime(ev.startsAt)}
                 </Text>
@@ -93,12 +99,12 @@ export default function EventsScreen() {
                 </View>
               </Pressable>
               {canRsvp ? (
-                <Pressable
+                <PressableScale
                   accessibilityRole="button"
                   accessibilityState={{ selected: ev.myRsvp, busy: busy === ev.id }}
                   disabled={busy === ev.id}
                   onPress={() => void toggleRsvp(ev)}
-                  style={({ pressed }) => ({
+                  style={{
                     minHeight: 46,
                     borderRadius: radius.md,
                     alignItems: 'center',
@@ -108,8 +114,8 @@ export default function EventsScreen() {
                     borderWidth: 1,
                     borderColor: colors.primary,
                     backgroundColor: ev.myRsvp ? colors.primary : 'transparent',
-                    opacity: busy === ev.id ? 0.5 : pressed ? 0.85 : 1,
-                  })}
+                    opacity: busy === ev.id ? 0.5 : 1,
+                  }}
                 >
                   <Ionicons
                     name={ev.myRsvp ? 'checkmark-circle' : 'add-circle-outline'}
@@ -119,7 +125,7 @@ export default function EventsScreen() {
                   <Text variant="label" style={{ fontSize: 15, color: ev.myRsvp ? colors.primaryText : colors.primary }}>
                     {ev.myRsvp ? "Qatnashasiz (bekor qilish)" : 'Qatnashaman'}
                   </Text>
-                </Pressable>
+                </PressableScale>
               ) : null}
             </View>
           );

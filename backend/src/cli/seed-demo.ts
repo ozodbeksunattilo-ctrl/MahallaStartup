@@ -1,13 +1,13 @@
-import sharp from 'sharp';
 import type { Queryable } from '../core/db';
 import type { Deps } from '../core/deps';
 import { uuidv7 } from '../core/ids';
 import { notify } from '../core/notify';
 import { hashPassword } from '../core/password';
 import { fanoutAnnouncement } from '../modules/announcements/routes';
-import { periodFor, type Period } from '../modules/rounds/period';
+import { periodFor, weekPeriodFor, type Period, type RoundKind } from '../modules/rounds/period';
 import { audit } from '../core/audit';
 import type { Category, IssueStatus } from '../core/types';
+import { demoPhoto, illustration, type DemoPhoto, type Scene } from './illustrations';
 
 export const DEMO_PASSWORD = 'Demo12345!';
 export const DEMO_TEMP_PASSWORD = 'Temp12345!';
@@ -36,6 +36,8 @@ interface IssueSeed {
   status: IssueStatus;
   createdAt: Date;
   publishedAt?: Date | null;
+  /** Standart — oylik */
+  roundKind?: RoundKind;
   rejectedReason?: string;
   duplicateOfId?: string;
   responsible?: string;
@@ -54,13 +56,13 @@ async function mkIssue(q: Queryable, o: IssueSeed): Promise<string> {
   await q.query(
     `INSERT INTO issues (id, mahalla_id, author_id, title, description, category, location_text, status, published_at,
                          rejected_reason, duplicate_of_id, responsible, next_step, due_date, referred_org, referred_at,
-                         follow_up_at, resolution_text, idempotency_key, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::date, $15, $16::date, $17::date, $18, $19, $20, $20)`,
+                         follow_up_at, resolution_text, idempotency_key, created_at, updated_at, round_kind)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::date, $15, $16::date, $17::date, $18, $19, $20, $20, $21)`,
     [
       id, o.mahallaId, o.authorId, o.title, o.description, o.category, 'Mahalla markazi, 12-uy yonida', o.status,
       o.publishedAt ?? null, o.rejectedReason ?? null, o.duplicateOfId ?? null, o.responsible ?? null, o.nextStep ?? null,
       o.dueDate ?? null, o.referredOrg ?? null, o.referredAt ?? null, o.followUpAt ?? null, o.resolutionText ?? null,
-      `seed-${id}`, o.createdAt,
+      `seed-${id}`, o.createdAt, o.roundKind ?? 'MONTHLY',
     ],
   );
   return id;
@@ -85,11 +87,17 @@ async function mkUpdate(
   return id;
 }
 
-async function mkRound(q: Queryable, mahallaId: string, p: Period, status: 'OPEN' | 'CLOSED'): Promise<string> {
+async function mkRound(
+  q: Queryable,
+  mahallaId: string,
+  p: Period,
+  status: 'OPEN' | 'CLOSED',
+  kind: RoundKind = 'MONTHLY',
+): Promise<string> {
   const id = uuidv7();
   await q.query(
-    `INSERT INTO voting_rounds (id, mahalla_id, period_start, period_end, status) VALUES ($1, $2, $3, $4, $5)`,
-    [id, mahallaId, p.start, p.end, status],
+    `INSERT INTO voting_rounds (id, mahalla_id, kind, period_start, period_end, status) VALUES ($1, $2, $3, $4, $5, $6)`,
+    [id, mahallaId, kind, p.start, p.end, status],
   );
   return id;
 }
@@ -138,6 +146,7 @@ async function wipeMahalla(deps: Deps, q: Queryable, mahallaId: string): Promise
     'DELETE FROM reports WHERE mahalla_id = $1',
     'DELETE FROM audit_events WHERE mahalla_id = $1',
     'DELETE FROM chat_messages WHERE mahalla_id = $1',
+    'DELETE FROM support_messages WHERE mahalla_id = $1',
     'DELETE FROM comments WHERE mahalla_id = $1',
     'DELETE FROM votes WHERE round_id IN (SELECT id FROM voting_rounds WHERE mahalla_id = $1)',
     'DELETE FROM round_results WHERE round_id IN (SELECT id FROM voting_rounds WHERE mahalla_id = $1)',
@@ -162,11 +171,17 @@ async function wipeMahalla(deps: Deps, q: Queryable, mahallaId: string): Promise
   await q.query('DELETE FROM mahalla WHERE id = $1', [mahallaId]);
 }
 
-async function addPhoto(deps: Deps, q: Queryable, o: { mahallaId: string; ownerId: string; issueId?: string; updateId?: string; eventId?: string; color: [number, number, number] }) {
+let photoSeed = 0;
+
+async function addPhoto(
+  deps: Deps,
+  q: Queryable,
+  o: { mahallaId: string; ownerId: string; issueId?: string; updateId?: string; eventId?: string; scene: Scene; photo?: DemoPhoto },
+) {
   const id = uuidv7();
-  const base = sharp({ create: { width: 1024, height: 768, channels: 3, background: { r: o.color[0], g: o.color[1], b: o.color[2] } } });
-  const main = await base.clone().jpeg({ quality: 80 }).toBuffer();
-  const thumb = await base.clone().resize({ width: 480 }).jpeg({ quality: 75 }).toBuffer();
+  photoSeed += 1;
+  // Haqiqiy surat bo'lsa — o'sha, aks holda toifaga mos chizma
+  const { main, thumb } = (o.photo ? await demoPhoto(o.photo) : null) ?? (await illustration(o.scene, photoSeed));
   await deps.storage.put(`${id}.jpg`, main, 'image/jpeg');
   await deps.storage.put(`${id}_t.jpg`, thumb, 'image/jpeg');
   await q.query(
@@ -243,9 +258,9 @@ async function seedMahalla(deps: Deps, q: Queryable, d: (typeof DEMOS)[number], 
     if (w.status === 'RESOLVED') {
       const u = await mkUpdate(q, winner, admin, 'IN_PROGRESS', 'RESOLVED', 'Ish yakunlandi', after(10));
       await mkUpdate(q, winner, ali, null, null, 'Rahmat, hammasi yaxshi ishlayapti', after(11), 'AUTHOR_FEEDBACK');
-      await addPhoto(deps, q, { mahallaId, ownerId: admin, updateId: u, color: [60, 160, 90] });
+      await addPhoto(deps, q, { mahallaId, ownerId: admin, updateId: u, scene: 'DONE' });
     }
-    if (k === 1) await addPhoto(deps, q, { mahallaId, ownerId: common.authorId, issueId: winner, color: [200, 140, 40] });
+    await addPhoto(deps, q, { mahallaId, ownerId: common.authorId, issueId: winner, scene: w.category });
   }
 
   // ---- joriy davr
@@ -262,7 +277,9 @@ async function seedMahalla(deps: Deps, q: Queryable, d: (typeof DEMOS)[number], 
     { issueId: waste, voters: [vali] },
   ], t(40));
   await mkUpdate(q, lamp, admin, 'PENDING_REVIEW', 'OPEN', null, t(100));
-  await addPhoto(deps, q, { mahallaId, ownerId: ali, issueId: lamp, color: [40, 90, 170] });
+  await addPhoto(deps, q, { mahallaId, ownerId: ali, issueId: lamp, scene: 'LIGHTING', photo: 'street-lamp' });
+  await addPhoto(deps, q, { mahallaId, ownerId: vali, issueId: yard, scene: 'ROAD' });
+  await addPhoto(deps, q, { mahallaId, ownerId: sara, issueId: waste, scene: 'WASTE' });
 
   const pending1 = await mkIssue(q, { mahallaId, authorId: dilnoza, title: "Bolalar maydonchasida qum yetishmaydi", description: "Qum qutisi deyarli bo'sh, bolalar o'ynay olmayapti.", category: 'LANDSCAPING', status: 'PENDING_REVIEW', createdAt: t(5) });
   await mkIssue(q, { mahallaId, authorId: ali, title: "Avtobus bekati tomi singan", description: "Yomg'irli kunlarda odamlar ho'l bo'lib turadi, tom qismi qulagan.", category: 'OTHER', status: 'PENDING_REVIEW', createdAt: t(2) });
@@ -278,6 +295,31 @@ async function seedMahalla(deps: Deps, q: Queryable, d: (typeof DEMOS)[number], 
   }
   await q.query('UPDATE issues SET comment_count = 2 WHERE id = $1', [lamp]);
 
+  // ---- haftalik davr (oylik bilan parallel): o'tgan hafta g'olibi 1 hafta ichida hal qilinmoqda + joriy hafta ovozi
+  const weekNow = weekPeriodFor(now);
+  const weekPrev = weekPeriodFor(new Date(weekNow.start.getTime() - 1));
+  const prevWeekly = await mkRound(q, mahallaId, weekPrev, 'CLOSED', 'WEEKLY');
+  const weeklyWinTitle = "Kirish yo'lagidagi chuqurni ko'mish";
+  const weeklyWin = await mkIssue(q, {
+    mahallaId, authorId: sara, title: weeklyWinTitle, description: "Mahalla kirish yo'lagida katta chuqur paydo bo'ldi, mashinalar shikastlanmoqda.",
+    category: 'ROAD', status: 'IN_PROGRESS', roundKind: 'WEEKLY', createdAt: new Date(weekPrev.start.getTime() + DAY), publishedAt: new Date(weekPrev.start.getTime() + DAY + 3600_000),
+    responsible: "Yo'l xizmati", nextStep: "Shag'al va asfalt keltirish", dueDate: day(new Date(weekPrev.end.getTime() + 7 * DAY)),
+  });
+  await mkVotes(q, prevWeekly, [{ issueId: weeklyWin, voters: [ali, vali, sara] }], new Date(weekPrev.start.getTime() + 2 * DAY));
+  await q.query(
+    `INSERT INTO round_results (id, round_id, winner_issue_id, snapshot, total_voters, total_votes, closed_at)
+     VALUES ($1, $2, $3, $4::jsonb, 3, 3, $5)`,
+    [uuidv7(), prevWeekly, weeklyWin, JSON.stringify([{ issueId: weeklyWin, title: weeklyWinTitle, votes: 3, rank: 1 }]), weekPrev.end],
+  );
+  await mkUpdate(q, weeklyWin, null, 'OPEN', 'SELECTED', "Hafta g'olibi", weekPrev.end);
+  await mkUpdate(q, weeklyWin, admin, 'SELECTED', 'IN_PROGRESS', null, new Date(weekPrev.end.getTime() + 3600_000));
+
+  const weekly = await mkRound(q, mahallaId, weekNow, 'OPEN', 'WEEKLY');
+  const wt = (hoursAfterStart: number) => new Date(Math.min(now.getTime() - 3600_000, weekNow.start.getTime() + hoursAfterStart * 3600_000));
+  const bench = await mkIssue(q, { mahallaId, authorId: ali, title: "Bekatdagi o'rindiq singan", description: "Avtobus bekatidagi o'rindiq sinib qolgan, keksalar o'tira olmayapti.", category: 'OTHER', status: 'OPEN', roundKind: 'WEEKLY', createdAt: wt(1), publishedAt: wt(2) });
+  const hatch = await mkIssue(q, { mahallaId, authorId: vali, title: "Kanalizatsiya qopqog'i ochiq qolgan", description: "Maktab yo'lida qopqoqsiz quduq bor, bolalar uchun xavfli.", category: 'WATER', status: 'OPEN', roundKind: 'WEEKLY', createdAt: wt(2), publishedAt: wt(3) });
+  await mkVotes(q, weekly, [{ issueId: hatch, voters: [vali, sara] }, { issueId: bench, voters: [sara] }], wt(4));
+
   // ---- tadbirlar
   const upcoming = uuidv7();
   const mkEvent = (id: string, title: string, desc: string, startsAt: Date, status: string, extra: { result?: string; rsvp?: number } = {}) =>
@@ -290,7 +332,8 @@ async function seedMahalla(deps: Deps, q: Queryable, d: (typeof DEMOS)[number], 
   await q.query('INSERT INTO event_rsvps (event_id, user_id) VALUES ($1, $2), ($1, $3)', [upcoming, ali, vali]);
   const done = uuidv7();
   await mkEvent(done, 'Navro\'z bayrami tantanasi', "Mahalla aholisi bilan bayram dasturxoni va bolalar o'yinlari.", new Date(now.getTime() - 40 * DAY), 'COMPLETED', { result: "120 dan ortiq kishi qatnashdi, bolalar uchun sovg'alar tarqatildi", rsvp: 3 });
-  await addPhoto(deps, q, { mahallaId, ownerId: admin, eventId: done, color: [180, 90, 140] });
+  await addPhoto(deps, q, { mahallaId, ownerId: admin, eventId: done, scene: 'EVENT' });
+  await addPhoto(deps, q, { mahallaId, ownerId: admin, eventId: upcoming, scene: 'LANDSCAPING', photo: 'mahalla-street' });
   await mkEvent(uuidv7(), 'Yangi yil oldi yarmarkasi (qoralama)', 'Hali tasdiqlanmagan tadbir loyihasi.', new Date(now.getTime() + 25 * DAY), 'DRAFT');
 
   // ---- e'lonlar

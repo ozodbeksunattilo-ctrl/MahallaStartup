@@ -1,23 +1,37 @@
+import { Lora_500Medium, Lora_500Medium_Italic } from '@expo-google-fonts/lora';
+import { Onest_400Regular, Onest_500Medium, Onest_600SemiBold, Onest_700Bold } from '@expo-google-fonts/onest';
+import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
 import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { AnimatedSplash } from '@/components/AnimatedSplash';
-import { API_URL, DEMO, SKIP_AUTH } from '@/lib/config';
+import { API_URL } from '@/lib/config';
 import { log } from '@/lib/log';
 import { useStackScreenOptions } from '@/lib/navigation';
 import { openEntity } from '@/lib/push';
 import { LangProvider, useLang } from '@/lib/i18n';
 import { SessionProvider, useSession } from '@/lib/session';
 
-log.info('app', 'API:', API_URL, SKIP_AUTH ? '(SKIP_AUTH)' : '', DEMO ? '(DEMO)' : '');
+log.info('app', 'API:', API_URL);
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 function RootStack() {
   const { status, mustChangePassword } = useSession();
   const [showSplash, setShowSplash] = useState(true);
+  // Dizayn shriftlari: Lora (sarlavhalar) va Onest (matn). Xato bo'lsa tizim shrifti bilan davom etadi.
+  const [fontsLoaded, fontError] = useFonts({
+    Lora_500Medium,
+    Lora_500Medium_Italic,
+    Onest_400Regular,
+    Onest_500Medium,
+    Onest_600SemiBold,
+    Onest_700Bold,
+  });
+  const ready = status !== 'loading' && (fontsLoaded || fontError !== null);
 
   useEffect(() => {
     log.info('session', 'holat:', status, mustChangePassword ? '(parol almashtirish kerak)' : '');
@@ -30,8 +44,10 @@ function RootStack() {
 
   return (
     <>
-      <Navigation />
-      {showSplash ? <AnimatedSplash ready={status !== 'loading'} onDone={() => setShowSplash(false)} /> : null}
+      {/* Sessiya aniqlanmaguncha navigator chizilmaydi (splash yopib turadi): aks holda login -> tablar
+          almashuvida ROUTE_NAMES_CHANGED xatosi chiqadi */}
+      {ready ? <Navigation /> : null}
+      {showSplash ? <AnimatedSplash ready={ready} onDone={() => setShowSplash(false)} /> : null}
     </>
   );
 }
@@ -85,12 +101,14 @@ function Navigation() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <LangProvider>
-        <SessionProvider>
-          <StatusBar style="auto" />
-          <RootStack />
-        </SessionProvider>
-      </LangProvider>
+      <KeyboardProvider>
+        <LangProvider>
+          <SessionProvider>
+            <StatusBar style="dark" />
+            <RootStack />
+          </SessionProvider>
+        </LangProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

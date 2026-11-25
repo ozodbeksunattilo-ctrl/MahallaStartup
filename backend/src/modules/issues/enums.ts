@@ -10,3 +10,6 @@ export const issueStatusEnum = z.enum([
   'REFERRED',
   'RESOLVED',
 ]);
+
+/** Ovoz davri turi: oylik yoki haftalik (parallel). */
+export const roundKindEnum = z.enum(['MONTHLY', 'WEEKLY']);

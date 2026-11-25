@@ -1,15 +1,19 @@
 import * as SecureStore from 'expo-secure-store';
 import { Alert } from 'react-native';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { EN_RAW, MONTHS_EN } from './i18n-en';
 
-/** uz — o'zbek (lotin), oz — o'zbek (kirill), ru — rus. Manba matnlar o'zbek lotinida yoziladi. */
-export type Lang = 'uz' | 'oz' | 'ru';
+/** uz — o'zbek (lotin), oz — o'zbek (kirill), ru — rus, en — ingliz. Manba matnlar o'zbek lotinida yoziladi. */
+export type Lang = 'uz' | 'oz' | 'ru' | 'en';
 
 export const LANGS: Array<{ code: Lang; label: string }> = [
   { code: 'uz', label: "O'zbekcha" },
   { code: 'oz', label: 'Ўзбекча' },
   { code: 'ru', label: 'Русский' },
+  { code: 'en', label: 'English' },
 ];
+
+const isLang = (v: unknown): v is Lang => v === 'uz' || v === 'oz' || v === 'ru' || v === 'en';
 
 const KEY = 'mhd_lang';
 let current: Lang = 'uz';
@@ -332,8 +336,94 @@ const RU_RAW: Record<string, string> = {
   'kun oldin': 'дн. назад',
 };
 
+/** Keyin qo'shilgan matnlar: [rus, ingliz] */
+const EXTRA: Record<string, [string, string]> = {
+  // ro'yxatdan o'tish
+  'Mahalla': ['Махалля', 'Mahalla'],
+  'Mahallangizni tanlang': ['Выберите махаллю', 'Choose your mahalla'],
+  'Telefon raqami': ['Номер телефона', 'Phone number'],
+  "So'rov holati": ['Статус заявки', 'Request status'],
+  "Ko'rib chiqilmoqda": ['На рассмотрении', 'Under review'],
+  'Tasdiqlandi': ['Одобрено', 'Approved'],
+  'Rad etildi': ['Отклонено', 'Rejected'],
+  'Holatni tekshirish': ['Проверить статус', 'Check status'],
+  "Yangi so'rov yuborish": ['Отправить новую заявку', 'Send a new request'],
+  "Akkauntingiz tayyor. Admin bergan login va vaqtinchalik parol bilan kiring.": [
+    'Аккаунт готов. Войдите с логином и временным паролем от администратора.',
+    'Your account is ready. Sign in with the login and temporary password from the admin.',
+  ],
+  "So'rovingiz rad etildi. Ma'lumotlarni tekshirib qayta yuboring.": [
+    'Заявка отклонена. Проверьте данные и отправьте снова.',
+    'Your request was rejected. Check your details and send it again.',
+  ],
+  "Mahallalar ro'yxatini yuklab bo'lmadi": ['Не удалось загрузить список махаллей', "Couldn't load the mahalla list"],
+  'Qidirish…': ['Поиск…', 'Search…'],
+  // ovoz berish
+  'Ovozlar tugadi': ['Голоса закончились', 'No votes left'],
+  "Bu oy 3 ta ovozingizni ishlatdingiz. Boshqasiga berish uchun bittasini qaytarib oling.": [
+    'Вы использовали 3 голоса в этом месяце. Чтобы проголосовать за другое, отзовите один голос.',
+    "You've used all 3 votes this month. Remove one to vote for something else.",
+  ],
+  "Ovozingiz qabul qilindi": ['Ваш голос принят', 'Your vote counts'],
+  'Ovoz qaytarildi': ['Голос отозван', 'Vote removed'],
+  'Muammo yo‘li': ['Путь проблемы', 'Issue journey'],
+  'Yuborilgan': ['Отправлено', 'Submitted'],
+  'Ovozda': ['Голосование', 'Voting'],
+  "G'olib": ['Победитель', 'Winner'],
+  'Bajarilmoqda': ['В работе', 'In work'],
+  'Hal qilindi': ['Решено', 'Resolved'],
+  // izohlar
+  'Izohlar': ['Комментарии', 'Comments'],
+  'Izoh yozing…': ['Напишите комментарий…', 'Write a comment…'],
+  "Bu muammoga izoh qoldirib bo'lmaydi": ['К этой проблеме нельзя оставить комментарий', "Comments are closed for this issue"],
+  "Birinchi bo'lib fikr bildiring.": ['Оставьте первый комментарий.', 'Be the first to comment.'],
+  // media
+  'Yopish': ['Закрыть', 'Close'],
+  // forma tekshiruvi va admin
+  "Sarlavha kamida 5 belgi bo'lsin": ['Заголовок — минимум 5 символов', 'Title must be at least 5 characters'],
+  "Tavsif kamida 10 belgi bo'lsin": ['Описание — минимум 10 символов', 'Description must be at least 10 characters'],
+  'Joyni yozing (kamida 3 belgi)': ['Укажите место (минимум 3 символа)', 'Enter a location (at least 3 characters)'],
+  'Toifani tanlang': ['Выберите категорию', 'Choose a category'],
+  'Ovozlar': ['Голоса', 'Votes'],
+  "Admin akkaunti: ovoz berish va muammo yuborish faqat aholi uchun. Moderatsiya veb-panelda.": [
+    'Аккаунт администратора: голосовать и отправлять проблемы могут только жители. Модерация — в веб-панели.',
+    'Admin account: only residents can vote and report issues. Moderation is in the web panel.',
+  ],
+  // umumiy
+  'Barchasi': ['Все', 'All'],
+  'Admin bilan': ['С админом', 'With admin'],
+  "Hozircha suhbat yo'q. Aholi yozganda shu yerda ko'rinadi.": [
+    'Пока нет диалогов. Они появятся, когда жители напишут.',
+    'No conversations yet. They appear here when residents write.',
+  ],
+  'Javob kutmoqda · ': ['Ждёт ответа · ', 'Awaiting reply · '],
+  "Xabar yo'q": ['Сообщений нет', 'No messages'],
+  'Javobingizni yozing.': ['Напишите ответ.', 'Write your reply.'],
+  'Mahalla aholisi va admin ishtirok etadigan umumiy chat.': [
+    'Общий чат жителей махалли и администратора.',
+    'A shared chat for mahalla residents and the admin.',
+  ],
+  "Shaxsiy suhbat: faqat siz va mahalla admini ko'radi. Savol yoki taklifingizni yozing.": [
+    'Личный диалог: видите только вы и администратор. Напишите вопрос или предложение.',
+    'Private chat: only you and the mahalla admin can see it. Ask a question or share an idea.',
+  ],
+  'Adminga yozing': ['Напишите администратору', 'Write to the admin'],
+  "Savol yoki taklifingizni yuboring — admin shu yerda javob beradi.": [
+    'Отправьте вопрос или предложение — администратор ответит здесь.',
+    'Send a question or suggestion — the admin will reply here.',
+  ],
+  'Ha, chiqish': ['Да, выйти', 'Yes, sign out'],
+  'Mahalladosh · v0.1.0': ['Mahalladosh · v0.1.0', 'Mahalladosh · v0.1.0'],
+};
+
 const RU: Record<string, string> = {};
 for (const [k, v] of Object.entries(RU_RAW)) RU[norm(k)] = v;
+const EN: Record<string, string> = {};
+for (const [k, v] of Object.entries(EN_RAW)) EN[norm(k)] = v;
+for (const [k, [ru, en]] of Object.entries(EXTRA)) {
+  RU[norm(k).trim()] ??= ru;
+  EN[norm(k).trim()] ??= en;
+}
 
 /** Interpolyatsiyali matnlar */
 const RU_PATTERNS: Array<[RegExp, (m: RegExpExecArray) => string]> = [
@@ -356,6 +446,27 @@ const RU_PATTERNS: Array<[RegExp, (m: RegExpExecArray) => string]> = [
   [/^Video ([\d.,]+) MB — 25 MB dan oshmasin$/, (m) => `Видео ${m[1]} МБ — не больше 25 МБ`],
 ];
 
+const EN_PATTERNS: Array<[RegExp, (m: RegExpExecArray) => string]> = [
+  [/^Salom, (.+)$/, (m) => `Hi, ${m[1]}`],
+  [/^Holat: (.+)$/, (m) => `Status: ${tr(m[1] as string)}`],
+  [/^(\d+) ovoz$/, (m) => `${m[1]} ${m[1] === '1' ? 'vote' : 'votes'}`],
+  [/^Izohlar \((\d+)\)$/, (m) => `Comments (${m[1]})`],
+  [/^(\d+) ta ovoz qoldi$/, (m) => `${m[1]} votes left`],
+  [/^(\d+) ta qoldi$/, (m) => `${m[1]} left`],
+  [/^(\d+) kishi qatnashadi$/, (m) => `${m[1]} going`],
+  [/^(\d+) daqiqa oldin$/, (m) => `${m[1]} min ago`],
+  [/^(\d+) soat oldin$/, (m) => `${m[1]} h ago`],
+  [/^(\d+) kun oldin$/, (m) => `${m[1]} d ago`],
+  [/^(\d+) kun (\d+) soat$/, (m) => `${m[1]} d ${m[2]} h`],
+  [/^(\d+) soat (\d+) daqiqa$/, (m) => `${m[1]} h ${m[2]} min`],
+  [/^(\d+) daqiqa$/, (m) => `${m[1]} min`],
+  [/^Yangi\. (.*)$/, (m) => `New. ${tr(m[1] as string)}`],
+  [/^(.+) — (.+)ga qo'ng'iroq qilish$/, (m) => `${tr(m[1] as string)} — call ${m[2]}`],
+  [/^Rasm ([\d.,]+) MB — 5 MB dan oshmasin$/, (m) => `Photo ${m[1]} MB — max 5 MB`],
+  [/^Video ([\d.,]+) MB — 25 MB dan oshmasin$/, (m) => `Video ${m[1]} MB — max 25 MB`],
+  [/^(.+) bilan shaxsiy suhbat\.$/, (m) => `Private chat with ${m[1]}.`],
+];
+
 const MONTHS_RU = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 const MONTHS_UZ = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
 
@@ -367,19 +478,24 @@ export function tr(text: string, lang: Lang = current): string {
   const core = text.trim();
   if (!core) return text;
   if (lang === 'oz') return lead + toCyrillic(core) + trail;
+  const en = lang === 'en';
   const key = norm(core);
-  const hit = RU[key];
+  const hit = (en ? EN : RU)[key];
   if (hit) return lead + hit + trail;
   const compact = key.replace(/\s+/g, ' ');
-  for (const [re, fn] of RU_PATTERNS) {
+  for (const [re, fn] of en ? EN_PATTERNS : RU_PATTERNS) {
     const m = re.exec(compact);
     if (m) return lead + fn(m) + trail;
   }
-  // Oy nomlari "12 yan 2026"
+  // Oy nomlari "12 yanvar 2026"
   const dm = /^(\d{1,2}) ([a-z]+) (\d{4})(.*)$/.exec(compact);
   if (dm) {
     const i = MONTHS_UZ.indexOf(dm[2] as string);
-    if (i >= 0) return `${lead}${dm[1]} ${MONTHS_RU[i]} ${dm[3]}${dm[4]}${trail}`;
+    if (i >= 0) {
+      return en
+        ? `${lead}${dm[1]} ${MONTHS_EN[i]} ${dm[3]}${dm[4]}${trail}`
+        : `${lead}${dm[1]} ${MONTHS_RU[i]} ${dm[3]}${dm[4]}${trail}`;
+    }
   }
   return text;
 }
@@ -399,7 +515,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void SecureStore.getItemAsync(KEY)
       .then((v) => {
-        if (v === 'uz' || v === 'oz' || v === 'ru') {
+        if (isLang(v)) {
           current = v;
           setLangState(v);
         }

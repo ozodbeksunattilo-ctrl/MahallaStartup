@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState, type ReactNode } from 'react';
-import { Modal, Pressable, ScrollView, View } from 'react-native';
+import { Modal, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from './Text';
-import { useTheme, type ToneName } from '@/theme';
+import { haptic } from '@/lib/haptics';
+import { useLang } from '@/lib/i18n';
+import { fonts, useTheme, type ToneName } from '@/theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -29,6 +31,9 @@ interface SelectProps {
   tone?: 'default' | 'dark';
   /** O'zgacha tugma (masalan, kichik til tugmasi) */
   trigger?: (open: () => void, current: SelectOption | undefined) => ReactNode;
+  /** Ro'yxat tepasida qidiruv maydoni (uzun ro'yxatlar uchun) */
+  searchable?: boolean;
+  error?: string | null;
 }
 
 /** Ochiladigan ro'yxat (select): maydon ko'rinishidagi tugma + pastdan chiqadigan varaq. */
@@ -40,15 +45,25 @@ export function Select({
   allowAll = false,
   placeholder = 'Tanlang',
   icon,
-  iconTone = 'blue',
+  iconTone: _iconTone = 'blue',
   tone = 'default',
   trigger,
+  searchable = false,
+  error,
 }: SelectProps) {
-  const { colors, tones, radius, spacing, shadow } = useTheme();
+  const { t } = useLang();
+  const [query, setQuery] = useState('');
+  const { colors, radius, spacing, shadow } = useTheme();
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
   const items: SelectOption[] = allowAll ? [{ value: '', label: 'Hammasi' }, ...options] : options;
   const current = items.find((o) => o.value === (value ?? ''));
+  const q = query.trim().toLowerCase();
+  const shown = q ? items.filter((o) => o.label.toLowerCase().includes(q)) : items;
+  const close = () => {
+    setOpen(false);
+    setQuery('');
+  };
   const dark = tone === 'dark';
 
   return (
@@ -68,13 +83,13 @@ export function Select({
           minHeight: dark ? 42 : 50,
           paddingHorizontal: spacing.md,
           borderRadius: dark ? radius.pill : radius.md,
-          borderWidth: dark ? 0 : 1,
-          borderColor: colors.border,
+          borderWidth: dark ? 0 : error ? 2 : 1,
+          borderColor: error ? colors.danger : colors.border,
           backgroundColor: dark ? 'rgba(255,255,255,0.2)' : colors.surface,
           opacity: pressed ? 0.85 : 1,
         })}
       >
-        {icon ? <Ionicons name={icon} size={20} color={dark ? '#fff' : tones[iconTone].fg} /> : null}
+        {icon ? <Ionicons name={icon} size={20} color={dark ? '#fff' : colors.muted} /> : null}
         <Text
           raw={current?.raw}
           style={{ flex: 1, color: dark ? '#fff' : current ? colors.text : colors.muted, fontWeight: dark ? '700' : '500' }}
@@ -86,21 +101,37 @@ export function Select({
       </Pressable>
       )}
 
-      <Modal visible={open} transparent animationType="slide" statusBarTranslucent onRequestClose={() => setOpen(false)}>
+      {error ? (
+        <Text variant="muted" style={{ color: colors.danger }}>
+          {error}
+        </Text>
+      ) : null}
+
+      <Modal visible={open} transparent animationType={searchable ? 'fade' : 'slide'} statusBarTranslucent onRequestClose={close}>
         <View
           style={{ flex: 1, backgroundColor: 'rgba(8,20,14,0.5)', justifyContent: 'flex-end' }}
         >
-          <Pressable style={{ flex: 1 }} onPress={() => setOpen(false)} accessibilityLabel="Yopish" />
+          {/* Qidiruvli ro'yxat tepadan ochiladi: klaviatura pastda chiqib, uni yopib qo'ymaydi */}
+          <Pressable style={{ flex: 1 }} onPress={close} accessibilityLabel={t('Yopish')} />
           <View
             style={[
-              {
-                backgroundColor: colors.surface,
-                borderTopLeftRadius: radius.xl,
-                borderTopRightRadius: radius.xl,
-                paddingTop: spacing.md,
-                paddingBottom: insets.bottom + spacing.lg,
-                maxHeight: '70%',
-              },
+              searchable
+                ? {
+                    position: 'absolute',
+                    top: insets.top + spacing.xl,
+                    left: spacing.md,
+                    right: spacing.md,
+                    borderRadius: radius.xl,
+                    paddingBottom: spacing.md,
+                    maxHeight: '55%',
+                  }
+                : {
+                    borderTopLeftRadius: radius.xl,
+                    borderTopRightRadius: radius.xl,
+                    paddingBottom: insets.bottom + spacing.lg,
+                    maxHeight: '70%',
+                  },
+              { backgroundColor: colors.surface, paddingTop: spacing.md },
               shadow.lg,
             ]}
           >
@@ -119,8 +150,37 @@ export function Select({
                 {label}
               </Text>
             ) : null}
-            <ScrollView>
-              {items.map((o) => {
+            {searchable ? (
+              <View style={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.sm }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: spacing.sm,
+                    paddingHorizontal: spacing.md,
+                    borderRadius: radius.md,
+                    backgroundColor: colors.surfaceAlt,
+                  }}
+                >
+                  <Ionicons name="search" size={18} color={colors.muted} />
+                  <TextInput
+                    value={query}
+                    onChangeText={setQuery}
+                    placeholder={t('Qidirish…')}
+                    placeholderTextColor={colors.muted}
+                    autoCorrect={false}
+                    style={{ flex: 1, minHeight: 44, color: colors.text, fontSize: 15, fontFamily: fonts.regular }}
+                  />
+                </View>
+              </View>
+            ) : null}
+            <ScrollView keyboardShouldPersistTaps="handled">
+              {shown.length === 0 ? (
+                <Text variant="muted" style={{ textAlign: 'center', padding: spacing.lg }}>
+                  {"Ma'lumot topilmadi"}
+                </Text>
+              ) : null}
+              {shown.map((o) => {
                 const active = o.value === (value ?? '');
                 return (
                   <Pressable
@@ -128,8 +188,9 @@ export function Select({
                     accessibilityRole="menuitem"
                     accessibilityState={{ selected: active }}
                     onPress={() => {
+                      haptic.tap();
                       onChange(o.value === '' ? null : o.value);
-                      setOpen(false);
+                      close();
                     }}
                     style={({ pressed }) => ({
                       flexDirection: 'row',

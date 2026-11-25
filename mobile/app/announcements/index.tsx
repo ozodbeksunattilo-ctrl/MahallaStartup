@@ -41,8 +41,10 @@ export default function AnnouncementsScreen() {
                 <Ionicons name="megaphone-outline" size={14} color={colors.warning} /> MUHIM
               </Text>
             ) : null}
-            <Text variant="heading">{a.title}</Text>
-            <Text numberOfLines={2} variant="muted">
+            <Text variant="heading" raw>
+              {a.title}
+            </Text>
+            <Text numberOfLines={2} variant="muted" raw>
               {a.body}
             </Text>
             <Text variant="muted">{timeAgo(a.publishedAt ?? a.createdAt)}</Text>
