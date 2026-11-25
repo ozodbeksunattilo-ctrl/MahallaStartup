@@ -1,13 +1,6 @@
-import type { Metadata } from 'next';
-import { Landing } from '@/components/landing/Landing';
-import './landing.css';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: { absolute: 'Mahalladosh — mahalla ovozi bitta ilovada' },
-  description:
-    "Muammoni yuboring, oyiga 3 ta ovoz bering, hal bo'lishini kuzating. Mahalla aholisi va adminlari uchun yagona platforma.",
-};
-
-export default function LandingPage() {
-  return <Landing />;
+// Landing alohida loyihada (Mahalla-landing); bu yerda uslubsiz qolgan edi, shuning uchun ildiz admin panelga olib boradi
+export default function RootPage() {
+  redirect('/dashboard');
 }
