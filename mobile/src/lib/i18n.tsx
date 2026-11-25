@@ -2,13 +2,14 @@ import * as SecureStore from 'expo-secure-store';
 import { Alert } from 'react-native';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-/** uz — o'zbek (lotin), oz — o'zbek (kirill), ru — rus. Manba matnlar o'zbek lotinida yoziladi. */
-export type Lang = 'uz' | 'oz' | 'ru';
+/** uz — o'zbek (lotin), oz — o'zbek (kirill), ru — rus, en — ingliz. Manba matnlar o'zbek lotinida yoziladi. */
+export type Lang = 'uz' | 'oz' | 'ru' | 'en';
 
 export const LANGS: Array<{ code: Lang; label: string }> = [
   { code: 'uz', label: "O'zbekcha" },
   { code: 'oz', label: 'Ўзбекча' },
   { code: 'ru', label: 'Русский' },
+  { code: 'en', label: 'English' },
 ];
 
 const KEY = 'mhd_lang';
@@ -330,6 +331,18 @@ const RU_RAW: Record<string, string> = {
   'daqiqa oldin': 'мин. назад',
   'soat oldin': 'ч. назад',
   'kun oldin': 'дн. назад',
+  // chat, profil va qolgan matnlar
+  'Admin bilan': 'С админом',
+  "Xabar yo'q": 'Сообщений нет',
+  'Javob kutmoqda ·': 'Ждёт ответа ·',
+  "Hozircha suhbat yo'q. Aholi yozganda shu yerda ko'rinadi.": 'Пока нет переписки. Когда жители напишут, она появится здесь.',
+  'Mahalla aholisi va admin ishtirok etadigan umumiy chat.': 'Общий чат жителей махалли и администратора.',
+  "Shaxsiy suhbat: faqat siz va mahalla admini ko'radi. Savol yoki taklifingizni yozing.":
+    'Личный чат: его видите только вы и администратор махалли. Напишите вопрос или предложение.',
+  'Savol yoki taklifingizni yuboring — admin shu yerda javob beradi.': 'Отправьте вопрос или предложение — администратор ответит здесь.',
+  'Ha, chiqish': 'Да, выйти',
+  'Muallif: muammo davom etmoqda': 'Автор: проблема сохраняется',
+  '★ Kuzatilmoqda': '★ Отслеживается',
 };
 
 const RU: Record<string, string> = {};
@@ -356,6 +369,302 @@ const RU_PATTERNS: Array<[RegExp, (m: RegExpExecArray) => string]> = [
   [/^Video ([\d.,]+) MB — 25 MB dan oshmasin$/, (m) => `Видео ${m[1]} МБ — не больше 25 МБ`],
 ];
 
+// ---------- English (same keys as RU_RAW) ----------
+const EN_RAW: Record<string, string> = {
+  'Mahallamiz — bizning kuchimiz': 'Our mahalla is our strength',
+  'Yuklanmoqda…': 'Loading…',
+  "Yuklab bo'lmadi": 'Couldn’t load',
+  "Ma'lumot topilmadi": 'Nothing found',
+  'Qayta urinish': 'Try again',
+  'Kutilmagan xato yuz berdi': 'Something went wrong',
+  "Internetga ulanib bo'lmadi": 'No internet connection',
+  'Hammasi': 'All',
+  'Bekor qilish': 'Cancel',
+  'Yuborish': 'Send',
+  'Saqlash': 'Save',
+  'Saqlandi': 'Saved',
+  'Yuborildi': 'Sent',
+  'Rahmat': 'Thank you',
+  'Tahrirlash': 'Edit',
+  "O'chirish": 'Delete',
+  'Shikoyat': 'Report',
+  'Izoh': 'Comment',
+  'Siz': 'You',
+  'Natija': 'Result',
+  'Reyting': 'Ranking',
+  'Bosh sahifa': 'Home',
+  'Muammolar': 'Issues',
+  'Tadbirlar': 'Events',
+  'Chat': 'Chat',
+  'Profil': 'Profile',
+  'Til': 'Language',
+  "Akkauntingiz yo'qmi? Ro'yxatdan o'ting": 'No account? Sign up',
+  "Ro'yxatdan o'tish": 'Sign up',
+  "Ma'lumotlaringizni yuboring — mahalla admini akkaunt yaratib beradi": 'Send your details — your mahalla admin will create an account for you',
+  'Akkauntim bor — kirish': 'I have an account — sign in',
+  'Ism va familiya': 'Full name',
+  'Mahalla nomi': 'Mahalla name',
+  'Masalan, Navbahor mahallasi': 'e.g. Navbahor mahalla',
+  'Manzil (ixtiyoriy)': 'Address (optional)',
+  "Ko'cha, uy raqami": 'Street, house number',
+  "So'rov yuborish": 'Send request',
+  "So'rov yuborildi": 'Request sent',
+  "Mahalla admini ko'rib chiqadi va sizga login hamda parol beradi": 'Your mahalla admin will review it and give you a login and password',
+  'Tasdiqlangach, admin bergan login va parol bilan ilovaga kirasiz.': 'Once approved, sign in with the login and password from your admin.',
+  'Kirish ekraniga': 'Back to sign in',
+  "Akkauntni faqat mahalla admini beradi. Telefon raqami admin siz bilan bog'lanishi uchun kerak.":
+    'Only your mahalla admin can create accounts. Your phone number lets the admin contact you.',
+  'Bu admin akkaunti. Admin veb-panel orqali kiradi; ilovada aholi akkaunti bilan kiring.':
+    'This is an admin account. Admins sign in on the web panel; use a resident account in the app.',
+  'Oldingi davrlar': 'Past rounds',
+  'Mahalla admini bergan login va parol bilan kiring': 'Sign in with the login and password from your mahalla admin',
+  "Ma'lumotlaringiz himoyalangan. Faqat o'z mahallangiz aholisi va admini ko'radi.":
+    'Your data is protected. Only residents and the admin of your mahalla can see it.',
+  'Login': 'Login',
+  'masalan, sardor.k': 'e.g. sardor.k',
+  'Parol': 'Password',
+  'Parolingiz': 'Your password',
+  'Kirish': 'Sign in',
+  "Parolni ko'rsatish": 'Show password',
+  'Parolni yashirish': 'Hide password',
+  'Parolni almashtirish': 'Change password',
+  'Juda zaif': 'Very weak',
+  'Zaif': 'Weak',
+  "O'rtacha": 'Fair',
+  'Yaxshi': 'Good',
+  'Kuchli': 'Strong',
+  "Yangi parol kamida 8 belgidan iborat bo'lsin": 'The new password needs at least 8 characters',
+  'Parollar mos kelmadi': 'Passwords don’t match',
+  'Yangi parol eskisidan farq qilsin': 'The new password must differ from the old one',
+  "Vaqtinchalik parol bilan kirdingiz. Davom etish uchun yangi parol o'rnating.":
+    'You signed in with a temporary password. Set a new one to continue.',
+  'Hisobingiz xavfsizligi uchun kuchli parol tanlang.': 'Choose a strong password to keep your account safe.',
+  'Joriy parol': 'Current password',
+  'Yangi parol': 'New password',
+  "Kamida 8 belgi: harf va raqam aralash bo'lsin": 'At least 8 characters, mixing letters and numbers',
+  'Yangi parolni takrorlang': 'Repeat the new password',
+  'Parolni saqlash': 'Save password',
+  'Xush kelibsiz': 'Welcome',
+  'Mahalladosh': 'Mahalladosh',
+  "E'lonlar": 'Announcements',
+  'Bildirishnomalar': 'Notifications',
+  'Ovoz berish davri': 'Voting round',
+  'ta ovoz qoldi': 'votes left',
+  'qoldi · oyiga 3 ta': 'left · 3 a month',
+  'Ovoz berish': 'Vote',
+  "Hozir faol davr yo'q": 'No active round right now',
+  'Yangi ovoz berish davri boshlanganda xabar beramiz.': 'We’ll let you know when a new voting round starts.',
+  'Oy muammosi': 'Issue of the month',
+  "Batafsil ko'rish →": 'See details →',
+  "Bu oy g'olib yoki jarayondagi muammo hali yo'q.": 'No winning or in-progress issue this month yet.',
+  'Yaqin tadbir': 'Next event',
+  "Rejalashtirilgan tadbir yo'q.": 'No events planned.',
+  'Barcha tadbirlar': 'All events',
+  "Muhim e'lon": 'Important announcement',
+  "MUHIM E'LON": 'IMPORTANT ANNOUNCEMENT',
+  'Eng yangi': 'Newest',
+  "Eng ko'p ovoz": 'Most votes',
+  'Sizning ovozlaringiz': 'Your votes',
+  'ta qoldi': 'left',
+  'Ovoz davri yuklanmoqda…': 'Loading the voting round…',
+  "Hozir faol ovoz berish davri yo'q": 'No active voting round right now',
+  'Filtr': 'Filter',
+  'Faqat joriy oy ovozidagilar': 'Only issues in this month’s vote',
+  'Muammolar topilmadi': 'No issues found',
+  "Filtrni o'zgartiring yoki birinchi bo'lib muammo yuboring.": 'Change the filter or be the first to report an issue.',
+  'Muammo yuborish': 'Report an issue',
+  'Muammo': 'Issue',
+  'Ovoz berdingiz': 'You voted',
+  'Moderatsiyada': 'In review',
+  'Ovoz berilmoqda': 'Voting open',
+  'Tuzatish kerak': 'Needs changes',
+  'Birlashtirilgan': 'Merged',
+  'Oylik ovozda tanlandi': 'Chosen in the monthly vote',
+  'Jarayonda': 'In progress',
+  'Tashkilotdan javob kutilmoqda': 'Waiting for an organization',
+  'Hal qilingan': 'Solved',
+  'Nashr qilingan': 'Published',
+  'Bekor qilingan': 'Cancelled',
+  'Yakunlangan': 'Completed',
+  'Qoralama': 'Draft',
+  "Yo'l": 'Roads',
+  'Yoritish': 'Lighting',
+  'Chiqindi': 'Waste',
+  'Suv': 'Water',
+  'Obodonlashtirish': 'Public spaces',
+  'Boshqa': 'Other',
+  'Rasmni ochish': 'Open photo',
+  'Videoni ochish': 'Open video',
+  "Moderator ko'rib chiqmoqda. Tasdiqlangach ovozga chiqadi.": 'A moderator is reviewing it. Once approved, it goes to the vote.',
+  'Bu muammo birlashtirildi': 'This issue was merged',
+  "Ovoz berish va kuzatish o'sha yerda.": 'Voting and following happen there.',
+  "Asosiy postga o'tish": 'Go to the main post',
+  'Ish rejasi': 'Work plan',
+  "Mas'ul": 'Responsible',
+  'Keyingi qadam': 'Next step',
+  'Muddat': 'Deadline',
+  'Tashkilot': 'Organization',
+  'Yuborilgan sana': 'Date sent',
+  'Keyingi tekshiruv': 'Next check',
+  'Bajarilgan ish': 'Work done',
+  'Natija sizni qoniqtirdimi?': 'Are you happy with the result?',
+  "Ha, hal bo'ldi": 'Yes, it’s solved',
+  'Muammo davom etmoqda': 'Problem persists',
+  'Nima davom etmoqda? (dalil/izoh)': 'What is still wrong? (evidence or comment)',
+  '3–1000 belgi': '3–1000 characters',
+  'Ovoz': 'vote',
+  'Ovoz berish yopiq': 'Voting closed',
+  'Ovozni qaytarib olish': 'Take back vote',
+  'Kuzatishni bekor qilish': 'Unfollow',
+  'Kuzatish': 'Follow',
+  'Holat tarixi': 'Status history',
+  'Izoh ustidan shikoyat': 'Report comment',
+  "Hali izoh yo'q.": 'No comments yet.',
+  'Yana izohlar': 'More comments',
+  'Izoh qoldiring': 'Leave a comment',
+  'Postdan shikoyat qilish': 'Report post',
+  "Holat o'zgardi": 'Status changed',
+  'Muallif natijani tasdiqladi': 'The author confirmed the result',
+  "Keyingi davrga o'tkazildi": 'Moved to the next round',
+  "Ma'lumotlar yangilandi": 'Details updated',
+  'Fikringiz adminga yuborildi.': 'Your feedback was sent to the admin.',
+  "Muammoni o'chirish": 'Delete issue',
+  "Bu amalni qaytarib bo'lmaydi.": 'This can’t be undone.',
+  'Tuzatib qayta yuborish': 'Fix and resubmit',
+  'Admin izohi:': 'Admin’s note:',
+  'Muammo qayta moderatsiyaga yuborildi.': 'The issue was sent back for review.',
+  "O'zgarishlar saqlandi.": 'Changes saved.',
+  "Bu muammoni endi tahrirlab bo'lmaydi.": 'This issue can no longer be edited.',
+  'Muammoingiz moderatsiyaga tushdi. Tasdiqlangach ovozga chiqadi.': 'Your issue is in review. Once approved, it goes to the vote.',
+  'Hali muammo yubormagansiz': 'You haven’t reported any issues yet',
+  'Mahallangizdagi muammoni rasm bilan yuboring.': 'Report a problem in your mahalla with a photo.',
+  'Mening muammolarim': 'My issues',
+  'Sarlavha': 'Title',
+  '5–120 belgi': '5–120 characters',
+  'Tavsif': 'Description',
+  "10–2000 belgi. Nima bo'lgan, qachondan beri?": '10–2000 characters. What happened, and since when?',
+  'Joy': 'Location',
+  "Jamoat joyi yoki mo'ljal (uy manzili yozmang)": 'A public place or landmark (not a home address)',
+  'Toifa': 'Category',
+  'Foto va video': 'Photos and video',
+  'Ixtiyoriy. 3 tagacha rasm (har biri 5 MB gacha) va 1 ta video (25 MB gacha, ~60 soniya).':
+    'Optional. Up to 3 photos (5 MB each) and 1 video (up to 25 MB, ~60 seconds).',
+  'Galereya': 'Gallery',
+  'Kamera': 'Camera',
+  'Sozlamalarda kameraga ruxsat bering.': 'Allow camera access in Settings.',
+  'Limit': 'Limit',
+  "3 ta rasm va 1 ta video qo'shilgan.": '3 photos and 1 video already added.',
+  "Faqat 1 ta video qo'shish mumkin": 'Only 1 video can be added',
+  "Eng ko'pi bilan 3 ta rasm": 'Up to 3 photos',
+  "Rasmni tayyorlab bo'lmadi": 'Couldn’t prepare the photo',
+  "Ba'zi fayllar qo'shilmadi": 'Some files weren’t added',
+  "Ba'zi fayllar yuklanmadi. “Qayta urinish” ni bosing yoki faylni olib tashlang.": 'Some files didn’t upload. Tap “Try again” or remove the file.',
+  'Faylni olib tashlash': 'Remove file',
+  'Muammo moderator tasdiqlagandan keyin ovoz berishga chiqadi.': 'The issue goes to the vote after a moderator approves it.',
+  "Shoshilinch xavf bo'lsa, avval tezkor xizmatga qo'ng'iroq qiling": 'In an emergency, call the emergency services first',
+  "Yong'in xizmati": 'Fire service',
+  'Politsiya': 'Police',
+  'Tez yordam': 'Ambulance',
+  'Kelgusi': 'Upcoming',
+  "O'tgan": 'Past',
+  'kishi qatnashadi': 'people going',
+  'Qatnashasiz (bekor qilish)': 'You’re going (cancel)',
+  'Qatnashaman': 'I’m going',
+  "O'tgan tadbirlar yo'q": 'No past events',
+  "Kelgusi tadbirlar yo'q": 'No upcoming events',
+  "Admin yangi tadbir nashr qilganda shu yerda ko'rinadi.": 'New events from the admin will appear here.',
+  'Tadbir': 'Event',
+  'Tadbir natijasi': 'Event result',
+  'Bu tadbir bekor qilingan.': 'This event was cancelled.',
+  'Qatnashasiz — bekor qilish': 'You’re going — cancel',
+  'Qatnashish': 'Join',
+  "E'lonlar yo'q": 'No announcements',
+  "Admin e'lon nashr qilganda shu yerda ko'rinadi.": 'Announcements from the admin will appear here.',
+  "E'lon": 'Announcement',
+  "Hammasini o'qish": 'Mark all as read',
+  "Bildirishnomalar yo'q": 'No notifications',
+  "Post holati, g'olib muammo va tadbirlar haqida shu yerda xabar olasiz.": 'Updates on your posts, the winning issue and events will appear here.',
+  'Ovoz davrlari': 'Voting rounds',
+  'Oldingi ovoz davrlari': 'Past voting rounds',
+  'Davr natijasi': 'Round result',
+  "Davrlar yo'q": 'No rounds',
+  "G'olib muammo": 'Winning issue',
+  "Bu oy g'olib aniqlanmadi": 'No winner this month',
+  'Muammoni ochish': 'Open issue',
+  'Ovoz bergan aholi:': 'Residents who voted:',
+  'Jami ovozlar:': 'Total votes:',
+  "Hali xabar yo'q": 'No messages yet',
+  "Birinchi bo'lib qo'shnilarga salom yozing.": 'Be the first to say hello to your neighbors.',
+  'Xabar yozing…': 'Write a message…',
+  'Yuborilmadi': 'Not sent',
+  '↻ Qayta yuborish': '↻ Send again',
+  'Shikoyat qilish uchun bosib turing': 'Press and hold to report',
+  'Mahalla chati': 'Mahalla chat',
+  'Admin bilan chat': 'Chat with the admin',
+  'Admin': 'Admin',
+  'Adminga yozing…': 'Write to the admin…',
+  'Savol yoki taklifingizni yozing — admin shu yerda javob beradi.': 'Write a question or suggestion — the admin will reply here.',
+  'Chiqish': 'Sign out',
+  'Akkauntdan chiqmoqchimisiz?': 'Sign out of your account?',
+  'Akkaunt': 'Account',
+  'Telefon': 'Phone',
+  'Sahifa topilmadi': 'Page not found',
+  'Bosh sahifaga qaytish': 'Back to home',
+  'Shikoyat qilish': 'Report',
+  'Sababni tanlang. Admin ko‘rib chiqadi.': 'Choose a reason. The admin will review it.',
+  'Shikoyatingiz adminga yuborildi.': 'Your report was sent to the admin.',
+  "Yuborib bo'lmadi": 'Couldn’t send',
+  'Spam yoki reklama': 'Spam or advertising',
+  'Haqorat yoki tahdid': 'Insults or threats',
+  "Noto'g'ri ma'lumot": 'False information',
+  'Boshqa sabab': 'Other reason',
+  'tugadi': 'ended',
+  'hozirgina': 'just now',
+  'yanvar': 'January', 'fevral': 'February', 'mart': 'March', 'aprel': 'April', 'may': 'May', 'iyun': 'June',
+  'iyul': 'July', 'avgust': 'August', 'sentabr': 'September', 'oktabr': 'October', 'noyabr': 'November', 'dekabr': 'December',
+  'daqiqa': 'min',
+  'daqiqa oldin': 'min ago',
+  'soat oldin': 'h ago',
+  'kun oldin': 'days ago',
+  'Admin bilan': 'With the admin',
+  "Xabar yo'q": 'No messages',
+  'Javob kutmoqda ·': 'Awaiting reply ·',
+  "Hozircha suhbat yo'q. Aholi yozganda shu yerda ko'rinadi.": 'No conversations yet. They’ll appear here when residents write.',
+  'Mahalla aholisi va admin ishtirok etadigan umumiy chat.': 'A shared chat for mahalla residents and the admin.',
+  "Shaxsiy suhbat: faqat siz va mahalla admini ko'radi. Savol yoki taklifingizni yozing.":
+    'Private chat: only you and your mahalla admin can see it. Write a question or suggestion.',
+  'Savol yoki taklifingizni yuboring — admin shu yerda javob beradi.': 'Send a question or suggestion — the admin will reply here.',
+  'Ha, chiqish': 'Yes, sign out',
+  'Muallif: muammo davom etmoqda': 'Author: problem persists',
+  '★ Kuzatilmoqda': '★ Following',
+};
+
+const EN: Record<string, string> = {};
+for (const [k, v] of Object.entries(EN_RAW)) EN[norm(k)] = v;
+
+const plural = (n: string, one: string, many: string) => `${n} ${n === '1' ? one : many}`;
+
+const EN_PATTERNS: Array<[RegExp, (m: RegExpExecArray) => string]> = [
+  [/^Salom, (.+)$/, (m) => `Hi, ${m[1]}`],
+  [/^Holat: (.+)$/, (m) => `Status: ${tr(m[1] as string)}`],
+  [/^(\d+) ovoz$/, (m) => plural(m[1] as string, 'vote', 'votes')],
+  [/^Izohlar \((\d+)\)$/, (m) => `Comments (${m[1]})`],
+  [/^(\d+) ta ovoz qoldi$/, (m) => `${plural(m[1] as string, 'vote', 'votes')} left`],
+  [/^(\d+) ta qoldi$/, (m) => `${m[1]} left`],
+  [/^(\d+) kishi qatnashadi$/, (m) => `${m[1]} going`],
+  [/^(\d+) daqiqa oldin$/, (m) => `${m[1]} min ago`],
+  [/^(\d+) soat oldin$/, (m) => `${m[1]} h ago`],
+  [/^(\d+) kun oldin$/, (m) => `${plural(m[1] as string, 'day', 'days')} ago`],
+  [/^(\d+) kun (\d+) soat$/, (m) => `${m[1]} d ${m[2]} h`],
+  [/^(\d+) soat (\d+) daqiqa$/, (m) => `${m[1]} h ${m[2]} min`],
+  [/^(\d+) daqiqa$/, (m) => `${m[1]} min`],
+  [/^Yangi\. (.*)$/, (m) => `New. ${tr(m[1] as string)}`],
+  [/^(.+) — (.+)ga qo'ng'iroq qilish$/, (m) => `${tr(m[1] as string)} — call ${m[2]}`],
+  [/^Rasm ([\d.,]+) MB — 5 MB dan oshmasin$/, (m) => `Photo is ${m[1]} MB — keep it under 5 MB`],
+  [/^Video ([\d.,]+) MB — 25 MB dan oshmasin$/, (m) => `Video is ${m[1]} MB — keep it under 25 MB`],
+];
+
+const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTHS_RU = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 const MONTHS_UZ = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
 
@@ -367,11 +676,14 @@ export function tr(text: string, lang: Lang = current): string {
   const core = text.trim();
   if (!core) return text;
   if (lang === 'oz') return lead + toCyrillic(core) + trail;
+  const en = lang === 'en';
   const key = norm(core);
-  const hit = RU[key];
-  if (hit) return lead + hit + trail;
+  const dict = en ? EN : RU;
   const compact = key.replace(/\s+/g, ' ');
-  for (const [re, fn] of RU_PATTERNS) {
+  // Labels split over lines ("Muammo\nyuborish") match their one-line key
+  const hit = dict[key] ?? dict[compact];
+  if (hit) return lead + hit + trail;
+  for (const [re, fn] of en ? EN_PATTERNS : RU_PATTERNS) {
     const m = re.exec(compact);
     if (m) return lead + fn(m) + trail;
   }
@@ -379,7 +691,11 @@ export function tr(text: string, lang: Lang = current): string {
   const dm = /^(\d{1,2}) ([a-z]+) (\d{4})(.*)$/.exec(compact);
   if (dm) {
     const i = MONTHS_UZ.indexOf(dm[2] as string);
-    if (i >= 0) return `${lead}${dm[1]} ${MONTHS_RU[i]} ${dm[3]}${dm[4]}${trail}`;
+    if (i >= 0) {
+      return en
+        ? `${lead}${MONTHS_EN[i]} ${dm[1]}, ${dm[3]}${dm[4]}${trail}`
+        : `${lead}${dm[1]} ${MONTHS_RU[i]} ${dm[3]}${dm[4]}${trail}`;
+    }
   }
   return text;
 }
@@ -399,7 +715,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void SecureStore.getItemAsync(KEY)
       .then((v) => {
-        if (v === 'uz' || v === 'oz' || v === 'ru') {
+        if (v === 'uz' || v === 'oz' || v === 'ru' || v === 'en') {
           current = v;
           setLangState(v);
         }

@@ -4,7 +4,7 @@ import { Select } from './Select';
 import { LANGS, useLang, type Lang } from '@/lib/i18n';
 import { useTheme } from '@/theme';
 
-const SHORT: Record<Lang, string> = { uz: "O'Z", oz: 'ЎЗ', ru: 'РУ' };
+const SHORT: Record<Lang, string> = { uz: "O'Z", oz: 'ЎЗ', ru: 'РУ', en: 'EN' };
 
 /** Til tanlagich (select). `compact` — burchakka qo'yiladigan kichik tugma (globus + qisqa nom). */
 export function LangSwitch({ compact = false }: { compact?: boolean }) {

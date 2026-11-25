@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { NavIcon } from '@/components/NavIcon';
 import { NAV_GROUPS } from '@/lib/nav';
-import { setLang, translate, useLang } from '@/lib/i18n';
+import { LANGS, setLang, translate, useLang, type Lang } from '@/lib/i18n';
 
 interface Command {
   id: string;
@@ -33,14 +33,16 @@ export function CommandPalette() {
     const pages = NAV_GROUPS.flatMap((g) =>
       g.items.map<Command>((i) => ({ id: i.href, label: i.label, group: g.title, icon: i.icon, run: (go) => go(i.href) })),
     );
-    const toggle: Command = {
-      id: 'lang',
-      label: lang === 'ru' ? "O'zbek tiliga o'tish" : 'Перейти на русский',
+    // One command per other language, named in that language
+    const names: Record<Lang, string> = { uz: "O'zbek tiliga o'tish", ru: 'Перейти на русский', en: 'Switch to English' };
+    const switches = LANGS.filter((l) => l.code !== lang).map<Command>((l) => ({
+      id: `lang-${l.code}`,
+      label: names[l.code],
       group: 'Amallar',
       icon: 'chat',
-      run: () => setLang(lang === 'ru' ? 'uz' : 'ru'),
-    };
-    return [...pages, ...CREATE, toggle];
+      run: () => setLang(l.code),
+    }));
+    return [...pages, ...CREATE, ...switches];
   }, [lang]);
 
   const shown = useMemo(() => {
