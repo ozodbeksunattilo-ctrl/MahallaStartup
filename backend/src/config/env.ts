@@ -65,6 +65,12 @@ export const envSchema = z
     PUBLIC_API_URL: opt,
 
     EXPO_ACCESS_TOKEN: opt,
+
+    // Mobil ilova yangilanishi (GET /app/version)
+    MOBILE_LATEST_VERSION: opt,
+    MOBILE_MIN_VERSION: opt,
+    MOBILE_DOWNLOAD_URL: opt,
+    MOBILE_RELEASE_NOTES: opt,
   })
   .superRefine((env, ctx) => {
     if (env.S3_ENDPOINT) {

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, TextInput, View } from 'react-native';
@@ -20,6 +21,7 @@ import { api } from '@/lib/api';
 import { formatDateTime, formatDay, timeAgo } from '@/lib/format';
 import { haptic } from '@/lib/haptics';
 import { errorMessage, useFetch, usePaged } from '@/lib/hooks';
+import { categoryImage } from '@/lib/categoryImages';
 import { useLang } from '@/lib/i18n';
 import { CATEGORY_STYLE, ISSUE_STATUS_LABELS } from '@/lib/labels';
 import { reportContent } from '@/lib/report';
@@ -197,7 +199,17 @@ export default function IssueScreen() {
           return (
             <>
               {/* Dizayn: avval rasm, keyin sarlavha, holat va qisqa meta qator */}
-              <MediaGrid media={i.media} />
+              {i.media.length > 0 ? (
+                <MediaGrid media={i.media} />
+              ) : (
+                // O'z surati yo'q: toifa rasmi (dizayn: sahifa tepasida rasm)
+                <Image
+                  source={categoryImage(i.category)}
+                  style={{ width: '100%', height: 200, borderRadius: radius.lg, backgroundColor: colors.surfaceAlt }}
+                  contentFit="cover"
+                  accessibilityLabel={i.categoryLabel}
+                />
+              )}
               <Animated.View entering={FadeInDown.duration(350)} style={{ gap: spacing.sm }}>
                 <Text variant="title" raw>
                   {i.title}

@@ -163,6 +163,17 @@ const resident = z.object({
 export const responseSchemas: Record<string, z.ZodType> = {
   'POST /auth/login': z.object({ token: z.string().optional().describe('Faqat mobil (client=mobile)'), user: userSchema, mustChangePassword: z.boolean() }),
   'GET /me': z.object({ user: userSchema, mahalla, role: z.enum(['RESIDENT', 'MAHALLA_ADMIN']), mustChangePassword: z.boolean(), unreadNotifications: z.number().int() }),
+  'GET /app/version': z.object({
+    android: z
+      .object({
+        latestVersion: z.string().describe('Masalan 0.2.0 (app.json `version`)'),
+        minVersion: z.string().nullable().describe('Bundan eski versiya majburiy yangilanadi'),
+        downloadUrl: z.string().describe('Yangi APK havolasi'),
+        notes: z.string().nullable(),
+      })
+      .nullable()
+      .describe('Sozlanmagan bo‘lsa null — yangilash oynasi chiqmaydi'),
+  }),
   'GET /home': z.object({
     round: z.object({ periodEnd: dt, votesLeft: z.number().int() }),
     weeklyRound: z.object({ periodEnd: dt, votesLeft: z.number().int() }).describe('Haftalik davr: qolgan ovozlar'),

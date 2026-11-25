@@ -4,6 +4,12 @@ Avtomatik generatsiya: `pnpm contract:build` (qo'lda tahrirlamang). Prefiks: `/a
 
 `/health` (liveness) va `/ready` (DB, kesh, saqlash holati) — prefikssiz.
 
+## Ilova
+
+| Metod | Yo'l | Kim | Tavsif |
+| --- | --- | --- | --- |
+| `GET` | `/app/version` | ochiq | Mobil ilovaning so'nggi versiyasi va yuklab olish havolasi (yangilash oynasi uchun) |
+
 ## Auth
 
 | Metod | Yo'l | Kim | Tavsif |

@@ -49,16 +49,17 @@ export default function ProfileScreen() {
                 justifyContent: 'center',
               }}
             >
-              <Text variant="display" style={{ color: colors.primaryDark }}>
+              <Text variant="display" raw style={{ color: colors.primaryDark, lineHeight: 40 }}>
                 {me.data ? initials(me.data.user.displayName) : ''}
               </Text>
             </View>
-            <Text variant="title" style={{ color: colors.primaryText }}>
+            {/* Ism va mahalla — foydalanuvchi ma'lumoti: tarjima qilinmaydi */}
+            <Text variant="title" raw numberOfLines={2} style={{ color: colors.primaryText, textAlign: 'center' }}>
               {me.data?.user.displayName ?? ' '}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Ionicons name="location-outline" size={14} color={colors.onHeroMuted} />
-              <Text variant="muted" style={{ color: colors.onHeroMuted }}>
+              <Text variant="muted" raw style={{ color: colors.onHeroMuted }}>
                 {me.data?.mahalla.name ?? ' '}
               </Text>
             </View>
@@ -72,12 +73,16 @@ export default function ProfileScreen() {
             <Card title="Akkaunt" icon="person-outline">
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Text variant="muted">Login</Text>
-                <Text variant="label">{m.user.login}</Text>
+                <Text variant="label" raw>
+                  {m.user.login}
+                </Text>
               </View>
               {m.user.phone ? (
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text variant="muted">Telefon</Text>
-                  <Text variant="label">{m.user.phone}</Text>
+                  <Text variant="label" raw>
+                    {m.user.phone}
+                  </Text>
                 </View>
               ) : null}
             </Card>

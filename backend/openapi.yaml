@@ -12,6 +12,7 @@ servers:
   - url: "http://localhost:4010/api/v1"
     description: "Prism mock (pnpm contract:mock)"
 tags:
+  - name: "Ilova"
   - name: "Auth"
     description: "TZ 2. Kirish (mobil token / veb cookie), vaqtinchalik parol, parol almashtirish, sessiya, qurilma tokeni."
   - name: "Admin: kirish so'rovlari"
@@ -109,6 +110,64 @@ paths:
                   db: "ok"
                   cache: "fail"
                   storage: "ok"
+  "/app/version":
+    get:
+      tags:
+        - "Ilova"
+      summary: "Mobil ilovaning so'nggi versiyasi va yuklab olish havolasi (yangilash oynasi uchun)"
+      description: "**Rol:** ochiq (kirish shart emas)"
+      operationId: "getAppVersion"
+      responses:
+        "200":
+          description: "Muvaffaqiyatli"
+          content:
+            "application/json":
+              schema:
+                type: "object"
+                properties:
+                  android:
+                    nullable: true
+                    description: "Sozlanmagan bo‘lsa null — yangilash oynasi chiqmaydi"
+                    type: "object"
+                    properties:
+                      latestVersion:
+                        type: "string"
+                        description: "Masalan 0.2.0 (app.json `version`)"
+                      minVersion:
+                        nullable: true
+                        description: "Bundan eski versiya majburiy yangilanadi"
+                        type: "string"
+                      downloadUrl:
+                        type: "string"
+                        description: "Yangi APK havolasi"
+                      notes:
+                        nullable: true
+                        type: "string"
+                    required:
+                      - "latestVersion"
+                      - "minVersion"
+                      - "downloadUrl"
+                      - "notes"
+                    additionalProperties: false
+                required:
+                  - "android"
+                additionalProperties: false
+        "429":
+          description: "**RATE_LIMITED** — Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring"
+          content:
+            "application/json":
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+              examples:
+                RATE_LIMITED:
+                  summary: "RATE_LIMITED"
+                  value:
+                    error:
+                      code: "RATE_LIMITED"
+                      message: "Juda ko'p so'rov. Birozdan keyin qayta urinib ko'ring"
+                      details: {}
+      security: []
+      "x-role": "public"
   "/auth/login":
     post:
       tags:
@@ -228,13 +287,13 @@ paths:
               example:
                 token: "Zk3QXw0hY1mJb7pS4nVd8eAcF2uLgT9rKiOyWq5Ni_M"
                 user:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   login: "ali.yunusobod"
                   displayName: "Ali Valiyev"
-                  phone: "+998904267702"
+                  phone: "+998904189142"
                   role: "RESIDENT"
                   mahalla:
-                    id: "01a211fb-f563-77b2-a7f2-18643ba031f8"
+                    id: "01a21211-070d-735d-a108-e6dab8fe61d9"
                     name: "Demo Yunusobod"
                     slug: "demo-yunusobod"
                 mustChangePassword: false
@@ -572,17 +631,17 @@ paths:
                 additionalProperties: false
               example:
                 user:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   login: "ali.yunusobod"
                   displayName: "Ali Valiyev"
-                  phone: "+998904267702"
+                  phone: "+998904189142"
                   role: "RESIDENT"
                   mahalla:
-                    id: "01a211fb-f563-77b2-a7f2-18643ba031f8"
+                    id: "01a21211-070d-735d-a108-e6dab8fe61d9"
                     name: "Demo Yunusobod"
                     slug: "demo-yunusobod"
                 mahalla:
-                  id: "01a211fb-f563-77b2-a7f2-18643ba031f8"
+                  id: "01a21211-070d-735d-a108-e6dab8fe61d9"
                   name: "Demo Yunusobod"
                   slug: "demo-yunusobod"
                 role: "RESIDENT"
@@ -1561,25 +1620,25 @@ paths:
                   periodEnd: "2026-11-29T19:00:00.000Z"
                   votesLeft: 3
                 weeklyIssue:
-                  id: "01a211fb-f6a4-7507-822c-9f51914117d1"
+                  id: "01a21211-08b1-76ac-a07d-94f019f0b288"
                   title: "Kirish yo'lagidagi chuqurni ko'mish"
                   status: "IN_PROGRESS"
                   statusLabel: "Jarayonda"
                   dueDate: "2026-11-29"
                 featuredIssue:
-                  id: "01a211fb-f56e-7238-911d-7433dd9b2f22"
+                  id: "01a21211-0719-735c-aa97-8d154b079132"
                   title: "Maktab oldidagi yo'lga svetofor o'rnatish"
                   status: "SELECTED"
                   statusLabel: "Oylik ovozda tanlandi"
                 nextEvent:
-                  id: "01a211fb-f6ab-7347-94a9-d369ce85b69b"
+                  id: "01a21211-08bd-740e-801f-031d15a93f24"
                   title: "Hashar: hovli va skverni tozalash"
-                  startsAt: "2026-12-02T09:14:14.702Z"
+                  startsAt: "2026-12-02T09:37:15.473Z"
                   location: "Markaziy hovli"
                 latestImportantAnnouncement:
-                  id: "01a211fb-f6ff-76af-84a8-7eece64ec344"
+                  id: "01a21211-0938-7748-9c80-3219e519178d"
                   title: "Ertaga suv o'chiriladi"
-                  publishedAt: "2026-11-24T13:14:14.702Z"
+                  publishedAt: "2026-11-24T13:37:15.473Z"
                 unreadNotifications: 2
         "401":
           description: "**UNAUTHENTICATED** — Tizimga kirish talab qilinadi"
@@ -1873,7 +1932,7 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f69f-74c8-a37a-b2558643fb3d"
+                  - id: "01a21211-08aa-7707-b8b5-8aa728072045"
                     title: "Avtobus bekati tomi singan"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -1881,7 +1940,7 @@ paths:
                     status: "PENDING_REVIEW"
                     statusLabel: "Moderatsiyada"
                     publishedAt: null
-                    createdAt: "2026-11-25T07:14:14.702Z"
+                    createdAt: "2026-11-25T07:37:15.473Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -1894,7 +1953,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f6a8-7595-bbac-1ef1649dd4d5"
+                  - id: "01a21211-08b6-76c0-b842-6fce1f6a0ef6"
                     title: "Bekatdagi o'rindiq singan"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -1915,28 +1974,28 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f634-710f-8064-50653dbd315f"
+                  - id: "01a21211-085d-77ba-a02b-c667f7b73697"
                     title: "Ko'cha chirog'i ishlamayapti"
                     category: "LIGHTING"
                     categoryLabel: "Yoritish"
                     locationText: "Mahalla markazi, 12-uy yonida"
                     status: "OPEN"
                     statusLabel: "Ovoz berilmoqda"
-                    publishedAt: "2026-11-21T05:14:14.702Z"
-                    createdAt: "2026-11-20T09:14:14.702Z"
+                    publishedAt: "2026-11-21T05:37:15.473Z"
+                    createdAt: "2026-11-20T09:37:15.473Z"
                     commentCount: 2
                     voteCount: 3
                     myVote: true
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee_t.jpg?exp=1795598355&sig=0bdf0e4ed57afe2090adb687d2031619bb29b7f7d4b2c62eb5707c6caa4ae7d3"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0_t.jpg?exp=1795599736&sig=01729b4c731acffef62f843c0ce93d52ec349c81264a2b334667409773fed63a"
                     authorName: "Ali Valiyev"
                     responsible: null
                     dueDate: null
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f56e-7238-911d-7433dd9b2f22"
+                  - id: "01a21211-0719-735c-aa97-8d154b079132"
                     title: "Maktab oldidagi yo'lga svetofor o'rnatish"
                     category: "ROAD"
                     categoryLabel: "Yo'l"
@@ -1950,7 +2009,7 @@ paths:
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f57a-7700-96e4-c19a669492ba_t.jpg?exp=1795598355&sig=e58ae242f1dcb6642e490290054a807e9622053a2c6765fd88b8e73b871813ea"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0729-72bc-b170-acc3dfa1e1b2_t.jpg?exp=1795599736&sig=011380826ba004da63915bad8a38814e4c41dcb99c281fc8c77db161e93c6c3e"
                     authorName: "Ali Valiyev"
                     responsible: null
                     dueDate: null
@@ -2218,28 +2277,28 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f634-710f-8064-50653dbd315f"
+                  - id: "01a21211-085d-77ba-a02b-c667f7b73697"
                     title: "Ko'cha chirog'i ishlamayapti"
                     category: "LIGHTING"
                     categoryLabel: "Yoritish"
                     locationText: "Mahalla markazi, 12-uy yonida"
                     status: "OPEN"
                     statusLabel: "Ovoz berilmoqda"
-                    publishedAt: "2026-11-21T05:14:14.702Z"
-                    createdAt: "2026-11-20T09:14:14.702Z"
+                    publishedAt: "2026-11-21T05:37:15.473Z"
+                    createdAt: "2026-11-20T09:37:15.473Z"
                     commentCount: 2
                     voteCount: 3
                     myVote: true
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee_t.jpg?exp=1795598355&sig=0bdf0e4ed57afe2090adb687d2031619bb29b7f7d4b2c62eb5707c6caa4ae7d3"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0_t.jpg?exp=1795599736&sig=01729b4c731acffef62f843c0ce93d52ec349c81264a2b334667409773fed63a"
                     authorName: "Ali Valiyev"
                     responsible: null
                     dueDate: null
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f6a8-7596-9d9f-22f57b0651ed"
+                  - id: "01a21211-08b7-7221-8488-8c65ee431d3d"
                     title: "Kanalizatsiya qopqog'i ochiq qolgan"
                     category: "WATER"
                     categoryLabel: "Suv"
@@ -2260,49 +2319,49 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f634-7110-aef0-bf62e7d9ff7c"
+                  - id: "01a21211-085e-74a5-9470-7ba6359a7fc2"
                     title: "Hovli yo'lagi ta'mirlanmagan"
                     category: "ROAD"
                     categoryLabel: "Yo'l"
                     locationText: "Mahalla markazi, 12-uy yonida"
                     status: "OPEN"
                     statusLabel: "Ovoz berilmoqda"
-                    publishedAt: "2026-11-22T01:14:14.702Z"
-                    createdAt: "2026-11-21T15:14:14.702Z"
+                    publishedAt: "2026-11-22T01:37:15.473Z"
+                    createdAt: "2026-11-21T15:37:15.473Z"
                     commentCount: 0
                     voteCount: 2
                     myVote: true
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f665-7674-83bf-05f82656b652_t.jpg?exp=1795598355&sig=4067c3af9741bd7dc2c782b466e857717e1e4734598f213234dc8c7a90faf1ab"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0877-75a4-92f3-8cf6e957635c_t.jpg?exp=1795599736&sig=10f4ee96daa39d158b0eeaf019f00379658d86058bff96a6d9d8e024284c643f"
                     authorName: "Vali Aliyev"
                     responsible: null
                     dueDate: null
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f635-7012-aac5-85732a1a0cde"
+                  - id: "01a21211-085e-74a6-a996-c1ff55f200dc"
                     title: "Chiqindi konteyneri to'lib ketgan"
                     category: "WASTE"
                     categoryLabel: "Chiqindi"
                     locationText: "Mahalla markazi, 12-uy yonida"
                     status: "OPEN"
                     statusLabel: "Ovoz berilmoqda"
-                    publishedAt: "2026-11-23T07:14:14.702Z"
-                    createdAt: "2026-11-22T21:14:14.702Z"
+                    publishedAt: "2026-11-23T07:37:15.473Z"
+                    createdAt: "2026-11-22T21:37:15.473Z"
                     commentCount: 0
                     voteCount: 1
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f67f-776c-99ce-f6128717c7d9_t.jpg?exp=1795598355&sig=3fc4138584e75af0286bbb8869d8b306281858a4806d3fbc7d8e9e281390ee96"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0887-77cd-84ae-f9f5eeecf809_t.jpg?exp=1795599736&sig=8846e2978c67a6371de614d068a041df7ec6fd2f23e9da323fc5e9d155fd3ef5"
                     authorName: "Sara Karimova"
                     responsible: null
                     dueDate: null
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f6a8-7595-bbac-1ef1649dd4d5"
+                  - id: "01a21211-08b6-76c0-b842-6fce1f6a0ef6"
                     title: "Bekatdagi o'rindiq singan"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -2748,7 +2807,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f99a-71a0-b6bd-817feaaaab21"
+                id: "01a21211-0c39-710d-9841-ff220dfc16b1"
                 title: "Yo'l chetida axlat to'planib qolgan"
                 category: "WASTE"
                 categoryLabel: "Chiqindi"
@@ -2756,9 +2815,9 @@ paths:
                 statusLabel: "Moderatsiyada"
                 hidden: false
                 author:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   displayName: "Ali Valiyev"
-                createdAt: "2026-11-25T09:14:15.833Z"
+                createdAt: "2026-11-25T09:37:16.854Z"
                 publishedAt: null
                 roundKind: "MONTHLY"
                 description: "Maktab yo'lagidagi axlat haftalardan beri olib ketilmayapti"
@@ -3169,7 +3228,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f634-710f-8064-50653dbd315f"
+                id: "01a21211-085d-77ba-a02b-c667f7b73697"
                 title: "Ko'cha chirog'i ishlamayapti"
                 category: "LIGHTING"
                 categoryLabel: "Yoritish"
@@ -3177,25 +3236,25 @@ paths:
                 statusLabel: "Ovoz berilmoqda"
                 hidden: false
                 author:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   displayName: "Ali Valiyev"
-                createdAt: "2026-11-20T09:14:14.702Z"
-                publishedAt: "2026-11-21T05:14:14.702Z"
+                createdAt: "2026-11-20T09:37:15.473Z"
+                publishedAt: "2026-11-21T05:37:15.473Z"
                 roundKind: "MONTHLY"
                 description: "Navoiy ko'chasi 12-uy yonidagi chiroq ikki haftadan beri yonmayapti, kechasi juda qorong'i."
                 locationText: "Mahalla markazi, 12-uy yonida"
                 media:
-                  - id: "01a211fb-f63a-741e-935b-8b69a88f72ee"
+                  - id: "01a21211-0864-713a-9c6f-147881e685d0"
                     kind: "IMAGE"
-                    url: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee.jpg?exp=1795598355&sig=b5db5a0f566ad227d4586140f6e417537e8ab3544d7564e3f11193d664b97132"
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee_t.jpg?exp=1795598355&sig=0bdf0e4ed57afe2090adb687d2031619bb29b7f7d4b2c62eb5707c6caa4ae7d3"
+                    url: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0.jpg?exp=1795599736&sig=b5b6bde8360b7b8676b3ecaab20e5cefd45b8e5124ee093c8c6c46f71ecca186"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0_t.jpg?exp=1795599736&sig=01729b4c731acffef62f843c0ce93d52ec349c81264a2b334667409773fed63a"
                     width: 1024
                     height: 768
                     mime: "image/jpeg"
                     sizeBytes: 124315
-                    expiresAt: "2026-11-25T09:19:15.751Z"
+                    expiresAt: "2026-11-25T09:42:16.754Z"
                 voteCount: 3
-                roundId: "01a211fb-f633-77ab-8f2a-870609904c94"
+                roundId: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                 myVote: true
                 isFollowing: false
                 canVote: false
@@ -3211,13 +3270,13 @@ paths:
                 resolutionText: null
                 hiddenReason: null
                 history:
-                  - id: "01a211fb-f639-708d-9206-a31a1a9f4e03"
+                  - id: "01a21211-0863-7123-ac46-dc76171eac85"
                     type: "STATUS_CHANGE"
                     fromStatus: "PENDING_REVIEW"
                     toStatus: "OPEN"
                     reason: null
                     payload: {}
-                    createdAt: "2026-11-21T05:14:14.702Z"
+                    createdAt: "2026-11-21T05:37:15.473Z"
                     actorName: null
                     media: []
         "400":
@@ -3646,7 +3705,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f99a-71a0-b6bd-817feaaaab21"
+                id: "01a21211-0c39-710d-9841-ff220dfc16b1"
                 title: "Yo'l chetida axlat to'planib qolgan (aniqlandi)"
                 category: "WASTE"
                 categoryLabel: "Chiqindi"
@@ -3654,9 +3713,9 @@ paths:
                 statusLabel: "Moderatsiyada"
                 hidden: false
                 author:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   displayName: "Ali Valiyev"
-                createdAt: "2026-11-25T09:14:15.833Z"
+                createdAt: "2026-11-25T09:37:16.854Z"
                 publishedAt: null
                 roundKind: "MONTHLY"
                 description: "Maktab yo'lagidagi axlat haftalardan beri olib ketilmayapti"
@@ -4789,16 +4848,16 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f6a1-74aa-a7ff-b3d72b473c1f"
+                  - id: "01a21211-08ae-77f7-9f2a-61c8014f757e"
                     text: "Men ham har kuni shu yerdan o'taman, juda qorong'i"
-                    authorId: "01a211fb-f567-75db-9c27-f6d379d3ffa1"
+                    authorId: "01a21211-0713-7310-ab94-5c8272f5e404"
                     authorName: "Vali Aliyev"
-                    createdAt: "2026-11-21T15:14:14.702Z"
-                  - id: "01a211fb-f6a2-72e9-b6eb-85a286cd765e"
+                    createdAt: "2026-11-21T15:37:15.473Z"
+                  - id: "01a21211-08af-762c-ad8b-90269d3f8207"
                     text: "Qo'llab-quvvatlayman, tezroq hal qilinsin"
-                    authorId: "01a211fb-f568-749f-9bda-53214211bd93"
+                    authorId: "01a21211-0714-75a7-83da-d9bb75b86aa5"
                     authorName: "Sara Karimova"
-                    createdAt: "2026-11-22T11:14:14.702Z"
+                    createdAt: "2026-11-22T11:37:15.473Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -4949,11 +5008,11 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f990-7038-bdc5-3f64707f3f16"
+                id: "01a21211-0c2b-77d9-bb6a-7cb67b04eaf4"
                 text: "Men ham har kuni shu yerdan o'taman"
-                authorId: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                authorId: "01a21211-0711-7081-82fe-2b332230537e"
                 authorName: "Ali Valiyev"
-                createdAt: "2026-11-25T09:14:15.822Z"
+                createdAt: "2026-11-25T09:37:16.841Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -5232,7 +5291,7 @@ paths:
                 additionalProperties: false
               example:
                 round:
-                  id: "01a211fb-f633-77ab-8f2a-870609904c94"
+                  id: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                   kind: "MONTHLY"
                   status: "OPEN"
                   periodStart: "2026-10-31T19:00:00.000Z"
@@ -5242,15 +5301,15 @@ paths:
                 votesUsed: 2
                 votesLeft: 1
                 myVotes:
-                  - issueId: "01a211fb-f634-710f-8064-50653dbd315f"
+                  - issueId: "01a21211-085d-77ba-a02b-c667f7b73697"
                     title: "Ko'cha chirog'i ishlamayapti"
                     slot: 1
-                  - issueId: "01a211fb-f634-7110-aef0-bf62e7d9ff7c"
+                  - issueId: "01a21211-085e-74a5-9470-7ba6359a7fc2"
                     title: "Hovli yo'lagi ta'mirlanmagan"
                     slot: 2
                 weekly:
                   round:
-                    id: "01a211fb-f6a7-746d-814e-abe7041097eb"
+                    id: "01a21211-08b6-76bf-8535-4b1831ff869f"
                     kind: "WEEKLY"
                     status: "OPEN"
                     periodStart: "2026-11-22T19:00:00.000Z"
@@ -5426,7 +5485,7 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f6a7-746d-814e-abe7041097eb"
+                  - id: "01a21211-08b6-76bf-8535-4b1831ff869f"
                     kind: "WEEKLY"
                     periodStart: "2026-11-22T19:00:00.000Z"
                     periodEnd: "2026-11-29T19:00:00.000Z"
@@ -5434,18 +5493,18 @@ paths:
                     winner: null
                     totalVoters: null
                     totalVotes: null
-                  - id: "01a211fb-f6a3-7483-8257-c1b766ebf981"
+                  - id: "01a21211-08b0-7517-9952-380a7095a022"
                     kind: "WEEKLY"
                     periodStart: "2026-11-15T19:00:00.000Z"
                     periodEnd: "2026-11-22T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f6a4-7507-822c-9f51914117d1"
+                      issueId: "01a21211-08b1-76ac-a07d-94f019f0b288"
                       title: "Kirish yo'lagidagi chuqurni ko'mish"
                       votes: 3
                     totalVoters: 3
                     totalVotes: 3
-                  - id: "01a211fb-f633-77ab-8f2a-870609904c94"
+                  - id: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                     kind: "MONTHLY"
                     periodStart: "2026-10-31T19:00:00.000Z"
                     periodEnd: "2026-11-30T19:00:00.000Z"
@@ -5453,46 +5512,46 @@ paths:
                     winner: null
                     totalVoters: null
                     totalVotes: null
-                  - id: "01a211fb-f570-76c5-bd59-f670eaa2faef"
+                  - id: "01a21211-071b-7631-930d-54a8cf0a26ff"
                     kind: "MONTHLY"
                     periodStart: "2026-09-30T19:00:00.000Z"
                     periodEnd: "2026-10-31T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f56e-7238-911d-7433dd9b2f22"
+                      issueId: "01a21211-0719-735c-aa97-8d154b079132"
                       title: "Maktab oldidagi yo'lga svetofor o'rnatish"
                       votes: 3
                     totalVoters: 4
                     totalVotes: 4
-                  - id: "01a211fb-f5a9-76b2-bd1e-9e50a4cebff2"
+                  - id: "01a21211-0764-71e5-847f-076d3331b1c9"
                     kind: "MONTHLY"
                     periodStart: "2026-08-31T19:00:00.000Z"
                     periodEnd: "2026-09-30T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f5a7-7540-8634-ac9c0ccc01b1"
+                      issueId: "01a21211-0763-74d4-be94-fb2440de3f31"
                       title: "Bolalar maydonchasi qoplamasini yangilash"
                       votes: 3
                     totalVoters: 4
                     totalVotes: 4
-                  - id: "01a211fb-f5cb-72c3-b314-228692feca05"
+                  - id: "01a21211-07a4-7037-8b58-372bbc22b6fe"
                     kind: "MONTHLY"
                     periodStart: "2026-07-31T19:00:00.000Z"
                     periodEnd: "2026-08-31T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f5c9-70d6-9f9c-b272aac11f40"
+                      issueId: "01a21211-07a2-7649-b4f2-db2573855bac"
                       title: "Markaziy quvurdagi suv oqishini bartaraf etish"
                       votes: 3
                     totalVoters: 4
                     totalVotes: 4
-                  - id: "01a211fb-f5f4-7129-94dc-77eda87a0ebc"
+                  - id: "01a21211-07f3-75cc-86e4-ecd1389f94c2"
                     kind: "MONTHLY"
                     periodStart: "2026-06-30T19:00:00.000Z"
                     periodEnd: "2026-07-31T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f5f3-7036-90a4-be087453a40a"
+                      issueId: "01a21211-07f1-736b-a5e8-82a6b0cc8893"
                       title: "Ko'cha chiroqlarini LED ga almashtirish"
                       votes: 3
                     totalVoters: 4
@@ -5683,7 +5742,7 @@ paths:
                   - "message"
                 additionalProperties: false
               example:
-                roundId: "01a211fb-f6a3-7483-8257-c1b766ebf981"
+                roundId: "01a21211-08b0-7517-9952-380a7095a022"
                 kind: "WEEKLY"
                 periodStart: "2026-11-15T19:00:00.000Z"
                 periodEnd: "2026-11-22T19:00:00.000Z"
@@ -5692,12 +5751,12 @@ paths:
                   rank: 1
                   title: "Kirish yo'lagidagi chuqurni ko'mish"
                   votes: 3
-                  issueId: "01a211fb-f6a4-7507-822c-9f51914117d1"
+                  issueId: "01a21211-08b1-76ac-a07d-94f019f0b288"
                 ranking:
                   - rank: 1
                     title: "Kirish yo'lagidagi chuqurni ko'mish"
                     votes: 3
-                    issueId: "01a211fb-f6a4-7507-822c-9f51914117d1"
+                    issueId: "01a21211-08b1-76ac-a07d-94f019f0b288"
                 totalVoters: 3
                 totalVotes: 3
                 message: "«Kirish yo'lagidagi chuqurni ko'mish» 3 ta ovoz bilan g'olib bo'ldi"
@@ -5841,7 +5900,7 @@ paths:
                   - "roundKind"
                 additionalProperties: false
               example:
-                issueId: "01a211fb-f6a8-7596-9d9f-22f57b0651ed"
+                issueId: "01a21211-08b7-7221-8488-8c65ee431d3d"
                 voted: true
                 slot: 1
                 votesUsed: 1
@@ -6199,7 +6258,7 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f6a7-746d-814e-abe7041097eb"
+                  - id: "01a21211-08b6-76bf-8535-4b1831ff869f"
                     kind: "WEEKLY"
                     periodStart: "2026-11-22T19:00:00.000Z"
                     periodEnd: "2026-11-29T19:00:00.000Z"
@@ -6207,18 +6266,18 @@ paths:
                     winner: null
                     totalVoters: null
                     totalVotes: null
-                  - id: "01a211fb-f6a3-7483-8257-c1b766ebf981"
+                  - id: "01a21211-08b0-7517-9952-380a7095a022"
                     kind: "WEEKLY"
                     periodStart: "2026-11-15T19:00:00.000Z"
                     periodEnd: "2026-11-22T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f6a4-7507-822c-9f51914117d1"
+                      issueId: "01a21211-08b1-76ac-a07d-94f019f0b288"
                       title: "Kirish yo'lagidagi chuqurni ko'mish"
                       votes: 3
                     totalVoters: 3
                     totalVotes: 3
-                  - id: "01a211fb-f633-77ab-8f2a-870609904c94"
+                  - id: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                     kind: "MONTHLY"
                     periodStart: "2026-10-31T19:00:00.000Z"
                     periodEnd: "2026-11-30T19:00:00.000Z"
@@ -6226,46 +6285,46 @@ paths:
                     winner: null
                     totalVoters: null
                     totalVotes: null
-                  - id: "01a211fb-f570-76c5-bd59-f670eaa2faef"
+                  - id: "01a21211-071b-7631-930d-54a8cf0a26ff"
                     kind: "MONTHLY"
                     periodStart: "2026-09-30T19:00:00.000Z"
                     periodEnd: "2026-10-31T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f56e-7238-911d-7433dd9b2f22"
+                      issueId: "01a21211-0719-735c-aa97-8d154b079132"
                       title: "Maktab oldidagi yo'lga svetofor o'rnatish"
                       votes: 3
                     totalVoters: 4
                     totalVotes: 4
-                  - id: "01a211fb-f5a9-76b2-bd1e-9e50a4cebff2"
+                  - id: "01a21211-0764-71e5-847f-076d3331b1c9"
                     kind: "MONTHLY"
                     periodStart: "2026-08-31T19:00:00.000Z"
                     periodEnd: "2026-09-30T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f5a7-7540-8634-ac9c0ccc01b1"
+                      issueId: "01a21211-0763-74d4-be94-fb2440de3f31"
                       title: "Bolalar maydonchasi qoplamasini yangilash"
                       votes: 3
                     totalVoters: 4
                     totalVotes: 4
-                  - id: "01a211fb-f5cb-72c3-b314-228692feca05"
+                  - id: "01a21211-07a4-7037-8b58-372bbc22b6fe"
                     kind: "MONTHLY"
                     periodStart: "2026-07-31T19:00:00.000Z"
                     periodEnd: "2026-08-31T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f5c9-70d6-9f9c-b272aac11f40"
+                      issueId: "01a21211-07a2-7649-b4f2-db2573855bac"
                       title: "Markaziy quvurdagi suv oqishini bartaraf etish"
                       votes: 3
                     totalVoters: 4
                     totalVotes: 4
-                  - id: "01a211fb-f5f4-7129-94dc-77eda87a0ebc"
+                  - id: "01a21211-07f3-75cc-86e4-ecd1389f94c2"
                     kind: "MONTHLY"
                     periodStart: "2026-06-30T19:00:00.000Z"
                     periodEnd: "2026-07-31T19:00:00.000Z"
                     status: "CLOSED"
                     winner:
-                      issueId: "01a211fb-f5f3-7036-90a4-be087453a40a"
+                      issueId: "01a21211-07f1-736b-a5e8-82a6b0cc8893"
                       title: "Ko'cha chiroqlarini LED ga almashtirish"
                       votes: 3
                     totalVoters: 4
@@ -6456,7 +6515,7 @@ paths:
                   - "message"
                 additionalProperties: false
               example:
-                roundId: "01a211fb-f6a3-7483-8257-c1b766ebf981"
+                roundId: "01a21211-08b0-7517-9952-380a7095a022"
                 kind: "WEEKLY"
                 periodStart: "2026-11-15T19:00:00.000Z"
                 periodEnd: "2026-11-22T19:00:00.000Z"
@@ -6465,12 +6524,12 @@ paths:
                   rank: 1
                   title: "Kirish yo'lagidagi chuqurni ko'mish"
                   votes: 3
-                  issueId: "01a211fb-f6a4-7507-822c-9f51914117d1"
+                  issueId: "01a21211-08b1-76ac-a07d-94f019f0b288"
                 ranking:
                   - rank: 1
                     title: "Kirish yo'lagidagi chuqurni ko'mish"
                     votes: 3
-                    issueId: "01a211fb-f6a4-7507-822c-9f51914117d1"
+                    issueId: "01a21211-08b1-76ac-a07d-94f019f0b288"
                 totalVoters: 3
                 totalVotes: 3
                 message: "«Kirish yo'lagidagi chuqurni ko'mish» 3 ta ovoz bilan g'olib bo'ldi"
@@ -6760,9 +6819,9 @@ paths:
                   - "expiresAt"
                 additionalProperties: false
               example:
-                url: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee.jpg?exp=1795598355&sig=b5db5a0f566ad227d4586140f6e417537e8ab3544d7564e3f11193d664b97132"
-                thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee_t.jpg?exp=1795598355&sig=0bdf0e4ed57afe2090adb687d2031619bb29b7f7d4b2c62eb5707c6caa4ae7d3"
-                expiresAt: "2026-11-25T09:19:15.764Z"
+                url: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0.jpg?exp=1795599736&sig=b5b6bde8360b7b8676b3ecaab20e5cefd45b8e5124ee093c8c6c46f71ecca186"
+                thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0_t.jpg?exp=1795599736&sig=01729b4c731acffef62f843c0ce93d52ec349c81264a2b334667409773fed63a"
+                expiresAt: "2026-11-25T09:42:16.768Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -6932,48 +6991,48 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f703-70b5-af2e-0e13e0aac64d"
+                  - id: "01a21211-093c-770c-aa45-99d6d680264a"
                     text: "Men ovoz berdim, rahmat eslatganingiz uchun!"
-                    senderId: "01a211fb-f56a-752a-b765-a6c5ac6c0b91"
+                    senderId: "01a21211-0715-7411-befd-f17fcab182cb"
                     senderName: "Dilnoza Rahimova"
                     senderRole: "RESIDENT"
                     mine: false
-                    createdAt: "2026-11-25T09:04:14.702Z"
-                  - id: "01a211fb-f703-70b4-b9d3-c9f898358abe"
+                    createdAt: "2026-11-25T09:27:15.473Z"
+                  - id: "01a21211-093b-7752-93be-91a769b9b52a"
                     text: "Chiroq masalasiga ovoz berishni unutmanglar"
-                    senderId: "01a211fb-f567-75db-9c27-f6d379d3ffa1"
+                    senderId: "01a21211-0713-7310-ab94-5c8272f5e404"
                     senderName: "Vali Aliyev"
                     senderRole: "RESIDENT"
                     mine: false
-                    createdAt: "2026-11-25T08:54:14.702Z"
-                  - id: "01a211fb-f702-758f-987e-53b9e263605b"
+                    createdAt: "2026-11-25T09:17:15.473Z"
+                  - id: "01a21211-093b-7751-afb8-f7370b36e097"
                     text: "Men ham keladigan bo'ldim, asbob-uskunalar olib kelaman"
-                    senderId: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                    senderId: "01a21211-0711-7081-82fe-2b332230537e"
                     senderName: "Ali Valiyev"
                     senderRole: "RESIDENT"
                     mine: true
-                    createdAt: "2026-11-25T08:44:14.702Z"
-                  - id: "01a211fb-f702-758e-b7a4-017385ecfc3b"
+                    createdAt: "2026-11-25T09:07:15.473Z"
+                  - id: "01a21211-093b-7750-afd8-377111510923"
                     text: "Albatta, bolalar bilan kelaman"
-                    senderId: "01a211fb-f568-749f-9bda-53214211bd93"
+                    senderId: "01a21211-0714-75a7-83da-d9bb75b86aa5"
                     senderName: "Sara Karimova"
                     senderRole: "RESIDENT"
                     mine: false
-                    createdAt: "2026-11-25T08:34:14.702Z"
-                  - id: "01a211fb-f701-74e1-b1e8-797cf7909f87"
+                    createdAt: "2026-11-25T08:57:15.473Z"
+                  - id: "01a21211-093a-762c-9795-e34a4ab9c2e1"
                     text: "Vaalaykum assalom! Ertaga hashar bor ekan, kelasizlarmi?"
-                    senderId: "01a211fb-f567-75db-9c27-f6d379d3ffa1"
+                    senderId: "01a21211-0713-7310-ab94-5c8272f5e404"
                     senderName: "Vali Aliyev"
                     senderRole: "RESIDENT"
                     mine: false
-                    createdAt: "2026-11-25T08:24:14.702Z"
-                  - id: "01a211fb-f701-74e0-a5bf-c7e99c0b70ca"
+                    createdAt: "2026-11-25T08:47:15.473Z"
+                  - id: "01a21211-093a-762b-b40b-9239e3560621"
                     text: "Assalomu alaykum, qo'shnilar!"
-                    senderId: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                    senderId: "01a21211-0711-7081-82fe-2b332230537e"
                     senderName: "Ali Valiyev"
                     senderRole: "RESIDENT"
                     mine: true
-                    createdAt: "2026-11-25T08:14:14.702Z"
+                    createdAt: "2026-11-25T08:37:15.473Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -7115,13 +7174,13 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f97c-7245-9655-3a5c809e5a9c"
+                id: "01a21211-0c13-742f-bd3a-8c25377eaeb3"
                 text: "Assalomu alaykum, qo'shnilar!"
-                senderId: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                senderId: "01a21211-0711-7081-82fe-2b332230537e"
                 senderName: "Ali Valiyev"
                 senderRole: "RESIDENT"
                 mine: true
-                createdAt: "2026-11-25T09:14:15.804Z"
+                createdAt: "2026-11-25T09:37:16.818Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -7238,13 +7297,13 @@ paths:
                 additionalProperties: true
               example:
                 items:
-                  - id: "01a211fb-f980-7303-a642-21e0a52d05b0"
+                  - id: "01a21211-0c16-71ac-9bd9-8b30a7b89ad6"
                     text: "Assalomu alaykum, hovlidagi chiroq yonmayapti"
-                    senderId: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                    senderId: "01a21211-0711-7081-82fe-2b332230537e"
                     senderName: "Ali Valiyev"
                     senderRole: "RESIDENT"
                     mine: true
-                    createdAt: "2026-11-25T09:14:15.807Z"
+                    createdAt: "2026-11-25T09:37:16.822Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -7348,13 +7407,13 @@ paths:
                 type: "object"
                 additionalProperties: true
               example:
-                id: "01a211fb-f980-7303-a642-21e0a52d05b0"
+                id: "01a21211-0c16-71ac-9bd9-8b30a7b89ad6"
                 text: "Assalomu alaykum, hovlidagi chiroq yonmayapti"
-                senderId: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                senderId: "01a21211-0711-7081-82fe-2b332230537e"
                 senderName: "Ali Valiyev"
                 senderRole: "RESIDENT"
                 mine: true
-                createdAt: "2026-11-25T09:14:15.807Z"
+                createdAt: "2026-11-25T09:37:16.822Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -7448,10 +7507,10 @@ paths:
                 additionalProperties: true
               example:
                 items:
-                  - residentId: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  - residentId: "01a21211-0711-7081-82fe-2b332230537e"
                     residentName: "Ali Valiyev"
                     lastText: "Assalomu alaykum, hovlidagi chiroq yonmayapti"
-                    lastAt: "2026-11-25T09:14:15.807Z"
+                    lastAt: "2026-11-25T09:37:16.822Z"
                     awaitingReply: true
         "401":
           description: "**UNAUTHENTICATED** — Tizimga kirish talab qilinadi"
@@ -7553,20 +7612,20 @@ paths:
                 additionalProperties: true
               example:
                 items:
-                  - id: "01a211fb-f989-7536-873d-bb4fd33689d6"
+                  - id: "01a21211-0c22-779a-b67e-8441fcf7a911"
                     text: "Salom! Ertaga ko'rib chiqamiz"
-                    senderId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    senderId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     senderName: "Admin Demo Yunusobod"
                     senderRole: "MAHALLA_ADMIN"
                     mine: true
-                    createdAt: "2026-11-25T09:14:15.816Z"
-                  - id: "01a211fb-f980-7303-a642-21e0a52d05b0"
+                    createdAt: "2026-11-25T09:37:16.833Z"
+                  - id: "01a21211-0c16-71ac-9bd9-8b30a7b89ad6"
                     text: "Assalomu alaykum, hovlidagi chiroq yonmayapti"
-                    senderId: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                    senderId: "01a21211-0711-7081-82fe-2b332230537e"
                     senderName: "Ali Valiyev"
                     senderRole: "RESIDENT"
                     mine: false
-                    createdAt: "2026-11-25T09:14:15.807Z"
+                    createdAt: "2026-11-25T09:37:16.822Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -7692,13 +7751,13 @@ paths:
                 type: "object"
                 additionalProperties: true
               example:
-                id: "01a211fb-f989-7536-873d-bb4fd33689d6"
+                id: "01a21211-0c22-779a-b67e-8441fcf7a911"
                 text: "Salom! Ertaga ko'rib chiqamiz"
-                senderId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                senderId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                 senderName: "Admin Demo Yunusobod"
                 senderRole: "MAHALLA_ADMIN"
                 mine: true
-                createdAt: "2026-11-25T09:14:15.816Z"
+                createdAt: "2026-11-25T09:37:16.833Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -7887,13 +7946,13 @@ paths:
                   - "resolvedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f994-728a-817b-7096194ca67b"
+                id: "01a21211-0c30-77f5-8eb2-922b3453a720"
                 targetType: "CHAT_MESSAGE"
-                targetId: "01a211fb-f703-70b5-af2e-0e13e0aac64d"
+                targetId: "01a21211-093c-770c-aa45-99d6d680264a"
                 reason: "Reklama xarakteridagi xabar"
                 status: "OPEN"
                 resolution: null
-                createdAt: "2026-11-25T09:14:15.826Z"
+                createdAt: "2026-11-25T09:37:16.846Z"
                 resolvedAt: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -8092,24 +8151,24 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f994-728a-817b-7096194ca67b"
+                  - id: "01a21211-0c30-77f5-8eb2-922b3453a720"
                     targetType: "CHAT_MESSAGE"
-                    targetId: "01a211fb-f703-70b5-af2e-0e13e0aac64d"
+                    targetId: "01a21211-093c-770c-aa45-99d6d680264a"
                     reason: "Reklama xarakteridagi xabar"
                     status: "OPEN"
                     resolution: null
-                    createdAt: "2026-11-25T09:14:15.826Z"
+                    createdAt: "2026-11-25T09:37:16.846Z"
                     resolvedAt: null
                     reporterName: "Ali Valiyev"
                     contentPreview: "Men ovoz berdim, rahmat eslatganingiz uchun!"
                     contentHidden: false
-                  - id: "01a211fb-f704-720d-839b-05164cc15279"
+                  - id: "01a21211-093c-770d-b126-34d7aa211bc2"
                     targetType: "CHAT_MESSAGE"
-                    targetId: "01a211fb-f703-70b4-b9d3-c9f898358abe"
+                    targetId: "01a21211-093b-7752-93be-91a769b9b52a"
                     reason: "Reklama xarakteridagi xabar"
                     status: "OPEN"
                     resolution: null
-                    createdAt: "2026-11-25T09:14:14.754Z"
+                    createdAt: "2026-11-25T09:37:15.532Z"
                     resolvedAt: null
                     reporterName: "Sara Karimova"
                     contentPreview: "Chiroq masalasiga ovoz berishni unutmanglar"
@@ -8238,7 +8297,7 @@ paths:
                   - "status"
                 additionalProperties: false
               example:
-                id: "01a211fb-f994-728a-817b-7096194ca67b"
+                id: "01a21211-0c30-77f5-8eb2-922b3453a720"
                 status: "ACTIONED"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -8396,7 +8455,7 @@ paths:
                   - "status"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa2b-715b-879d-5fe3ddd92f38"
+                id: "01a21211-0cfd-70b1-9711-568619298fa1"
                 status: "DISMISSED"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -8665,10 +8724,10 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f6ab-7347-94a9-d369ce85b69b"
+                  - id: "01a21211-08bd-740e-801f-031d15a93f24"
                     title: "Hashar: hovli va skverni tozalash"
                     description: "Birgalikda hovli va skverni tozalaymiz, asbob-uskunalar tayyor bo'ladi."
-                    startsAt: "2026-12-02T09:14:14.702Z"
+                    startsAt: "2026-12-02T09:37:15.473Z"
                     endsAt: null
                     location: "Markaziy hovli"
                     organizer: "Mahalla qo'mitasi"
@@ -8677,7 +8736,7 @@ paths:
                     resultText: null
                     rsvpCount: 2
                     myRsvp: true
-                    createdAt: "2026-11-25T09:14:14.754Z"
+                    createdAt: "2026-11-25T09:37:15.532Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -8882,10 +8941,10 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f6ab-7347-94a9-d369ce85b69b"
+                id: "01a21211-08bd-740e-801f-031d15a93f24"
                 title: "Hashar: hovli va skverni tozalash"
                 description: "Birgalikda hovli va skverni tozalaymiz, asbob-uskunalar tayyor bo'ladi."
-                startsAt: "2026-12-02T09:14:14.702Z"
+                startsAt: "2026-12-02T09:37:15.473Z"
                 endsAt: null
                 location: "Markaziy hovli"
                 organizer: "Mahalla qo'mitasi"
@@ -8894,17 +8953,17 @@ paths:
                 resultText: null
                 rsvpCount: 2
                 myRsvp: true
-                createdAt: "2026-11-25T09:14:14.754Z"
+                createdAt: "2026-11-25T09:37:15.532Z"
                 media:
-                  - id: "01a211fb-f6ca-70a2-be22-b59b41e28594"
+                  - id: "01a21211-08eb-7116-a446-7a99914844a4"
                     kind: "IMAGE"
-                    url: "http://localhost:3000/api/v1/files/01a211fb-f6ca-70a2-be22-b59b41e28594.jpg?exp=1795598355&sig=213e5f90268bd4bc48fde73b29655e956e5f2a6e73d4271ac10e3602375dd799"
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f6ca-70a2-be22-b59b41e28594_t.jpg?exp=1795598355&sig=763fc2320b67cf9974a26561784f9abe4cad4c6d668746bd7a804ff7633cd5fa"
+                    url: "http://localhost:3000/api/v1/files/01a21211-08eb-7116-a446-7a99914844a4.jpg?exp=1795599736&sig=3b055f76c7b6de01779420adf84e8971a1eb2359a76ead622059f0d4aaa09691"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-08eb-7116-a446-7a99914844a4_t.jpg?exp=1795599736&sig=6cbc9266177587e3809fc01b8a46014b582b08f814e593feb3785385f67af5e4"
                     width: 1024
                     height: 768
                     mime: "image/jpeg"
                     sizeBytes: 199103
-                    expiresAt: "2026-11-25T09:19:15.785Z"
+                    expiresAt: "2026-11-25T09:42:16.793Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -9399,10 +9458,10 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f6ff-76ae-97b5-472bafc461bb"
+                  - id: "01a21211-0937-726c-90f5-57c3c328ff5e"
                     title: "Yangi yil oldi yarmarkasi (qoralama)"
                     description: "Hali tasdiqlanmagan tadbir loyihasi."
-                    startsAt: "2026-12-20T09:14:14.702Z"
+                    startsAt: "2026-12-20T09:37:15.473Z"
                     endsAt: null
                     location: "Markaziy hovli"
                     organizer: "Mahalla qo'mitasi"
@@ -9411,11 +9470,11 @@ paths:
                     resultText: null
                     rsvpCount: 0
                     myRsvp: false
-                    createdAt: "2026-11-25T09:14:14.754Z"
-                  - id: "01a211fb-f6ab-7347-94a9-d369ce85b69b"
+                    createdAt: "2026-11-25T09:37:15.532Z"
+                  - id: "01a21211-08bd-740e-801f-031d15a93f24"
                     title: "Hashar: hovli va skverni tozalash"
                     description: "Birgalikda hovli va skverni tozalaymiz, asbob-uskunalar tayyor bo'ladi."
-                    startsAt: "2026-12-02T09:14:14.702Z"
+                    startsAt: "2026-12-02T09:37:15.473Z"
                     endsAt: null
                     location: "Markaziy hovli"
                     organizer: "Mahalla qo'mitasi"
@@ -9424,11 +9483,11 @@ paths:
                     resultText: null
                     rsvpCount: 2
                     myRsvp: false
-                    createdAt: "2026-11-25T09:14:14.754Z"
-                  - id: "01a211fb-f6ad-7119-8473-90e9a1d27a08"
+                    createdAt: "2026-11-25T09:37:15.532Z"
+                  - id: "01a21211-08c0-7380-ab24-20f1ba724eae"
                     title: "Navro'z bayrami tantanasi"
                     description: "Mahalla aholisi bilan bayram dasturxoni va bolalar o'yinlari."
-                    startsAt: "2026-10-16T09:14:14.702Z"
+                    startsAt: "2026-10-16T09:37:15.473Z"
                     endsAt: null
                     location: "Markaziy hovli"
                     organizer: "Mahalla qo'mitasi"
@@ -9437,7 +9496,7 @@ paths:
                     resultText: "120 dan ortiq kishi qatnashdi, bolalar uchun sovg'alar tarqatildi"
                     rsvpCount: 3
                     myRsvp: false
-                    createdAt: "2026-11-25T09:14:14.754Z"
+                    createdAt: "2026-11-25T09:37:15.532Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -9675,10 +9734,10 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa6e-7677-b691-9bc24f9307df"
+                id: "01a21211-0d4f-70a2-92f7-f28d28404fbb"
                 title: "Hashar: hovli tozalash"
                 description: "Mahalla hovlisini birgalikda tozalaymiz"
-                startsAt: "2026-12-04T09:14:16.045Z"
+                startsAt: "2026-12-04T09:37:17.133Z"
                 endsAt: null
                 location: "Markaziy hovli"
                 organizer: "Mahalla qo‘mitasi"
@@ -9687,7 +9746,7 @@ paths:
                 resultText: null
                 rsvpCount: 0
                 myRsvp: false
-                createdAt: "2026-11-25T09:14:16.045Z"
+                createdAt: "2026-11-25T09:37:17.134Z"
                 media: []
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -9931,10 +9990,10 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa6e-7677-b691-9bc24f9307df"
+                id: "01a21211-0d4f-70a2-92f7-f28d28404fbb"
                 title: "Hashar: hovli tozalash"
                 description: "Mahalla hovlisini birgalikda tozalaymiz"
-                startsAt: "2026-12-05T09:14:16.056Z"
+                startsAt: "2026-12-05T09:37:17.144Z"
                 endsAt: null
                 location: "Markaziy hovli"
                 organizer: "Mahalla qo‘mitasi"
@@ -9943,7 +10002,7 @@ paths:
                 resultText: null
                 rsvpCount: 0
                 myRsvp: false
-                createdAt: "2026-11-25T09:14:16.045Z"
+                createdAt: "2026-11-25T09:37:17.134Z"
                 media: []
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -10183,10 +10242,10 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa6e-7677-b691-9bc24f9307df"
+                id: "01a21211-0d4f-70a2-92f7-f28d28404fbb"
                 title: "Hashar: hovli tozalash"
                 description: "Mahalla hovlisini birgalikda tozalaymiz"
-                startsAt: "2026-12-04T09:14:16.045Z"
+                startsAt: "2026-12-04T09:37:17.133Z"
                 endsAt: null
                 location: "Markaziy hovli"
                 organizer: "Mahalla qo‘mitasi"
@@ -10195,7 +10254,7 @@ paths:
                 resultText: null
                 rsvpCount: 0
                 myRsvp: false
-                createdAt: "2026-11-25T09:14:16.045Z"
+                createdAt: "2026-11-25T09:37:17.134Z"
                 media: []
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -10451,10 +10510,10 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa6e-7677-b691-9bc24f9307df"
+                id: "01a21211-0d4f-70a2-92f7-f28d28404fbb"
                 title: "Hashar: hovli tozalash"
                 description: "Mahalla hovlisini birgalikda tozalaymiz"
-                startsAt: "2026-12-05T09:14:16.056Z"
+                startsAt: "2026-12-05T09:37:17.144Z"
                 endsAt: null
                 location: "Markaziy hovli"
                 organizer: "Mahalla qo‘mitasi"
@@ -10463,7 +10522,7 @@ paths:
                 resultText: null
                 rsvpCount: 0
                 myRsvp: false
-                createdAt: "2026-11-25T09:14:16.045Z"
+                createdAt: "2026-11-25T09:37:17.134Z"
                 media: []
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -10728,10 +10787,10 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa82-703e-b03e-9f399b3af37c"
+                id: "01a21211-0d67-745d-ac17-e88ba0a81eb1"
                 title: "Daraxt ekish"
                 description: "Mahalla hovlisini birgalikda tozalaymiz"
-                startsAt: "2026-12-04T09:14:16.065Z"
+                startsAt: "2026-12-04T09:37:17.158Z"
                 endsAt: null
                 location: "Markaziy hovli"
                 organizer: "Mahalla qo‘mitasi"
@@ -10740,7 +10799,7 @@ paths:
                 resultText: "25 kishi qatnashdi, 40 ta ko‘chat o‘tkazildi"
                 rsvpCount: 0
                 myRsvp: false
-                createdAt: "2026-11-25T09:14:16.066Z"
+                createdAt: "2026-11-25T09:37:17.159Z"
                 media: []
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -10906,16 +10965,16 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  - id: "01a21211-0711-7081-82fe-2b332230537e"
                     login: "ali.yunusobod"
                     displayName: "Ali Valiyev"
-                    phone: "+998904267702"
-                    rsvpAt: "2026-11-25T09:14:14.754Z"
-                  - id: "01a211fb-f567-75db-9c27-f6d379d3ffa1"
+                    phone: "+998904189142"
+                    rsvpAt: "2026-11-25T09:37:15.532Z"
+                  - id: "01a21211-0713-7310-ab94-5c8272f5e404"
                     login: "vali.yunusobod"
                     displayName: "Vali Aliyev"
-                    phone: "+998908600485"
-                    rsvpAt: "2026-11-25T09:14:14.754Z"
+                    phone: "+998901596807"
+                    rsvpAt: "2026-11-25T09:37:15.532Z"
                 total: 2
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -11077,20 +11136,20 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f6ff-76af-84a8-7eece64ec344"
+                  - id: "01a21211-0938-7748-9c80-3219e519178d"
                     title: "Ertaga suv o'chiriladi"
                     body: "Ertaga soat 09:00 dan 14:00 gacha profilaktika ishlari sababli suv o'chiriladi. Iltimos, oldindan zaxira qiling."
                     isImportant: true
                     status: "PUBLISHED"
-                    publishedAt: "2026-11-24T13:14:14.702Z"
-                    createdAt: "2026-11-25T09:14:14.754Z"
-                  - id: "01a211fb-f700-73ce-bd9b-6f298f15edc7"
+                    publishedAt: "2026-11-24T13:37:15.473Z"
+                    createdAt: "2026-11-25T09:37:15.532Z"
+                  - id: "01a21211-0939-76f0-b24d-470c71350759"
                     title: "Chiqindi olib ketish jadvali o'zgardi"
                     body: "Endi chiqindi dushanba, chorshanba va juma kunlari olib ketiladi."
                     isImportant: false
                     status: "PUBLISHED"
-                    publishedAt: "2026-11-21T05:14:14.702Z"
-                    createdAt: "2026-11-25T09:14:14.754Z"
+                    publishedAt: "2026-11-21T05:37:15.473Z"
+                    createdAt: "2026-11-25T09:37:15.532Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -11218,13 +11277,13 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f6ff-76af-84a8-7eece64ec344"
+                id: "01a21211-0938-7748-9c80-3219e519178d"
                 title: "Ertaga suv o'chiriladi"
                 body: "Ertaga soat 09:00 dan 14:00 gacha profilaktika ishlari sababli suv o'chiriladi. Iltimos, oldindan zaxira qiling."
                 isImportant: true
                 status: "PUBLISHED"
-                publishedAt: "2026-11-24T13:14:14.702Z"
-                createdAt: "2026-11-25T09:14:14.754Z"
+                publishedAt: "2026-11-24T13:37:15.473Z"
+                createdAt: "2026-11-25T09:37:15.532Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -11385,13 +11444,13 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa8f-77d4-b5d1-b008404ed5e0"
+                id: "01a21211-0d76-71ea-a7fe-dcf14e066f73"
                 title: "Ertaga suv o'chadi"
                 body: "Ertaga soat 9 dan 14 gacha suv o'chiriladi"
                 isImportant: true
                 status: "DRAFT"
                 publishedAt: null
-                createdAt: "2026-11-25T09:14:16.079Z"
+                createdAt: "2026-11-25T09:37:17.174Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -11548,13 +11607,13 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa8f-77d4-b5d1-b008404ed5e0"
+                id: "01a21211-0d76-71ea-a7fe-dcf14e066f73"
                 title: "Ertaga suv o'chadi (yangilandi)"
                 body: "Ertaga soat 9 dan 14 gacha suv o'chiriladi"
                 isImportant: false
                 status: "DRAFT"
                 publishedAt: null
-                createdAt: "2026-11-25T09:14:16.079Z"
+                createdAt: "2026-11-25T09:37:17.174Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -11823,13 +11882,13 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa8f-77d4-b5d1-b008404ed5e0"
+                id: "01a21211-0d76-71ea-a7fe-dcf14e066f73"
                 title: "Ertaga suv o'chadi (yangilandi)"
                 body: "Ertaga soat 9 dan 14 gacha suv o'chiriladi"
                 isImportant: false
                 status: "PUBLISHED"
-                publishedAt: "2026-11-25T09:14:16.085Z"
-                createdAt: "2026-11-25T09:14:16.079Z"
+                publishedAt: "2026-11-25T09:37:17.182Z"
+                createdAt: "2026-11-25T09:37:17.174Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -12007,24 +12066,24 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "597f2aa0-a97a-4ac8-be16-492b09f02a15"
+                  - id: "78260035-5e25-432e-bb30-26411db7a9b7"
                     type: "IMPORTANT_ANNOUNCEMENT"
                     title: "Ertaga suv o'chiriladi"
                     body: "Ertaga soat 09:00 dan 14:00 gacha profilaktika ishlari sababli suv o'chiriladi. Iltimos, oldindan zaxira qiling."
                     entityType: "ANNOUNCEMENT"
-                    entityId: "01a211fb-f6ff-76af-84a8-7eece64ec344"
+                    entityId: "01a21211-0938-7748-9c80-3219e519178d"
                     read: false
                     readAt: null
-                    createdAt: "2026-11-25T09:14:15.548Z"
-                  - id: "52d9398e-a694-45f8-bf90-73e908377e40"
+                    createdAt: "2026-11-25T09:37:16.537Z"
+                  - id: "033683ab-046b-4804-8891-d33403ce8ec5"
                     type: "ISSUE_STATUS_CHANGED"
                     title: "Muammo tasdiqlandi"
                     body: "«Ko'cha chirog'i ishlamayapti» ovoz berishga qo'yildi"
                     entityType: "ISSUE"
-                    entityId: "01a211fb-f634-710f-8064-50653dbd315f"
+                    entityId: "01a21211-085d-77ba-a02b-c667f7b73697"
                     read: false
                     readAt: null
-                    createdAt: "2026-11-25T09:14:14.754Z"
+                    createdAt: "2026-11-25T09:37:15.532Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -12449,42 +12508,42 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f56a-752a-b765-a6c5ac6c0b91"
+                  - id: "01a21211-0715-7411-befd-f17fcab182cb"
                     login: "dilnoza.yunusobod"
                     displayName: "Dilnoza Rahimova"
-                    phone: "+998905522617"
+                    phone: "+998907855129"
                     status: "ACTIVE"
                     blockedReason: null
                     mustChangePassword: true
-                    tempPasswordExpiresAt: "2026-11-28T09:14:14.702Z"
-                    createdAt: "2026-11-25T09:14:14.754Z"
-                  - id: "01a211fb-f568-749f-9bda-53214211bd93"
+                    tempPasswordExpiresAt: "2026-11-28T09:37:15.473Z"
+                    createdAt: "2026-11-25T09:37:15.532Z"
+                  - id: "01a21211-0714-75a7-83da-d9bb75b86aa5"
                     login: "sara.yunusobod"
                     displayName: "Sara Karimova"
-                    phone: "+998908590362"
+                    phone: "+998902820933"
                     status: "ACTIVE"
                     blockedReason: null
                     mustChangePassword: false
                     tempPasswordExpiresAt: null
-                    createdAt: "2026-11-25T09:14:14.754Z"
-                  - id: "01a211fb-f567-75db-9c27-f6d379d3ffa1"
+                    createdAt: "2026-11-25T09:37:15.532Z"
+                  - id: "01a21211-0713-7310-ab94-5c8272f5e404"
                     login: "vali.yunusobod"
                     displayName: "Vali Aliyev"
-                    phone: "+998908600485"
+                    phone: "+998901596807"
                     status: "ACTIVE"
                     blockedReason: null
                     mustChangePassword: false
                     tempPasswordExpiresAt: null
-                    createdAt: "2026-11-25T09:14:14.754Z"
-                  - id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                    createdAt: "2026-11-25T09:37:15.532Z"
+                  - id: "01a21211-0711-7081-82fe-2b332230537e"
                     login: "ali.yunusobod"
                     displayName: "Ali Valiyev"
-                    phone: "+998904267702"
+                    phone: "+998904189142"
                     status: "ACTIVE"
                     blockedReason: null
                     mustChangePassword: false
                     tempPasswordExpiresAt: null
-                    createdAt: "2026-11-25T09:14:14.754Z"
+                    createdAt: "2026-11-25T09:37:15.532Z"
                 nextCursor: null
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
@@ -12654,17 +12713,17 @@ paths:
                 additionalProperties: false
               example:
                 user:
-                  id: "01a211fb-fa49-761b-924c-710771b1553e"
+                  id: "01a21211-0d22-77bd-ba65-05345f88e21e"
                   login: "ali.valiyev"
                   displayName: "Ali Valiyev"
                   phone: "+998901234567"
                   status: "ACTIVE"
                   blockedReason: null
                   mustChangePassword: true
-                  tempPasswordExpiresAt: "2026-11-28T09:14:15.987Z"
-                  createdAt: "2026-11-25T09:14:15.987Z"
+                  tempPasswordExpiresAt: "2026-11-28T09:37:17.062Z"
+                  createdAt: "2026-11-25T09:37:17.062Z"
                 temporaryPassword: "Hn4Rk8Tm3Q"
-                expiresAt: "2026-11-28T09:14:15.987Z"
+                expiresAt: "2026-11-28T09:37:17.062Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -12820,15 +12879,15 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f56a-752a-b765-a6c5ac6c0b91"
+                id: "01a21211-0715-7411-befd-f17fcab182cb"
                 login: "dilnoza.yunusobod"
                 displayName: "Dilnoza Rahimova"
-                phone: "+998905522617"
+                phone: "+998907855129"
                 status: "ACTIVE"
                 blockedReason: null
                 mustChangePassword: true
-                tempPasswordExpiresAt: "2026-11-28T09:14:14.702Z"
-                createdAt: "2026-11-25T09:14:14.754Z"
+                tempPasswordExpiresAt: "2026-11-28T09:37:15.473Z"
+                createdAt: "2026-11-25T09:37:15.532Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -12947,7 +13006,7 @@ paths:
                 additionalProperties: false
               example:
                 temporaryPassword: "Hn4Rk8Tm3Q"
-                expiresAt: "2026-11-28T09:14:16.012Z"
+                expiresAt: "2026-11-28T09:37:17.094Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -13121,15 +13180,15 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa49-761b-924c-710771b1553e"
+                id: "01a21211-0d22-77bd-ba65-05345f88e21e"
                 login: "ali.valiyev"
                 displayName: "Ali Valiyev"
                 phone: "+998901234567"
                 status: "BLOCKED"
                 blockedReason: "Qoidabuzarlik"
                 mustChangePassword: true
-                tempPasswordExpiresAt: "2026-11-28T09:14:16.012Z"
-                createdAt: "2026-11-25T09:14:15.987Z"
+                tempPasswordExpiresAt: "2026-11-28T09:37:17.094Z"
+                createdAt: "2026-11-25T09:37:17.062Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -13285,15 +13344,15 @@ paths:
                   - "createdAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-fa49-761b-924c-710771b1553e"
+                id: "01a21211-0d22-77bd-ba65-05345f88e21e"
                 login: "ali.valiyev"
                 displayName: "Ali Valiyev"
                 phone: "+998901234567"
                 status: "ACTIVE"
                 blockedReason: null
                 mustChangePassword: true
-                tempPasswordExpiresAt: "2026-11-28T09:14:16.012Z"
-                createdAt: "2026-11-25T09:14:15.987Z"
+                tempPasswordExpiresAt: "2026-11-28T09:37:17.094Z"
+                createdAt: "2026-11-25T09:37:17.062Z"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:
@@ -13525,7 +13584,7 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f69e-7583-ab10-74d81e51330d"
+                  - id: "01a21211-08a9-7088-8928-228d854e7dd4"
                     title: "Bolalar maydonchasida qum yetishmaydi"
                     category: "LANDSCAPING"
                     categoryLabel: "Obodonlashtirish"
@@ -13533,7 +13592,7 @@ paths:
                     status: "PENDING_REVIEW"
                     statusLabel: "Moderatsiyada"
                     publishedAt: null
-                    createdAt: "2026-11-25T04:14:14.702Z"
+                    createdAt: "2026-11-25T04:37:15.473Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -13546,7 +13605,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f69f-74c8-a37a-b2558643fb3d"
+                  - id: "01a21211-08aa-7707-b8b5-8aa728072045"
                     title: "Avtobus bekati tomi singan"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -13554,7 +13613,7 @@ paths:
                     status: "PENDING_REVIEW"
                     statusLabel: "Moderatsiyada"
                     publishedAt: null
-                    createdAt: "2026-11-25T07:14:14.702Z"
+                    createdAt: "2026-11-25T07:37:15.473Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -13567,7 +13626,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f99a-71a0-b6bd-817feaaaab21"
+                  - id: "01a21211-0c39-710d-9841-ff220dfc16b1"
                     title: "Yo'l chetida axlat to'planib qolgan (aniqlandi)"
                     category: "WASTE"
                     categoryLabel: "Chiqindi"
@@ -13575,7 +13634,7 @@ paths:
                     status: "PENDING_REVIEW"
                     statusLabel: "Moderatsiyada"
                     publishedAt: null
-                    createdAt: "2026-11-25T09:14:15.833Z"
+                    createdAt: "2026-11-25T09:37:16.854Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -13956,7 +14015,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f69e-7583-ab10-74d81e51330d"
+                id: "01a21211-08a9-7088-8928-228d854e7dd4"
                 title: "Bolalar maydonchasida qum yetishmaydi"
                 category: "LANDSCAPING"
                 categoryLabel: "Obodonlashtirish"
@@ -13964,16 +14023,16 @@ paths:
                 statusLabel: "Ovoz berilmoqda"
                 hidden: false
                 author:
-                  id: "01a211fb-f56a-752a-b765-a6c5ac6c0b91"
+                  id: "01a21211-0715-7411-befd-f17fcab182cb"
                   displayName: "Dilnoza Rahimova"
-                createdAt: "2026-11-25T04:14:14.702Z"
-                publishedAt: "2026-11-25T09:14:15.891Z"
+                createdAt: "2026-11-25T04:37:15.473Z"
+                publishedAt: "2026-11-25T09:37:16.946Z"
                 roundKind: "MONTHLY"
                 description: "Qum qutisi deyarli bo'sh, bolalar o'ynay olmayapti."
                 locationText: "Mahalla markazi, 12-uy yonida"
                 media: []
                 voteCount: 0
-                roundId: "01a211fb-f633-77ab-8f2a-870609904c94"
+                roundId: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                 myVote: false
                 isFollowing: false
                 canVote: false
@@ -13989,14 +14048,14 @@ paths:
                 resolutionText: null
                 hiddenReason: null
                 history:
-                  - id: "01a211fb-f9d6-7258-bb68-8c7a0f31e3eb"
+                  - id: "01a21211-0c97-762e-b845-d1d9e3bd4b75"
                     type: "STATUS_CHANGE"
                     fromStatus: "PENDING_REVIEW"
                     toStatus: "OPEN"
                     reason: null
                     payload:
-                      roundId: "01a211fb-f633-77ab-8f2a-870609904c94"
-                    createdAt: "2026-11-25T09:14:15.891Z"
+                      roundId: "01a21211-085c-7481-8aef-ec9c359c8c3b"
+                    createdAt: "2026-11-25T09:37:16.946Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
         "400":
@@ -14426,7 +14485,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f69f-74c8-a37a-b2558643fb3d"
+                id: "01a21211-08aa-7707-b8b5-8aa728072045"
                 title: "Avtobus bekati tomi singan"
                 category: "OTHER"
                 categoryLabel: "Boshqa"
@@ -14434,9 +14493,9 @@ paths:
                 statusLabel: "Tuzatish kerak"
                 hidden: false
                 author:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   displayName: "Ali Valiyev"
-                createdAt: "2026-11-25T07:14:14.702Z"
+                createdAt: "2026-11-25T07:37:15.473Z"
                 publishedAt: null
                 roundKind: "MONTHLY"
                 description: "Yomg'irli kunlarda odamlar ho'l bo'lib turadi, tom qismi qulagan."
@@ -14459,13 +14518,13 @@ paths:
                 resolutionText: null
                 hiddenReason: null
                 history:
-                  - id: "01a211fb-f9e1-74d9-8d5c-3742824e33f0"
+                  - id: "01a21211-0ca4-701a-8f5a-d17a9793f5c1"
                     type: "STATUS_CHANGE"
                     fromStatus: "PENDING_REVIEW"
                     toStatus: "REJECTED"
                     reason: "Aniq manzil ko'rsatilmagan"
                     payload: {}
-                    createdAt: "2026-11-25T09:14:15.903Z"
+                    createdAt: "2026-11-25T09:37:16.961Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
         "400":
@@ -14888,7 +14947,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f99a-71a0-b6bd-817feaaaab21"
+                id: "01a21211-0c39-710d-9841-ff220dfc16b1"
                 title: "Yo'l chetida axlat to'planib qolgan (aniqlandi)"
                 category: "WASTE"
                 categoryLabel: "Chiqindi"
@@ -14896,9 +14955,9 @@ paths:
                 statusLabel: "Birlashtirilgan"
                 hidden: false
                 author:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   displayName: "Ali Valiyev"
-                createdAt: "2026-11-25T09:14:15.833Z"
+                createdAt: "2026-11-25T09:37:16.854Z"
                 publishedAt: null
                 roundKind: "MONTHLY"
                 description: "Maktab yo'lagidagi axlat haftalardan beri olib ketilmayapti"
@@ -14911,7 +14970,7 @@ paths:
                 canVote: false
                 commentCount: 0
                 duplicateOf:
-                  id: "01a211fb-f634-710f-8064-50653dbd315f"
+                  id: "01a21211-085d-77ba-a02b-c667f7b73697"
                   title: "Ko'cha chirog'i ishlamayapti"
                 rejectedReason: null
                 responsible: null
@@ -14923,16 +14982,16 @@ paths:
                 resolutionText: null
                 hiddenReason: null
                 history:
-                  - id: "01a211fb-f9ef-7233-8b12-a090794c5af5"
+                  - id: "01a21211-0cb5-774f-95ab-ec629ef02e3d"
                     type: "STATUS_CHANGE"
                     fromStatus: "PENDING_REVIEW"
                     toStatus: "MERGED"
                     reason: null
                     payload:
                       duplicateOf:
-                        id: "01a211fb-f634-710f-8064-50653dbd315f"
+                        id: "01a21211-085d-77ba-a02b-c667f7b73697"
                         title: "Ko'cha chirog'i ishlamayapti"
-                    createdAt: "2026-11-25T09:14:15.916Z"
+                    createdAt: "2026-11-25T09:37:16.977Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
         "400":
@@ -15207,7 +15266,7 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-f99a-71a0-b6bd-817feaaaab21"
+                  - id: "01a21211-0c39-710d-9841-ff220dfc16b1"
                     title: "Yo'l chetida axlat to'planib qolgan (aniqlandi)"
                     category: "WASTE"
                     categoryLabel: "Chiqindi"
@@ -15215,7 +15274,7 @@ paths:
                     status: "PENDING_REVIEW"
                     statusLabel: "Moderatsiyada"
                     publishedAt: null
-                    createdAt: "2026-11-25T09:14:15.833Z"
+                    createdAt: "2026-11-25T09:37:16.854Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -15228,7 +15287,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f69f-74c8-a37a-b2558643fb3d"
+                  - id: "01a21211-08aa-7707-b8b5-8aa728072045"
                     title: "Avtobus bekati tomi singan"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -15236,7 +15295,7 @@ paths:
                     status: "PENDING_REVIEW"
                     statusLabel: "Moderatsiyada"
                     publishedAt: null
-                    createdAt: "2026-11-25T07:14:14.702Z"
+                    createdAt: "2026-11-25T07:37:15.473Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -15249,7 +15308,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f69e-7583-ab10-74d81e51330d"
+                  - id: "01a21211-08a9-7088-8928-228d854e7dd4"
                     title: "Bolalar maydonchasida qum yetishmaydi"
                     category: "LANDSCAPING"
                     categoryLabel: "Obodonlashtirish"
@@ -15257,7 +15316,7 @@ paths:
                     status: "PENDING_REVIEW"
                     statusLabel: "Moderatsiyada"
                     publishedAt: null
-                    createdAt: "2026-11-25T04:14:14.702Z"
+                    createdAt: "2026-11-25T04:37:15.473Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -15270,28 +15329,28 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f635-7012-aac5-85732a1a0cde"
+                  - id: "01a21211-085e-74a6-a996-c1ff55f200dc"
                     title: "Chiqindi konteyneri to'lib ketgan"
                     category: "WASTE"
                     categoryLabel: "Chiqindi"
                     locationText: "Mahalla markazi, 12-uy yonida"
                     status: "OPEN"
                     statusLabel: "Ovoz berilmoqda"
-                    publishedAt: "2026-11-23T07:14:14.702Z"
-                    createdAt: "2026-11-22T21:14:14.702Z"
+                    publishedAt: "2026-11-23T07:37:15.473Z"
+                    createdAt: "2026-11-22T21:37:15.473Z"
                     commentCount: 0
                     voteCount: 1
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f67f-776c-99ce-f6128717c7d9_t.jpg?exp=1795598355&sig=3fc4138584e75af0286bbb8869d8b306281858a4806d3fbc7d8e9e281390ee96"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0887-77cd-84ae-f9f5eeecf809_t.jpg?exp=1795599736&sig=8846e2978c67a6371de614d068a041df7ec6fd2f23e9da323fc5e9d155fd3ef5"
                     authorName: "Sara Karimova"
                     responsible: null
                     dueDate: null
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f6a0-76f9-92ae-d3b69204d277"
+                  - id: "01a21211-08ad-7442-8570-633fcad9309a"
                     title: "Navoiy ko'chasidagi chiroq o'chgan (dublikat)"
                     category: "LIGHTING"
                     categoryLabel: "Yoritish"
@@ -15299,7 +15358,7 @@ paths:
                     status: "MERGED"
                     statusLabel: "Birlashtirilgan"
                     publishedAt: null
-                    createdAt: "2026-11-23T02:14:14.702Z"
+                    createdAt: "2026-11-23T02:37:15.473Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -15312,9 +15371,9 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf:
-                      id: "01a211fb-f634-710f-8064-50653dbd315f"
+                      id: "01a21211-085d-77ba-a02b-c667f7b73697"
                       title: "Ko'cha chirog'i ishlamayapti"
-                  - id: "01a211fb-f6a8-7596-9d9f-22f57b0651ed"
+                  - id: "01a21211-08b7-7221-8488-8c65ee431d3d"
                     title: "Kanalizatsiya qopqog'i ochiq qolgan"
                     category: "WATER"
                     categoryLabel: "Suv"
@@ -15335,7 +15394,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f6a8-7595-bbac-1ef1649dd4d5"
+                  - id: "01a21211-08b6-76c0-b842-6fce1f6a0ef6"
                     title: "Bekatdagi o'rindiq singan"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -15356,7 +15415,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f69f-74c9-846f-6fe3a1d8c4c8"
+                  - id: "01a21211-08ab-741f-8a6b-56c5011aea4d"
                     title: "Qo'shni hovlida shovqin"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -15364,7 +15423,7 @@ paths:
                     status: "REJECTED"
                     statusLabel: "Tuzatish kerak"
                     publishedAt: null
-                    createdAt: "2026-11-22T11:14:14.702Z"
+                    createdAt: "2026-11-22T11:37:15.473Z"
                     commentCount: 0
                     voteCount: null
                     myVote: false
@@ -15377,49 +15436,49 @@ paths:
                     hidden: false
                     rejectedReason: "Bu mahalla infratuzilmasi masalasi emas; ichki ishlar organlariga murojaat qiling"
                     duplicateOf: null
-                  - id: "01a211fb-f634-7110-aef0-bf62e7d9ff7c"
+                  - id: "01a21211-085e-74a5-9470-7ba6359a7fc2"
                     title: "Hovli yo'lagi ta'mirlanmagan"
                     category: "ROAD"
                     categoryLabel: "Yo'l"
                     locationText: "Mahalla markazi, 12-uy yonida"
                     status: "OPEN"
                     statusLabel: "Ovoz berilmoqda"
-                    publishedAt: "2026-11-22T01:14:14.702Z"
-                    createdAt: "2026-11-21T15:14:14.702Z"
+                    publishedAt: "2026-11-22T01:37:15.473Z"
+                    createdAt: "2026-11-21T15:37:15.473Z"
                     commentCount: 0
                     voteCount: 2
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f665-7674-83bf-05f82656b652_t.jpg?exp=1795598355&sig=4067c3af9741bd7dc2c782b466e857717e1e4734598f213234dc8c7a90faf1ab"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0877-75a4-92f3-8cf6e957635c_t.jpg?exp=1795599736&sig=10f4ee96daa39d158b0eeaf019f00379658d86058bff96a6d9d8e024284c643f"
                     authorName: "Vali Aliyev"
                     responsible: null
                     dueDate: null
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f634-710f-8064-50653dbd315f"
+                  - id: "01a21211-085d-77ba-a02b-c667f7b73697"
                     title: "Ko'cha chirog'i ishlamayapti"
                     category: "LIGHTING"
                     categoryLabel: "Yoritish"
                     locationText: "Mahalla markazi, 12-uy yonida"
                     status: "OPEN"
                     statusLabel: "Ovoz berilmoqda"
-                    publishedAt: "2026-11-21T05:14:14.702Z"
-                    createdAt: "2026-11-20T09:14:14.702Z"
+                    publishedAt: "2026-11-21T05:37:15.473Z"
+                    createdAt: "2026-11-20T09:37:15.473Z"
                     commentCount: 3
                     voteCount: 3
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee_t.jpg?exp=1795598355&sig=0bdf0e4ed57afe2090adb687d2031619bb29b7f7d4b2c62eb5707c6caa4ae7d3"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0_t.jpg?exp=1795599736&sig=01729b4c731acffef62f843c0ce93d52ec349c81264a2b334667409773fed63a"
                     authorName: "Ali Valiyev"
                     responsible: null
                     dueDate: null
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f6a4-7507-822c-9f51914117d1"
+                  - id: "01a21211-08b1-76ac-a07d-94f019f0b288"
                     title: "Kirish yo'lagidagi chuqurni ko'mish"
                     category: "ROAD"
                     categoryLabel: "Yo'l"
@@ -15440,7 +15499,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f56f-7723-b823-311c41d7565c"
+                  - id: "01a21211-071a-76e0-aa5d-68de45ee29dd"
                     title: "Skver o'rindiqlarini ta'mirlash (2026-10)"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -15461,7 +15520,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f56e-7238-911d-7433dd9b2f22"
+                  - id: "01a21211-0719-735c-aa97-8d154b079132"
                     title: "Maktab oldidagi yo'lga svetofor o'rnatish"
                     category: "ROAD"
                     categoryLabel: "Yo'l"
@@ -15475,14 +15534,14 @@ paths:
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f57a-7700-96e4-c19a669492ba_t.jpg?exp=1795598355&sig=e58ae242f1dcb6642e490290054a807e9622053a2c6765fd88b8e73b871813ea"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0729-72bc-b170-acc3dfa1e1b2_t.jpg?exp=1795599736&sig=011380826ba004da63915bad8a38814e4c41dcb99c281fc8c77db161e93c6c3e"
                     authorName: "Ali Valiyev"
                     responsible: null
                     dueDate: null
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f5a8-7772-8108-a3e31c16e18a"
+                  - id: "01a21211-0764-71e4-8d4a-5d513c2439e6"
                     title: "Skver o'rindiqlarini ta'mirlash (2026-09)"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -15503,7 +15562,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f5a7-7540-8634-ac9c0ccc01b1"
+                  - id: "01a21211-0763-74d4-be94-fb2440de3f31"
                     title: "Bolalar maydonchasi qoplamasini yangilash"
                     category: "LANDSCAPING"
                     categoryLabel: "Obodonlashtirish"
@@ -15517,14 +15576,14 @@ paths:
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f5af-70ba-b17a-e0895bcce8c3_t.jpg?exp=1795598355&sig=bbf5a49e7abcf78c6078582f08cc754e86b8a300fceeb025630ef3b2cbb49eff"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-076b-73f5-adfa-64a107816555_t.jpg?exp=1795599736&sig=65c094fee4fdff935ba32c418332d00748db0dd3534515aea6116841ef888b76"
                     authorName: "Vali Aliyev"
                     responsible: "Obodonlashtirish xizmati"
                     dueDate: "2026-12-02"
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f5ca-726b-9060-9a25d867a9f1"
+                  - id: "01a21211-07a3-74a1-b908-ae1ecc288e25"
                     title: "Skver o'rindiqlarini ta'mirlash (2026-08)"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -15545,7 +15604,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f5c9-70d6-9f9c-b272aac11f40"
+                  - id: "01a21211-07a2-7649-b4f2-db2573855bac"
                     title: "Markaziy quvurdagi suv oqishini bartaraf etish"
                     category: "WATER"
                     categoryLabel: "Suv"
@@ -15559,14 +15618,14 @@ paths:
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f5d1-76f9-9d5c-a63a499f9ed7_t.jpg?exp=1795598355&sig=da1ce7518547ed035f358382b16db536c674db01634aeeac3fd46a3f8eda74a1"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-07ac-70b4-93bb-335a727af176_t.jpg?exp=1795599736&sig=23f6dca85e93e5cd44e244316112dc971dfafe90f4db5990276496395b29f853"
                     authorName: "Sara Karimova"
                     responsible: "Suv kanal xodimi"
                     dueDate: "2026-11-22"
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f5f4-7128-ba8b-741f1101c843"
+                  - id: "01a21211-07f2-70ea-a3c3-71c984ba181a"
                     title: "Skver o'rindiqlarini ta'mirlash (2026-07)"
                     category: "OTHER"
                     categoryLabel: "Boshqa"
@@ -15587,7 +15646,7 @@ paths:
                     hidden: false
                     rejectedReason: null
                     duplicateOf: null
-                  - id: "01a211fb-f5f3-7036-90a4-be087453a40a"
+                  - id: "01a21211-07f1-736b-a5e8-82a6b0cc8893"
                     title: "Ko'cha chiroqlarini LED ga almashtirish"
                     category: "LIGHTING"
                     categoryLabel: "Yoritish"
@@ -15601,7 +15660,7 @@ paths:
                     myVote: false
                     roundKind: "MONTHLY"
                     isFollowing: false
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f615-76f7-85cb-8904adf72c9b_t.jpg?exp=1795598355&sig=17798c2217e7b4acf1a6b97c691e423a2edf5086e6e70ffb1f364c99ddbe3e55"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0829-7083-a2ee-e33312a8dafa_t.jpg?exp=1795599736&sig=2c48ed672e1c861750c54b75f75ca84cdce23a1e71e8e866f201b46fd74d8911"
                     authorName: "Dilnoza Rahimova"
                     responsible: "Elektr tarmoqlari"
                     dueDate: "2026-08-10"
@@ -15976,7 +16035,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f634-710f-8064-50653dbd315f"
+                id: "01a21211-085d-77ba-a02b-c667f7b73697"
                 title: "Ko'cha chirog'i ishlamayapti"
                 category: "LIGHTING"
                 categoryLabel: "Yoritish"
@@ -15984,25 +16043,25 @@ paths:
                 statusLabel: "Ovoz berilmoqda"
                 hidden: false
                 author:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   displayName: "Ali Valiyev"
-                createdAt: "2026-11-20T09:14:14.702Z"
-                publishedAt: "2026-11-21T05:14:14.702Z"
+                createdAt: "2026-11-20T09:37:15.473Z"
+                publishedAt: "2026-11-21T05:37:15.473Z"
                 roundKind: "MONTHLY"
                 description: "Navoiy ko'chasi 12-uy yonidagi chiroq ikki haftadan beri yonmayapti, kechasi juda qorong'i."
                 locationText: "Mahalla markazi, 12-uy yonida"
                 media:
-                  - id: "01a211fb-f63a-741e-935b-8b69a88f72ee"
+                  - id: "01a21211-0864-713a-9c6f-147881e685d0"
                     kind: "IMAGE"
-                    url: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee.jpg?exp=1795598355&sig=b5db5a0f566ad227d4586140f6e417537e8ab3544d7564e3f11193d664b97132"
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f63a-741e-935b-8b69a88f72ee_t.jpg?exp=1795598355&sig=0bdf0e4ed57afe2090adb687d2031619bb29b7f7d4b2c62eb5707c6caa4ae7d3"
+                    url: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0.jpg?exp=1795599736&sig=b5b6bde8360b7b8676b3ecaab20e5cefd45b8e5124ee093c8c6c46f71ecca186"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0864-713a-9c6f-147881e685d0_t.jpg?exp=1795599736&sig=01729b4c731acffef62f843c0ce93d52ec349c81264a2b334667409773fed63a"
                     width: 1024
                     height: 768
                     mime: "image/jpeg"
                     sizeBytes: 124315
-                    expiresAt: "2026-11-25T09:19:15.867Z"
+                    expiresAt: "2026-11-25T09:42:16.902Z"
                 voteCount: 3
-                roundId: "01a211fb-f633-77ab-8f2a-870609904c94"
+                roundId: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                 myVote: false
                 isFollowing: false
                 canVote: false
@@ -16018,13 +16077,13 @@ paths:
                 resolutionText: null
                 hiddenReason: null
                 history:
-                  - id: "01a211fb-f639-708d-9206-a31a1a9f4e03"
+                  - id: "01a21211-0863-7123-ac46-dc76171eac85"
                     type: "STATUS_CHANGE"
                     fromStatus: "PENDING_REVIEW"
                     toStatus: "OPEN"
                     reason: null
                     payload: {}
-                    createdAt: "2026-11-21T05:14:14.702Z"
+                    createdAt: "2026-11-21T05:37:15.473Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
         "400":
@@ -16491,7 +16550,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f56e-7238-911d-7433dd9b2f22"
+                id: "01a21211-0719-735c-aa97-8d154b079132"
                 title: "Maktab oldidagi yo'lga svetofor o'rnatish"
                 category: "ROAD"
                 categoryLabel: "Yo'l"
@@ -16499,7 +16558,7 @@ paths:
                 statusLabel: "Jarayonda"
                 hidden: false
                 author:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   displayName: "Ali Valiyev"
                 createdAt: "2026-10-02T19:00:00.000Z"
                 publishedAt: "2026-10-03T19:00:00.000Z"
@@ -16507,17 +16566,17 @@ paths:
                 description: "Maktab oldidagi yo'lga svetofor o'rnatish. Aholi tomonidan ko'p marta so'ralgan, tezkor yechim kerak."
                 locationText: "Mahalla markazi, 12-uy yonida"
                 media:
-                  - id: "01a211fb-f57a-7700-96e4-c19a669492ba"
+                  - id: "01a21211-0729-72bc-b170-acc3dfa1e1b2"
                     kind: "IMAGE"
-                    url: "http://localhost:3000/api/v1/files/01a211fb-f57a-7700-96e4-c19a669492ba.jpg?exp=1795598355&sig=ad318bb2e9a1db59f3695437636e0c5a43ccab28ec75f70d089036924b324138"
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f57a-7700-96e4-c19a669492ba_t.jpg?exp=1795598355&sig=e58ae242f1dcb6642e490290054a807e9622053a2c6765fd88b8e73b871813ea"
+                    url: "http://localhost:3000/api/v1/files/01a21211-0729-72bc-b170-acc3dfa1e1b2.jpg?exp=1795599736&sig=2e2285d46d99b36601481d8199552c67d741f14e960695069f30cd6ed96a47ca"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0729-72bc-b170-acc3dfa1e1b2_t.jpg?exp=1795599736&sig=011380826ba004da63915bad8a38814e4c41dcb99c281fc8c77db161e93c6c3e"
                     width: 1024
                     height: 768
                     mime: "image/jpeg"
-                    sizeBytes: 18530
-                    expiresAt: "2026-11-25T09:19:15.933Z"
+                    sizeBytes: 221001
+                    expiresAt: "2026-11-25T09:42:16.996Z"
                 voteCount: 3
-                roundId: "01a211fb-f570-76c5-bd59-f670eaa2faef"
+                roundId: "01a21211-071b-7631-930d-54a8cf0a26ff"
                 myVote: false
                 isFollowing: false
                 canVote: false
@@ -16533,7 +16592,7 @@ paths:
                 resolutionText: null
                 hiddenReason: null
                 history:
-                  - id: "01a211fb-f578-7167-87b0-833746b93a03"
+                  - id: "01a21211-0726-7136-83c2-5aabc05f8d42"
                     type: "STATUS_CHANGE"
                     fromStatus: "PENDING_REVIEW"
                     toStatus: "OPEN"
@@ -16542,7 +16601,7 @@ paths:
                     createdAt: "2026-10-03T19:00:00.000Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
-                  - id: "01a211fb-f579-7239-90b6-6512ad9fb847"
+                  - id: "01a21211-0728-7226-878b-c5d74b475aef"
                     type: "STATUS_CHANGE"
                     fromStatus: "OPEN"
                     toStatus: "SELECTED"
@@ -16551,7 +16610,7 @@ paths:
                     createdAt: "2026-10-31T19:00:00.000Z"
                     actorName: null
                     media: []
-                  - id: "01a211fb-fa00-7507-86a2-18b2293a3895"
+                  - id: "01a21211-0cc9-74af-8b59-1cc547f4435f"
                     type: "STATUS_CHANGE"
                     fromStatus: "SELECTED"
                     toStatus: "IN_PROGRESS"
@@ -16560,7 +16619,7 @@ paths:
                       dueDate: "2026-12-10"
                       nextStep: "Yangi lampochka olib kelish"
                       responsible: "Elektr tarmoqlari xodimi Karimov"
-                    createdAt: "2026-11-25T09:14:15.933Z"
+                    createdAt: "2026-11-25T09:37:16.996Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
         "400":
@@ -16996,7 +17055,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f56e-7238-911d-7433dd9b2f22"
+                id: "01a21211-0719-735c-aa97-8d154b079132"
                 title: "Maktab oldidagi yo'lga svetofor o'rnatish"
                 category: "ROAD"
                 categoryLabel: "Yo'l"
@@ -17004,7 +17063,7 @@ paths:
                 statusLabel: "Jarayonda"
                 hidden: false
                 author:
-                  id: "01a211fb-f566-72ae-af0a-71df0c3a2ffc"
+                  id: "01a21211-0711-7081-82fe-2b332230537e"
                   displayName: "Ali Valiyev"
                 createdAt: "2026-10-02T19:00:00.000Z"
                 publishedAt: "2026-10-03T19:00:00.000Z"
@@ -17012,17 +17071,17 @@ paths:
                 description: "Maktab oldidagi yo'lga svetofor o'rnatish. Aholi tomonidan ko'p marta so'ralgan, tezkor yechim kerak."
                 locationText: "Mahalla markazi, 12-uy yonida"
                 media:
-                  - id: "01a211fb-f57a-7700-96e4-c19a669492ba"
+                  - id: "01a21211-0729-72bc-b170-acc3dfa1e1b2"
                     kind: "IMAGE"
-                    url: "http://localhost:3000/api/v1/files/01a211fb-f57a-7700-96e4-c19a669492ba.jpg?exp=1795598355&sig=ad318bb2e9a1db59f3695437636e0c5a43ccab28ec75f70d089036924b324138"
-                    thumbUrl: "http://localhost:3000/api/v1/files/01a211fb-f57a-7700-96e4-c19a669492ba_t.jpg?exp=1795598355&sig=e58ae242f1dcb6642e490290054a807e9622053a2c6765fd88b8e73b871813ea"
+                    url: "http://localhost:3000/api/v1/files/01a21211-0729-72bc-b170-acc3dfa1e1b2.jpg?exp=1795599737&sig=7c15f0269c31d8f650127f2c22037b36ae7fd21814feed13f8613cb95f53f58f"
+                    thumbUrl: "http://localhost:3000/api/v1/files/01a21211-0729-72bc-b170-acc3dfa1e1b2_t.jpg?exp=1795599737&sig=c1494131e3f721e690f51c464bd5719f594e9891080ef71432c36be8023ebfa7"
                     width: 1024
                     height: 768
                     mime: "image/jpeg"
-                    sizeBytes: 18530
-                    expiresAt: "2026-11-25T09:19:15.943Z"
+                    sizeBytes: 221001
+                    expiresAt: "2026-11-25T09:42:17.010Z"
                 voteCount: 3
-                roundId: "01a211fb-f570-76c5-bd59-f670eaa2faef"
+                roundId: "01a21211-071b-7631-930d-54a8cf0a26ff"
                 myVote: false
                 isFollowing: false
                 canVote: false
@@ -17038,7 +17097,7 @@ paths:
                 resolutionText: null
                 hiddenReason: null
                 history:
-                  - id: "01a211fb-f578-7167-87b0-833746b93a03"
+                  - id: "01a21211-0726-7136-83c2-5aabc05f8d42"
                     type: "STATUS_CHANGE"
                     fromStatus: "PENDING_REVIEW"
                     toStatus: "OPEN"
@@ -17047,7 +17106,7 @@ paths:
                     createdAt: "2026-10-03T19:00:00.000Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
-                  - id: "01a211fb-f579-7239-90b6-6512ad9fb847"
+                  - id: "01a21211-0728-7226-878b-c5d74b475aef"
                     type: "STATUS_CHANGE"
                     fromStatus: "OPEN"
                     toStatus: "SELECTED"
@@ -17056,7 +17115,7 @@ paths:
                     createdAt: "2026-10-31T19:00:00.000Z"
                     actorName: null
                     media: []
-                  - id: "01a211fb-fa00-7507-86a2-18b2293a3895"
+                  - id: "01a21211-0cc9-74af-8b59-1cc547f4435f"
                     type: "STATUS_CHANGE"
                     fromStatus: "SELECTED"
                     toStatus: "IN_PROGRESS"
@@ -17065,10 +17124,10 @@ paths:
                       dueDate: "2026-12-10"
                       nextStep: "Yangi lampochka olib kelish"
                       responsible: "Elektr tarmoqlari xodimi Karimov"
-                    createdAt: "2026-11-25T09:14:15.933Z"
+                    createdAt: "2026-11-25T09:37:16.996Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
-                  - id: "01a211fb-fa0a-7480-9137-b2bb725b6e4b"
+                  - id: "01a21211-0cd4-7260-8bdd-40ee8d15663f"
                     type: "DETAILS_CHANGE"
                     fromStatus: null
                     toStatus: null
@@ -17082,7 +17141,7 @@ paths:
                         dueDate: "2026-12-10"
                         nextStep: "Yangi lampochka olib kelish"
                         responsible: "Elektr tarmoqlari xodimi Karimov"
-                    createdAt: "2026-11-25T09:14:15.943Z"
+                    createdAt: "2026-11-25T09:37:17.010Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
         "400":
@@ -17487,7 +17546,7 @@ paths:
                   - "publishedAt"
                 additionalProperties: false
               example:
-                id: "01a211fb-f56f-7723-b823-311c41d7565c"
+                id: "01a21211-071a-76e0-aa5d-68de45ee29dd"
                 title: "Skver o'rindiqlarini ta'mirlash (2026-10)"
                 category: "OTHER"
                 categoryLabel: "Boshqa"
@@ -17495,7 +17554,7 @@ paths:
                 statusLabel: "Ovoz berilmoqda"
                 hidden: false
                 author:
-                  id: "01a211fb-f567-75db-9c27-f6d379d3ffa1"
+                  id: "01a21211-0713-7310-ab94-5c8272f5e404"
                   displayName: "Vali Aliyev"
                 createdAt: "2026-10-02T19:00:00.000Z"
                 publishedAt: "2026-10-03T19:00:00.000Z"
@@ -17504,7 +17563,7 @@ paths:
                 locationText: "Mahalla markazi, 12-uy yonida"
                 media: []
                 voteCount: 0
-                roundId: "01a211fb-f633-77ab-8f2a-870609904c94"
+                roundId: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                 myVote: false
                 isFollowing: false
                 canVote: false
@@ -17520,14 +17579,14 @@ paths:
                 resolutionText: null
                 hiddenReason: null
                 history:
-                  - id: "01a211fb-fa1b-773b-aeb7-f8cc392eb7f8"
+                  - id: "01a21211-0cea-7026-bcd7-654d18f9d98b"
                     type: "CARRY_OVER"
                     fromStatus: null
                     toStatus: null
                     reason: "Keyingi davrga o'tkazildi"
                     payload:
-                      roundId: "01a211fb-f633-77ab-8f2a-870609904c94"
-                    createdAt: "2026-11-25T09:14:15.959Z"
+                      roundId: "01a21211-085c-7481-8aef-ec9c359c8c3b"
+                    createdAt: "2026-11-25T09:37:17.029Z"
                     actorName: "Admin Demo Yunusobod"
                     media: []
         "400":
@@ -17992,7 +18051,7 @@ paths:
                 additionalProperties: false
               example:
                 round:
-                  id: "01a211fb-f633-77ab-8f2a-870609904c94"
+                  id: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                   periodStart: "2026-10-31T19:00:00.000Z"
                   periodEnd: "2026-11-30T19:00:00.000Z"
                   status: "OPEN"
@@ -18002,9 +18061,9 @@ paths:
                 overdueIssues: 1
                 openReports: 2
                 nextEvent:
-                  id: "01a211fb-f6ab-7347-94a9-d369ce85b69b"
+                  id: "01a21211-08bd-740e-801f-031d15a93f24"
                   title: "Hashar: hovli va skverni tozalash"
-                  startsAt: "2026-12-02T09:14:14.702Z"
+                  startsAt: "2026-12-02T09:37:15.473Z"
                   location: "Markaziy hovli"
                   rsvpCount: 2
         "401":
@@ -18161,205 +18220,205 @@ paths:
                 additionalProperties: false
               example:
                 items:
-                  - id: "01a211fb-fa96-74c5-9e31-505c3a2dbd1a"
+                  - id: "01a21211-0d7f-7031-be3f-925378f84143"
                     action: "announcement.publish"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "ANNOUNCEMENT"
-                    targetId: "01a211fb-fa8f-77d4-b5d1-b008404ed5e0"
+                    targetId: "01a21211-0d76-71ea-a7fe-dcf14e066f73"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.086Z"
-                  - id: "01a211fb-fa93-7169-a670-0f6f2444500a"
+                    createdAt: "2026-11-25T09:37:17.183Z"
+                  - id: "01a21211-0d7b-706b-824c-ebabe2733f37"
                     action: "announcement.update"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "ANNOUNCEMENT"
-                    targetId: "01a211fb-fa8f-77d4-b5d1-b008404ed5e0"
+                    targetId: "01a21211-0d76-71ea-a7fe-dcf14e066f73"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.083Z"
-                  - id: "01a211fb-fa90-727c-a997-7827bd47fd51"
+                    createdAt: "2026-11-25T09:37:17.179Z"
+                  - id: "01a21211-0d77-761a-87f8-4e22fe64c8c9"
                     action: "announcement.create"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "ANNOUNCEMENT"
-                    targetId: "01a211fb-fa8f-77d4-b5d1-b008404ed5e0"
+                    targetId: "01a21211-0d76-71ea-a7fe-dcf14e066f73"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.080Z"
-                  - id: "01a211fb-fa8b-7000-bfa4-83e9b8376117"
+                    createdAt: "2026-11-25T09:37:17.175Z"
+                  - id: "01a21211-0d72-74d5-9472-d9dba1002696"
                     action: "event.complete"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "EVENT"
-                    targetId: "01a211fb-fa82-703e-b03e-9f399b3af37c"
+                    targetId: "01a21211-0d67-745d-ac17-e88ba0a81eb1"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.073Z"
-                  - id: "01a211fb-fa86-709f-a6ea-8ea843723815"
+                    createdAt: "2026-11-25T09:37:17.169Z"
+                  - id: "01a21211-0d6c-75d1-af95-44b96d3f2323"
                     action: "event.publish"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "EVENT"
-                    targetId: "01a211fb-fa82-703e-b03e-9f399b3af37c"
+                    targetId: "01a21211-0d67-745d-ac17-e88ba0a81eb1"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.070Z"
-                  - id: "01a211fb-fa83-7621-a845-3dfe4bf5357a"
+                    createdAt: "2026-11-25T09:37:17.164Z"
+                  - id: "01a21211-0d67-745e-9eae-596e29c4b4ba"
                     action: "event.create"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "EVENT"
-                    targetId: "01a211fb-fa82-703e-b03e-9f399b3af37c"
+                    targetId: "01a21211-0d67-745d-ac17-e88ba0a81eb1"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.067Z"
-                  - id: "01a211fb-fa7f-73e0-b77c-813de482698b"
+                    createdAt: "2026-11-25T09:37:17.159Z"
+                  - id: "01a21211-0d63-756b-aa01-b22750846d09"
                     action: "event.cancel"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "EVENT"
-                    targetId: "01a211fb-fa6e-7677-b691-9bc24f9307df"
+                    targetId: "01a21211-0d4f-70a2-92f7-f28d28404fbb"
                     reason: "Ob-havo yomon"
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.062Z"
-                  - id: "01a211fb-fa7b-72b6-994c-c6685f81d45f"
+                    createdAt: "2026-11-25T09:37:17.153Z"
+                  - id: "01a21211-0d5d-7108-a8ad-943df01c4902"
                     action: "event.update"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "EVENT"
-                    targetId: "01a211fb-fa6e-7677-b691-9bc24f9307df"
+                    targetId: "01a21211-0d4f-70a2-92f7-f28d28404fbb"
                     reason: null
                     meta:
                       version: 2
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.057Z"
-                  - id: "01a211fb-fa74-7199-92af-575620ddf077"
+                    createdAt: "2026-11-25T09:37:17.146Z"
+                  - id: "01a21211-0d54-7189-b4ed-1a3fada9ccb1"
                     action: "event.publish"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "EVENT"
-                    targetId: "01a211fb-fa6e-7677-b691-9bc24f9307df"
+                    targetId: "01a21211-0d4f-70a2-92f7-f28d28404fbb"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.052Z"
-                  - id: "01a211fb-fa6e-7678-adb8-d1eeadfe9c18"
+                    createdAt: "2026-11-25T09:37:17.140Z"
+                  - id: "01a21211-0d50-7423-9319-02f2b569333f"
                     action: "event.create"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "EVENT"
-                    targetId: "01a211fb-fa6e-7677-b691-9bc24f9307df"
+                    targetId: "01a21211-0d4f-70a2-92f7-f28d28404fbb"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.046Z"
-                  - id: "01a211fb-fa6b-7045-aaba-d67e82345b72"
+                    createdAt: "2026-11-25T09:37:17.136Z"
+                  - id: "01a21211-0d4c-745b-a204-9008dab724ef"
                     action: "resident.unblock"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "USER"
-                    targetId: "01a211fb-fa49-761b-924c-710771b1553e"
+                    targetId: "01a21211-0d22-77bd-ba65-05345f88e21e"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.043Z"
-                  - id: "01a211fb-fa68-7031-b1e9-aded1ada53e3"
+                    createdAt: "2026-11-25T09:37:17.132Z"
+                  - id: "01a21211-0d47-7477-9c93-1319816ec5e8"
                     action: "resident.block"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "USER"
-                    targetId: "01a211fb-fa49-761b-924c-710771b1553e"
+                    targetId: "01a21211-0d22-77bd-ba65-05345f88e21e"
                     reason: "Qoidabuzarlik"
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.040Z"
-                  - id: "01a211fb-fa65-77c9-ad8b-4909385e4aee"
+                    createdAt: "2026-11-25T09:37:17.127Z"
+                  - id: "01a21211-0d43-764c-9f40-1840184fa9ee"
                     action: "resident.reset_password"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "USER"
-                    targetId: "01a211fb-fa49-761b-924c-710771b1553e"
+                    targetId: "01a21211-0d22-77bd-ba65-05345f88e21e"
                     reason: null
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.037Z"
-                  - id: "01a211fb-fa4a-7642-b2e8-e4d0bf325c95"
+                    createdAt: "2026-11-25T09:37:17.124Z"
+                  - id: "01a21211-0d24-7166-b4a9-b215dec7d8ee"
                     action: "resident.create"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "USER"
-                    targetId: "01a211fb-fa49-761b-924c-710771b1553e"
+                    targetId: "01a21211-0d22-77bd-ba65-05345f88e21e"
                     reason: null
                     meta:
                       login: "ali.valiyev"
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:16.009Z"
-                  - id: "01a211fb-fa31-761c-bc93-55dc5559f9c9"
+                    createdAt: "2026-11-25T09:37:17.090Z"
+                  - id: "01a21211-0d04-7212-9e57-b0118a808889"
                     action: "content.hide"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "COMMENT"
-                    targetId: "01a211fb-f990-7038-bdc5-3f64707f3f16"
+                    targetId: "01a21211-0c2b-77d9-bb6a-7cb67b04eaf4"
                     reason: "Nomaqbul kontent"
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:15.984Z"
-                  - id: "01a211fb-fa2e-7298-9ea3-5d50698d6c02"
+                    createdAt: "2026-11-25T09:37:17.058Z"
+                  - id: "01a21211-0d00-76f1-9af9-d6955e58bea2"
                     action: "report.dismiss"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "REPORT"
-                    targetId: "01a211fb-fa2b-715b-879d-5fe3ddd92f38"
+                    targetId: "01a21211-0cfd-70b1-9711-568619298fa1"
                     reason: "Asossiz"
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:15.982Z"
-                  - id: "01a211fb-fa27-70f8-b940-dcb41d346ed4"
+                    createdAt: "2026-11-25T09:37:17.056Z"
+                  - id: "01a21211-0cf8-71d3-88dc-16394d0cbbab"
                     action: "report.hide"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "REPORT"
-                    targetId: "01a211fb-f994-728a-817b-7096194ca67b"
+                    targetId: "01a21211-0c30-77f5-8eb2-922b3453a720"
                     reason: "Qoidabuzarlik"
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:15.973Z"
-                  - id: "01a211fb-fa26-7771-a502-36d46e3ae242"
+                    createdAt: "2026-11-25T09:37:17.045Z"
+                  - id: "01a21211-0cf7-7335-ad29-091b58a16235"
                     action: "content.hide"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "CHAT_MESSAGE"
-                    targetId: "01a211fb-f703-70b5-af2e-0e13e0aac64d"
+                    targetId: "01a21211-093c-770c-aa45-99d6d680264a"
                     reason: "Qoidabuzarlik"
                     meta: {}
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:15.973Z"
-                  - id: "01a211fb-fa1b-773c-978b-63d361ba9f13"
+                    createdAt: "2026-11-25T09:37:17.045Z"
+                  - id: "01a21211-0ceb-76ac-a7b0-5925d46f2c3c"
                     action: "issue.carry_over"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "ISSUE"
-                    targetId: "01a211fb-f56f-7723-b823-311c41d7565c"
+                    targetId: "01a21211-071a-76e0-aa5d-68de45ee29dd"
                     reason: null
                     meta:
-                      roundId: "01a211fb-f633-77ab-8f2a-870609904c94"
+                      roundId: "01a21211-085c-7481-8aef-ec9c359c8c3b"
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:15.959Z"
-                  - id: "01a211fb-fa0c-7440-9c86-c6ac1413881c"
+                    createdAt: "2026-11-25T09:37:17.030Z"
+                  - id: "01a21211-0cd6-71f3-8b7c-0baa676d832e"
                     action: "issue.work_update"
-                    actorId: "01a211fb-f563-77b3-a5e3-e4de161f054e"
+                    actorId: "01a21211-070e-7179-96b8-1c02fdbc991b"
                     actorName: "Admin Demo Yunusobod"
                     targetType: "ISSUE"
-                    targetId: "01a211fb-f56e-7238-911d-7433dd9b2f22"
+                    targetId: "01a21211-0719-735c-aa97-8d154b079132"
                     reason: "Mas'ul almashdi"
                     meta:
                       after:
@@ -18371,8 +18430,8 @@ paths:
                         nextStep: "Yangi lampochka olib kelish"
                         responsible: "Elektr tarmoqlari xodimi Karimov"
                     ip: "127.0.0.1"
-                    createdAt: "2026-11-25T09:14:15.944Z"
-                nextCursor: "eyJ0IjoiMjAyNi0xMS0yNVQwOToxNDoxNS45NDRaIiwiaWQiOiIwMWEyMTFmYi1mYTBjLTc0NDAtOWM4Ni1jNmFjMTQxMzg4MWMifQ"
+                    createdAt: "2026-11-25T09:37:17.010Z"
+                nextCursor: "eyJ0IjoiMjAyNi0xMS0yNVQwOTozNzoxNy4wMTBaIiwiaWQiOiIwMWEyMTIxMS0wY2Q2LTcxZjMtOGI3Yy0wYmFhNjc2ZDgzMmUifQ"
         "400":
           description: "**VALIDATION_ERROR** — So'rov ma'lumotlari noto'g'ri"
           content:

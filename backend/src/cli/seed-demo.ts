@@ -7,7 +7,7 @@ import { fanoutAnnouncement } from '../modules/announcements/routes';
 import { periodFor, weekPeriodFor, type Period, type RoundKind } from '../modules/rounds/period';
 import { audit } from '../core/audit';
 import type { Category, IssueStatus } from '../core/types';
-import { demoPhoto, illustration, type DemoPhoto, type Scene } from './illustrations';
+import { demoPhoto, illustration, SCENE_PHOTO, type DemoPhoto, type Scene } from './illustrations';
 
 export const DEMO_PASSWORD = 'Demo12345!';
 export const DEMO_TEMP_PASSWORD = 'Temp12345!';
@@ -180,8 +180,9 @@ async function addPhoto(
 ) {
   const id = uuidv7();
   photoSeed += 1;
-  // Haqiqiy surat bo'lsa — o'sha, aks holda toifaga mos chizma
-  const { main, thumb } = (o.photo ? await demoPhoto(o.photo) : null) ?? (await illustration(o.scene, photoSeed));
+  // Haqiqiy surat (aniq berilgan yoki toifaga mos) bo'lsa — o'sha, aks holda chizma
+  const photo = o.photo ?? SCENE_PHOTO[o.scene];
+  const { main, thumb } = (photo ? await demoPhoto(photo) : null) ?? (await illustration(o.scene, photoSeed));
   await deps.storage.put(`${id}.jpg`, main, 'image/jpeg');
   await deps.storage.put(`${id}_t.jpg`, thumb, 'image/jpeg');
   await q.query(

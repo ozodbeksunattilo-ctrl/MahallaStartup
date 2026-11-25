@@ -126,7 +126,17 @@ export async function illustration(scene: Scene, seed: number): Promise<{ main: 
 }
 
 /** Dizayn maketidagi haqiqiy suratlar (`db/demo-photos/`): demo ma'lumotda chizma o'rniga ishlatiladi. */
-export type DemoPhoto = 'street-lamp' | 'mahalla-street';
+export type DemoPhoto = 'street-lamp' | 'mahalla-street' | 'road' | 'waste' | 'water' | 'landscaping' | 'other';
+
+/** Toifaga mos surat (CC0 / public domain, manbalar mobile/assets/images/categories/SOURCES.md da). */
+export const SCENE_PHOTO: Partial<Record<Scene, DemoPhoto>> = {
+  ROAD: 'road',
+  LIGHTING: 'street-lamp',
+  WASTE: 'waste',
+  WATER: 'water',
+  LANDSCAPING: 'landscaping',
+  OTHER: 'other',
+};
 
 /** Surat 1024x768 (4:3) ga kesilib JPEG + 480 px thumbnail; fayl topilmasa `null` (chizmaga qaytiladi). */
 export async function demoPhoto(name: DemoPhoto): Promise<{ main: Buffer; thumb: Buffer } | null> {

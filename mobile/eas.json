@@ -19,7 +19,8 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "https://frontend-production-8907b1e6.up.railway.app",
         "EXPO_PUBLIC_DEBUG": "true"
-      }
+      },
+      "autoIncrement": true
     },
     "production": {
       "autoIncrement": true,

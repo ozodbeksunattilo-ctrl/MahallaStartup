@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { AnimatedSplash } from '@/components/AnimatedSplash';
+import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { API_URL } from '@/lib/config';
 import { log } from '@/lib/log';
 import { useStackScreenOptions } from '@/lib/navigation';
@@ -47,6 +48,8 @@ function RootStack() {
       {/* Sessiya aniqlanmaguncha navigator chizilmaydi (splash yopib turadi): aks holda login -> tablar
           almashuvida ROUTE_NAMES_CHANGED xatosi chiqadi */}
       {ready ? <Navigation /> : null}
+      {/* Yangi APK chiqqan bo'lsa «Yangilash» oynasi (splash yopilgandan keyin) */}
+      {ready && !showSplash ? <UpdatePrompt /> : null}
       {showSplash ? <AnimatedSplash ready={ready} onDone={() => setShowSplash(false)} /> : null}
     </>
   );

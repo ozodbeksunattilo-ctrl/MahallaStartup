@@ -8,6 +8,7 @@ import { StatusBadge, WeeklyTag } from './StatusBadge';
 import { Text } from './Text';
 import { VoteButton } from './VoteButton';
 import { timeAgo } from '@/lib/format';
+import { categoryImage } from '@/lib/categoryImages';
 import { CATEGORY_STYLE } from '@/lib/labels';
 import type { IssueListItem } from '@/lib/types';
 import { useTheme } from '@/theme';
@@ -42,52 +43,43 @@ export function IssueCard({ issue, onPress, onVote, voting, exhausted = false, i
         haptics={false}
         style={[{ backgroundColor: colors.surface, borderRadius: radius.lg, overflow: 'hidden' }, shadow.sm]}
       >
-        {issue.thumbUrl ? (
-          <View>
-            <Image
-              source={{ uri: issue.thumbUrl }}
-              style={{ width: '100%', height: 150, backgroundColor: colors.surfaceAlt }}
-              contentFit="cover"
-              transition={250}
-            />
-            {/* Pastki qorong'ilashtirish: toifa yozuvi rasm ustida o'qiladi */}
-            <LinearGradient
-              colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.45)']}
-              style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 70 }}
-            />
-            <View style={{ position: 'absolute', top: spacing.sm, right: spacing.sm, alignItems: 'flex-end', gap: 4 }}>
-              <StatusBadge status={issue.status} label={issue.statusLabel} />
-            </View>
-            {issue.roundKind === 'WEEKLY' ? (
-              <View style={{ position: 'absolute', top: spacing.sm, left: spacing.sm, backgroundColor: colors.surface, borderRadius: radius.pill }}>
-                <WeeklyTag />
-              </View>
-            ) : null}
-            <View
-              style={{
-                position: 'absolute',
-                left: spacing.md,
-                bottom: spacing.sm,
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5,
-              }}
-            >
-              <Ionicons name={cat?.icon as IconName} size={14} color="#fff" />
-              <Text variant="label" style={{ color: '#fff', fontSize: 12 }}>
-                {issue.categoryLabel}
-              </Text>
-            </View>
-          </View>
-        ) : (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, paddingBottom: 0 }}>
+        {/* Muammoning o'z surati; bo'lmasa — toifa rasmi (dizayn: har kartada rasm) */}
+        <View>
+          <Image
+            source={issue.thumbUrl ? { uri: issue.thumbUrl } : categoryImage(issue.category)}
+            style={{ width: '100%', height: 150, backgroundColor: colors.surfaceAlt }}
+            contentFit="cover"
+            transition={250}
+          />
+          {/* Pastki qorong'ilashtirish: toifa yozuvi rasm ustida o'qiladi */}
+          <LinearGradient
+            colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.45)']}
+            style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 70 }}
+          />
+          <View style={{ position: 'absolute', top: spacing.sm, right: spacing.sm }}>
             <StatusBadge status={issue.status} label={issue.statusLabel} />
-            {issue.roundKind === 'WEEKLY' ? <WeeklyTag /> : null}
-            <Text variant="muted" style={{ flex: 1, textAlign: 'right' }} numberOfLines={1}>
+          </View>
+          {issue.roundKind === 'WEEKLY' ? (
+            <View style={{ position: 'absolute', top: spacing.sm, left: spacing.sm, backgroundColor: colors.surface, borderRadius: radius.pill }}>
+              <WeeklyTag />
+            </View>
+          ) : null}
+          <View
+            style={{
+              position: 'absolute',
+              left: spacing.md,
+              bottom: spacing.sm,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <Ionicons name={cat?.icon as IconName} size={14} color="#fff" />
+            <Text variant="label" style={{ color: '#fff', fontSize: 12 }}>
               {issue.categoryLabel}
             </Text>
           </View>
-        )}
+        </View>
 
         <View style={{ padding: spacing.md, gap: 6 }}>
           <Text variant="heading" numberOfLines={2} raw>

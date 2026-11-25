@@ -14,6 +14,8 @@ interface ConfirmModalProps {
   cancelTitle?: string;
   icon?: IconName;
   destructive?: boolean;
+  /** Majburiy tanlov (masalan, majburiy yangilash): «Bekor qilish» tugmasi chiqmaydi */
+  hideCancel?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -27,6 +29,7 @@ export function ConfirmModal({
   cancelTitle = 'Bekor qilish',
   icon = 'log-out-outline',
   destructive = false,
+  hideCancel = false,
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
@@ -76,7 +79,7 @@ export function ConfirmModal({
           </Text>
           <View style={{ alignSelf: 'stretch', gap: spacing.sm, marginTop: spacing.sm }}>
             <Button title={confirmTitle} variant={destructive ? 'danger' : 'primary'} onPress={onConfirm} />
-            <Button title={cancelTitle} variant="ghost" onPress={onCancel} />
+            {hideCancel ? null : <Button title={cancelTitle} variant="ghost" onPress={onCancel} />}
           </View>
         </View>
       </View>

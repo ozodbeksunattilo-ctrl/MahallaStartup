@@ -1,5 +1,6 @@
 import type { AnyRoute } from './core/http';
 import { adminRoutes } from './modules/admin/routes';
+import { appRoutes } from './modules/app/routes';
 import { accessRequestRoutes } from './modules/access-requests/routes';
 import { announcementRoutes } from './modules/announcements/routes';
 import { authRoutes } from './modules/auth/routes';
@@ -21,6 +22,7 @@ import { supportRoutes } from './modules/support/routes';
  * OpenAPI shartnomasi (`pnpm contract:build`) ham aynan shu ro'yxatdan generatsiya qilinadi.
  */
 export const allRoutes: AnyRoute[] = [
+  ...appRoutes,
   ...authRoutes,
   ...accessRequestRoutes,
   ...homeRoutes,
