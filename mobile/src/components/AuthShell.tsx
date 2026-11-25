@@ -39,7 +39,7 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
       >
         <View style={{ height: 230 + insets.top, backgroundColor: colors.primaryDark }}>
           <Image
-            source={require('../../assets/login-hero.webp')}
+            source={require('../../assets/images/mahalla-street.webp')}
             style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
             contentFit="cover"
             transition={300}

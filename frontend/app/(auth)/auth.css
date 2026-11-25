@@ -1,229 +1,79 @@
-/* Kirish sahifalari (interaktiv): animatsiyali fon, shisha karta, ikonkali maydonlar */
-.auth-shell {
-  background: linear-gradient(165deg, #0a2e1b 0%, #0f4a2b 45%, #17703f 100%);
-  position: relative;
-  overflow: hidden;
-  --mx: 50%;
-  --my: 40%;
-  --px: 0;
-  --py: 0;
-}
+/* Sign-in pages: photo of a mahalla street beside a paper form, like the landing */
+.auth-shell { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 100vh; background: var(--paper); }
 
-.auth-shell > * {
-  position: relative;
-  z-index: 1;
-}
-
-.auth-shell > .auth-glow,
-.auth-shell > .auth-spot,
-.auth-shell > .leaves {
+.auth-photo { position: relative; margin: 0; overflow: hidden; background: var(--green); }
+.auth-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 55%; }
+.auth-photo figcaption {
   position: absolute;
-  z-index: 0;
-  pointer-events: none;
+  inset: auto 0 0;
+  padding: 80px 40px 36px;
+  background: linear-gradient(to top, rgba(22, 32, 25, 0.82), transparent);
+  color: #fbf6eb;
+  font: italic 500 clamp(1.6rem, 2.6vw, 2.3rem)/1.2 var(--font-serif);
+  letter-spacing: -0.03em;
 }
 
-.auth-glow {
-  border-radius: 50%;
-  filter: blur(80px);
-  animation: auth-float 16s ease-in-out infinite;
-  translate: calc(var(--px) * 20px) calc(var(--py) * 20px);
-  transition: translate 0.4s ease-out;
-}
+.auth-main { position: relative; display: grid; place-items: center; padding: 72px 24px 40px; }
+.lang-corner { position: absolute; top: 20px; right: 24px; }
 
-.auth-glow-1 { width: 460px; height: 460px; background: rgba(74, 190, 120, 0.35); top: -140px; left: -120px; }
-.auth-glow-2 { width: 380px; height: 380px; background: rgba(227, 166, 52, 0.18); bottom: -140px; right: -100px; animation-delay: -7s; }
+.lg-card, .auth-card { width: 100%; max-width: 380px; color: var(--ink); }
+.lg-logo, .auth-logo { display: block; width: 44px; height: 44px; margin: 0 0 22px; object-fit: contain; }
+.lg-title, .auth-card h1 { margin: 0 0 6px; font-size: 2.4rem; letter-spacing: -0.05em; }
+.lg-sub, .auth-card > .muted { margin: 0 0 28px; color: var(--muted); }
+.auth-card form { display: grid; gap: 16px; }
+.auth-card .btn-primary { width: 100%; min-height: 48px; }
 
-.auth-spot {
-  inset: 0;
-  background: radial-gradient(460px circle at var(--mx) var(--my), rgba(255, 244, 214, 0.16), transparent 70%);
-}
-
-@keyframes auth-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(30px, -40px) scale(1.08); }
-}
-
-/* Tushib turuvchi barglar */
-.leaves {
-  inset: 0;
-  overflow: hidden;
-  translate: calc(var(--px) * -18px) calc(var(--py) * -10px);
-  transition: translate 0.5s ease-out;
-}
-
-.leaf {
-  position: absolute;
-  top: -60px;
-  display: block;
-  opacity: 0.85;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
-  animation-name: leaf-fall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
-@keyframes leaf-fall {
-  0% { transform: translate3d(0, -10vh, 0) rotate(var(--rot)); opacity: 0; }
-  8% { opacity: 0.85; }
-  25% { transform: translate3d(40px, 25vh, 0) rotate(calc(var(--rot) + 90deg)); }
-  50% { transform: translate3d(-30px, 55vh, 0) rotate(calc(var(--rot) + 200deg)); }
-  75% { transform: translate3d(35px, 85vh, 0) rotate(calc(var(--rot) + 290deg)); }
-  92% { opacity: 0.8; }
-  100% { transform: translate3d(-10px, 115vh, 0) rotate(calc(var(--rot) + 380deg)); opacity: 0; }
-}
-
-.lg-card {
-  color: #0f2218;
-  color-scheme: light;
-  width: 100%;
-  max-width: 420px;
-  background: rgba(252, 250, 243, 0.97);
-  border-radius: 22px;
-  padding: 30px 30px 22px;
-  box-shadow: 0 24px 60px rgba(2, 20, 10, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
-  animation: lg-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-@keyframes lg-in {
-  from { opacity: 0; transform: translateY(24px) scale(0.97); }
-  to { opacity: 1; transform: none; }
-}
-
-.lg-logo {
-  display: block;
-  width: 190px;
-  max-width: 70%;
-  height: auto;
-  margin: 0 auto 10px;
-  animation: lg-bob 5s ease-in-out infinite;
-}
-
-@keyframes lg-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-.lg-title {
-  margin: 6px 0 2px;
-  text-align: center;
-  font-size: 24px;
-}
-
-.lg-sub {
-  margin: 0 0 20px;
-  text-align: center;
-  color: #587265;
-  font-size: 14px;
-}
-
-.lg-form {
-  display: grid;
-  gap: 16px;
-}
-
-.lg-field {
-  display: grid;
-  gap: 6px;
-}
-
-.lg-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #36524a;
-}
-
-.lg-input-wrap {
-  position: relative;
-  display: block;
-}
-
-.lg-ico {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  width: 18px;
-  height: 18px;
-  translate: 0 -50%;
-  fill: #8aa497;
-  transition: fill 0.2s;
-  pointer-events: none;
-}
-
+.lg-form { display: grid; gap: 18px; }
+.lg-field { display: grid; gap: 6px; }
+.lg-label { font-size: 13.5px; font-weight: 600; }
+.lg-input-wrap { position: relative; display: block; }
+.lg-ico { position: absolute; top: 50%; left: 13px; width: 18px; height: 18px; fill: var(--muted); translate: 0 -50%; pointer-events: none; }
 .lg-input {
   width: 100%;
+  padding: 12px 76px 12px 40px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
   font: inherit;
-  font-size: 15px;
-  padding: 13px 76px 13px 42px;
-  border-radius: 12px;
-  border: 1.5px solid #dcebe1;
-  background: #f3f7ef;
-  color: #0f2218;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  font-size: 16px;
+  transition: border-color 0.15s;
 }
-
-.lg-input::placeholder {
-  color: #a8bcb1;
-}
-
-.lg-input:hover {
-  border-color: #b9d6c4;
-}
-
-.lg-input:focus {
-  outline: none;
-  background: #ffffff;
-  border-color: #1f8a4c;
-  box-shadow: 0 0 0 4px rgba(31, 138, 76, 0.18);
-}
-
-.lg-input-wrap:focus-within .lg-ico {
-  fill: #1f8a4c;
-}
+.lg-input::placeholder { color: color-mix(in srgb, var(--muted) 60%, transparent); }
+.lg-input:hover { border-color: color-mix(in srgb, var(--ink) 30%, var(--line)); }
+.lg-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.lg-input-wrap:focus-within .lg-ico { fill: var(--ink); }
+.lg-input:-webkit-autofill { -webkit-text-fill-color: var(--ink); box-shadow: 0 0 0 1000px var(--surface) inset; caret-color: var(--ink); }
 
 .lg-eye {
   position: absolute;
-  right: 8px;
   top: 50%;
-  translate: 0 -50%;
+  right: 6px;
+  padding: 6px 8px;
   border: 0;
+  border-radius: 4px;
   background: transparent;
-  color: #1f8a4c;
+  color: var(--ink);
   font: inherit;
   font-size: 13px;
   font-weight: 600;
-  padding: 6px 8px;
-  border-radius: 8px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  translate: 0 -50%;
   cursor: pointer;
 }
-
-.lg-eye:hover {
-  background: #e2f4e8;
-}
-
-.lg-hint {
-  font-size: 12px;
-  color: #b54708;
-}
-
+.lg-eye:hover { color: var(--accent); }
+.lg-hint { color: var(--ochre); font-size: 12.5px; }
 .lg-error {
   margin: 0;
   padding: 10px 12px;
-  border-radius: 10px;
-  background: #fef3f2;
-  color: #b42318;
+  border-left: 3px solid var(--danger);
+  background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+  color: var(--danger);
   font-size: 14px;
 }
-
-.lg-shake {
-  animation: lg-shake 0.4s;
-}
-
-@keyframes lg-shake {
-  20% { transform: translateX(-8px); }
-  40% { transform: translateX(8px); }
-  60% { transform: translateX(-5px); }
-  80% { transform: translateX(5px); }
-}
+.lg-shake { animation: shake 0.35s; }
+@keyframes shake { 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-3px); } }
 
 .lg-btn {
   display: flex;
@@ -231,82 +81,28 @@
   justify-content: center;
   gap: 10px;
   width: 100%;
-  border: 0;
-  border-radius: 12px;
-  padding: 14px;
+  min-height: 50px;
+  border: 1px solid var(--green);
+  border-radius: 4px;
+  background: var(--green);
+  color: var(--on-green);
   font: inherit;
   font-size: 16px;
-  font-weight: 700;
-  color: #ffffff;
-  background: linear-gradient(135deg, #17703f, #2aa35c);
-  box-shadow: 0 8px 20px rgba(23, 112, 63, 0.4);
+  font-weight: 650;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
+.lg-btn:hover:not(:disabled) { background: transparent; color: var(--green); }
+.lg-btn:disabled { opacity: 0.8; cursor: progress; }
+.lg-arrow { transition: transform 0.15s; }
+.lg-btn:hover .lg-arrow { transform: translateX(3px); }
+.lg-foot { margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 
-.lg-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(31, 138, 76, 0.45);
-}
-
-.lg-btn:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
-}
-
-.lg-btn:disabled {
-  opacity: 0.8;
-  cursor: progress;
-}
-
-.lg-arrow {
-  transition: transform 0.2s;
-}
-
-.lg-btn:hover .lg-arrow {
-  transform: translateX(5px);
-}
-
-.lg-spin {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #ffffff;
-  animation: lg-rot 0.7s linear infinite;
-}
-
-@keyframes lg-rot {
-  to { transform: rotate(360deg); }
-}
-
-.lg-foot {
-  margin: 18px 0 0;
-  text-align: center;
-  font-size: 12px;
-  color: #8aa497;
-}
-
-@media (max-width: 480px) {
-  .lg-card {
-    padding: 24px 20px 18px;
-    border-radius: 18px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .auth-glow,
-  .leaf,
-  .lg-logo,
-  .lg-card {
-    animation: none;
-  }
-}
-
-/* Brauzer avtoto'ldirishi maydonni ko'k qilib qo'ymasin */
-.lg-input:-webkit-autofill,
-.lg-input:-webkit-autofill:hover,
-.lg-input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #0f2218;
-  box-shadow: 0 0 0 1000px #f3f7ef inset;
-  caret-color: #0f2218;
+@media (max-width: 860px) {
+  .auth-shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .auth-photo { height: 200px; }
+  .auth-photo figcaption { padding: 40px 20px 16px; font-size: 1.35rem; }
+  .auth-main { place-items: start center; padding: 28px 20px 32px; }
+  .lang-corner { position: static; justify-self: end; margin-bottom: 20px; }
+  .lg-title, .auth-card h1 { font-size: 2rem; }
 }
