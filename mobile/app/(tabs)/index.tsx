@@ -13,21 +13,21 @@ import { Text } from '@/components/Text';
 import { formatTime, monthName, timeAgo, timeLeft } from '@/lib/format';
 import { useFetch } from '@/lib/hooks';
 import type { Home, Me } from '@/lib/types';
-import { useTheme, type ToneName } from '@/theme';
+import { useTheme } from '@/theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-const ACTIONS: Array<{ icon: IconName; label: string; href: string; tone: ToneName }> = [
-  { icon: 'add-circle', label: 'Muammo\nyuborish', href: '/issues/new', tone: 'blue' },
-  { icon: 'document-text', label: 'Mening\nmuammolarim', href: '/issues/mine', tone: 'teal' },
-  { icon: 'megaphone', label: "E'lonlar", href: '/announcements', tone: 'rose' },
-  { icon: 'trophy', label: 'Oldingi\ndavrlar', href: '/rounds', tone: 'orange' },
+const ACTIONS: Array<{ icon: IconName; label: string; href: string }> = [
+  { icon: 'add-circle-outline', label: 'Muammo\nyuborish', href: '/issues/new' },
+  { icon: 'document-text-outline', label: 'Mening\nmuammolarim', href: '/issues/mine' },
+  { icon: 'megaphone-outline', label: "E'lonlar", href: '/announcements' },
+  { icon: 'trophy-outline', label: 'Oldingi\ndavrlar', href: '/rounds' },
 ];
 
 // API: GET /home (bitta so'rov) + GET /me (mahalla nomi)
 export default function HomeScreen() {
   const router = useRouter();
-  const { colors, tones, spacing, radius, shadow } = useTheme();
+  const { colors, spacing, radius, shadow } = useTheme();
   const home = useFetch<Home>('/home');
   const me = useFetch<Me>('/me');
 
@@ -52,14 +52,14 @@ export default function HomeScreen() {
       header={
         <Hero extraBottom={56}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md }}>
-            <View style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 52, height: 52, borderRadius: radius.md, backgroundColor: colors.heroText, alignItems: 'center', justifyContent: 'center' }}>
               <Logo size={42} />
             </View>
             <View style={{ flex: 1, gap: 2 }}>
-              <Text variant="muted" style={{ color: 'rgba(255,255,255,0.75)' }}>
+              <Text variant="muted" style={{ color: colors.heroMuted }}>
                 {firstName ? `Salom, ${firstName}` : 'Xush kelibsiz'}
               </Text>
-              <Text variant="display" style={{ color: '#fff' }} numberOfLines={2}>
+              <Text variant="display" style={{ color: colors.heroText }} numberOfLines={2}>
                 {me.data?.mahalla.name ?? 'Mahalladosh'}
               </Text>
             </View>
@@ -71,12 +71,13 @@ export default function HomeScreen() {
                 width: 46,
                 height: 46,
                 borderRadius: 23,
-                backgroundColor: 'rgba(255,255,255,0.16)',
+                borderWidth: 1,
+                borderColor: 'rgba(251,246,235,0.3)',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Ionicons name="notifications" size={22} color="#fff" />
+              <Ionicons name="notifications-outline" size={22} color={colors.heroText} />
               {unread > 0 ? (
                 <View
                   style={{
@@ -132,7 +133,7 @@ export default function HomeScreen() {
                         justifyContent: 'center',
                       }}
                     >
-                      <Text variant="display" style={{ color: colors.primary, fontSize: 32 }}>
+                      <Text variant="display" style={{ color: colors.primary, fontSize: 34 }}>
                         {h.round.votesLeft}
                       </Text>
                     </View>
@@ -179,13 +180,13 @@ export default function HomeScreen() {
                     style={{
                       width: 42,
                       height: 42,
-                      borderRadius: 14,
-                      backgroundColor: tones[a.tone].soft,
+                      borderRadius: radius.sm,
+                      backgroundColor: colors.primarySoft,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name={a.icon} size={22} color={tones[a.tone].fg} />
+                    <Ionicons name={a.icon} size={22} color={colors.primary} />
                   </View>
                   <Text variant="label" style={{ fontSize: 11, textAlign: 'center', lineHeight: 14 }}>
                     {a.label}

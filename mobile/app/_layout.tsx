@@ -1,3 +1,6 @@
+import { Lora_500Medium, Lora_500Medium_Italic } from '@expo-google-fonts/lora';
+import { Onest_400Regular, Onest_500Medium, Onest_600SemiBold, Onest_700Bold } from '@expo-google-fonts/onest';
+import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
 import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -18,6 +21,8 @@ SplashScreen.preventAutoHideAsync().catch(() => undefined);
 function RootStack() {
   const { status, mustChangePassword } = useSession();
   const [showSplash, setShowSplash] = useState(true);
+  // Lora + Onest, as on the landing; the splash stays up until they load (or fail, then system fonts)
+  const [fontsLoaded, fontError] = useFonts({ Lora_500Medium, Lora_500Medium_Italic, Onest_400Regular, Onest_500Medium, Onest_600SemiBold, Onest_700Bold });
 
   useEffect(() => {
     log.info('session', 'holat:', status, mustChangePassword ? '(parol almashtirish kerak)' : '');
@@ -31,7 +36,7 @@ function RootStack() {
   return (
     <>
       <Navigation />
-      {showSplash ? <AnimatedSplash ready={status !== 'loading'} onDone={() => setShowSplash(false)} /> : null}
+      {showSplash ? <AnimatedSplash ready={status !== 'loading' && (fontsLoaded || !!fontError)} onDone={() => setShowSplash(false)} /> : null}
     </>
   );
 }

@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, View } from 'react-native';
@@ -84,27 +83,24 @@ export default function FeedScreen() {
   }
 
   const r = round.data;
-  const onGradient = 'rgba(255,255,255,0.8)';
+  const onHero = colors.heroMuted;
 
   const activeFilters = (category ? 1 : 0) + (status ? 1 : 0);
 
   const header = (
     <View style={{ gap: spacing.sm, paddingBottom: spacing.xs }}>
-      <LinearGradient
+      <View
         accessibilityRole="summary"
-        colors={[colors.primary, colors.primaryDark]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{ borderRadius: radius.lg, paddingVertical: spacing.md, paddingHorizontal: spacing.lg, gap: 4 }}
+        style={{ backgroundColor: colors.hero, borderRadius: radius.md, paddingVertical: spacing.md, paddingHorizontal: spacing.lg, gap: 4 }}
       >
         {r && r.round ? (
           <>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View>
-                <Text variant="eyebrow" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                <Text variant="eyebrow" style={{ color: colors.accent }}>
                   Sizning ovozlaringiz
                 </Text>
-                <Text variant="heading" style={{ color: '#fff', fontSize: 20 }}>
+                <Text variant="title" style={{ color: colors.heroText }}>
                   {r.votesLeft} ta qoldi
                 </Text>
               </View>
@@ -118,32 +114,34 @@ export default function FeedScreen() {
                       borderRadius: 15,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      backgroundColor: n < r.votesUsed ? '#fff' : 'rgba(255,255,255,0.18)',
+                      backgroundColor: n < r.votesUsed ? colors.heroText : 'transparent',
+                      borderWidth: 1,
+                      borderColor: n < r.votesUsed ? colors.heroText : 'rgba(251,246,235,0.35)',
                     }}
                   >
                     <Ionicons
                       name={n < r.votesUsed ? 'checkmark' : 'thumbs-up-outline'}
                       size={16}
-                      color={n < r.votesUsed ? colors.primaryDark : '#fff'}
+                      color={n < r.votesUsed ? colors.hero : colors.heroText}
                     />
                   </View>
                 ))}
               </View>
             </View>
-            <Text variant="muted" style={{ color: onGradient }}>
-              <Ionicons name="time-outline" size={13} color={onGradient} /> {timeLeft(r.periodEnd)} qoldi
+            <Text variant="muted" style={{ color: onHero }}>
+              <Ionicons name="time-outline" size={13} color={onHero} /> {timeLeft(r.periodEnd)} qoldi
             </Text>
           </>
         ) : round.loading ? (
-          <Text variant="muted" style={{ color: '#fff' }}>
+          <Text variant="muted" style={{ color: colors.heroText }}>
             Ovoz davri yuklanmoqda…
           </Text>
         ) : (
-          <Text variant="muted" style={{ color: '#fff' }}>
+          <Text variant="muted" style={{ color: colors.heroText }}>
             {round.error ?? "Hozir faol ovoz berish davri yo'q"}
           </Text>
         )}
-      </LinearGradient>
+      </View>
 
       {notice ? (
         <View
@@ -267,7 +265,7 @@ export default function FeedScreen() {
         ]}
       >
         <Ionicons name="add" size={22} color={colors.primaryText} />
-        <Text variant="label" style={{ color: colors.primaryText, fontSize: 15, fontWeight: '700' }}>
+        <Text variant="label" style={{ color: colors.primaryText, fontSize: 15, fontWeight: '600' }}>
           Muammo yuborish
         </Text>
       </Pressable>

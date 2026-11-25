@@ -11,9 +11,9 @@ function icon(active: IconName, inactive: IconName, tone: ToneName) {
   return ({ focused }: { color: ColorValue; focused: boolean }) => <TabIcon name={focused ? active : inactive} tone={tone} focused={focused} />;
 }
 
-/** Har bir tab o'z rangida; faol bo'lsa to'liq rang va yumshoq fon, bo'lmasa xira. */
-function TabIcon({ name, tone, focused }: { name: IconName; tone: ToneName; focused: boolean }) {
-  const { tones } = useTheme();
+/** One tone for every tab, like the landing: the active tab gets green on a soft pill. */
+function TabIcon({ name, focused }: { name: IconName; tone: ToneName; focused: boolean }) {
+  const { colors } = useTheme();
   return (
     <View
       style={{
@@ -22,17 +22,17 @@ function TabIcon({ name, tone, focused }: { name: IconName; tone: ToneName; focu
         borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: focused ? tones[tone].soft : 'transparent',
+        backgroundColor: focused ? colors.primarySoft : 'transparent',
       }}
     >
-      <Ionicons name={name} size={22} color={tones[tone].fg} style={{ opacity: focused ? 1 : 0.7 }} />
+      <Ionicons name={name} size={22} color={focused ? colors.primary : colors.muted} />
     </View>
   );
 }
 
 // TZ 6-bo'lim: Bosh sahifa, Muammolar, Tadbirlar, Chat, Profil
 export default function TabsLayout() {
-  const { colors, shadow } = useTheme();
+  const { colors, fonts } = useTheme();
   const insets = useSafeAreaInsets();
   const { t } = useLang();
 
@@ -43,16 +43,16 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: colors.muted,
         tabBarStyle: {
           backgroundColor: colors.surface,
-          borderTopWidth: 0,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
           // Android edge-to-edge: tizim navigatsiya paneli ustiga chiqmasligi uchun pastki inset qo'shiladi
           height: 56 + Math.max(insets.bottom, Platform.OS === 'ios' ? 26 : 8),
           paddingTop: 6,
           paddingBottom: Math.max(insets.bottom, Platform.OS === 'ios' ? 26 : 8),
-          ...shadow.md,
         },
-        tabBarLabelStyle: { fontSize: 10.5, fontWeight: '700' },
-        headerStyle: { backgroundColor: colors.surface },
-        headerTitleStyle: { fontWeight: '800', fontSize: 18, color: colors.text },
+        tabBarLabelStyle: { fontSize: 11, fontFamily: fonts.semibold },
+        headerStyle: { backgroundColor: colors.bg },
+        headerTitleStyle: { fontFamily: fonts.serif, fontSize: 20, color: colors.text },
         headerTitleAlign: 'center',
         headerTintColor: colors.primary,
         headerShadowVisible: false,

@@ -33,7 +33,7 @@ interface ChatViewProps {
 // API: GET /chat/messages (before= eskilar, after= yangilar) · POST /chat/messages { text, clientMessageId }
 // Realtime o'rniga ~4 s da `after=<oxirgi id>` bilan so'raladi: uzilishdan keyin ham aynan shu yerdan davom etadi.
 export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
-  const { colors, tones, spacing } = useTheme();
+  const { colors, spacing } = useTheme();
   const { t } = useLang();
   // Ro'yxat inverted: 0-element — eng yangi
   const [rows, setRows] = useState<Row[]>([]);
@@ -198,13 +198,13 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
                   width: 30,
                   height: 30,
                   borderRadius: 15,
-                  backgroundColor: admin ? tones.blue.soft : colors.primarySoft,
+                  backgroundColor: admin ? colors.secondarySoft : colors.primarySoft,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
                 {admin ? (
-                  <Ionicons name="shield-checkmark" size={16} color={tones.blue.fg} />
+                  <Ionicons name="shield-checkmark" size={16} color={colors.secondary} />
                 ) : (
                   <Text variant="label" style={{ color: colors.primary, fontSize: 11, lineHeight: 14 }}>
                     {initials}
@@ -217,9 +217,9 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
         <View style={{ maxWidth: '78%', alignItems: mine ? 'flex-end' : 'flex-start' }}>
           <View
             style={{
-              backgroundColor: mine ? colors.primary : admin ? tones.blue.soft : colors.surface,
+              backgroundColor: mine ? colors.primary : admin ? colors.secondarySoft : colors.surface,
               borderWidth: admin ? 1 : mine ? 0 : 1,
-              borderColor: admin ? tones.blue.fg : colors.border,
+              borderColor: admin ? colors.secondary : colors.border,
               borderRadius: 18,
               borderBottomRightRadius: mine && lastInGroup ? 4 : 18,
               borderBottomLeftRadius: !mine && lastInGroup ? 4 : 18,
@@ -231,7 +231,7 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
             }}
           >
             {!mine && firstInGroup ? (
-              <Text variant="label" style={{ color: admin ? tones.blue.fg : colors.primary, fontSize: 12 }}>
+              <Text variant="label" style={{ color: admin ? colors.secondary : colors.primary, fontSize: 12 }}>
                 {admin ? `${t('Admin')} · ${item.senderName}` : item.senderName}
               </Text>
             ) : null}
@@ -274,10 +274,10 @@ export function ChatView({ base, hint, emptyTitle, emptyHint }: ChatViewProps) {
             marginTop: spacing.sm,
             padding: spacing.md,
             borderRadius: 14,
-            backgroundColor: tones.blue.soft,
+            backgroundColor: colors.secondarySoft,
           }}
         >
-          <Ionicons name="shield-checkmark" size={20} color={tones.blue.fg} />
+          <Ionicons name="shield-checkmark" size={20} color={colors.secondary} />
           <Text variant="muted" style={{ flex: 1, color: colors.text }}>
             {hint}
           </Text>

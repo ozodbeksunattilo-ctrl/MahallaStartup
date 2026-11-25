@@ -44,23 +44,21 @@ export default function ProfileScreen() {
                 width: 92,
                 height: 92,
                 borderRadius: 46,
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                borderWidth: 3,
-                borderColor: 'rgba(255,255,255,0.5)',
+                backgroundColor: colors.heroText,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Text variant="display" style={{ color: '#fff' }}>
+              <Text variant="display" style={{ color: colors.hero }}>
                 {me.data ? initials(me.data.user.displayName) : ''}
               </Text>
             </View>
-            <Text variant="title" style={{ color: '#fff' }}>
+            <Text variant="title" style={{ color: colors.heroText }}>
               {me.data?.user.displayName ?? ' '}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name="location" size={14} color="rgba(255,255,255,0.8)" />
-              <Text variant="muted" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              <Ionicons name="location-outline" size={14} color={colors.heroMuted} />
+              <Text variant="muted" style={{ color: colors.heroMuted }}>
                 {me.data?.mahalla.name ?? ' '}
               </Text>
             </View>
